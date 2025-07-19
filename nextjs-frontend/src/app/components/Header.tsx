@@ -242,6 +242,12 @@ export default function Header() {
             <Link href="/past-conferences" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Past Conferences
             </Link>
+            <Link href="/brochure" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Download Brochure
+            </Link>
+            <Link href="/sponsorship" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Sponsorship
+            </Link>
             {siteSettings?.journal?.showJournal && (
               <Link href="/journal" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
                 Journal
@@ -250,8 +256,8 @@ export default function Header() {
             <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Contact Us
             </Link>
-            <Link 
-              href="/register" 
+            <Link
+              href="/register"
               className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-full font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Register Now
@@ -304,6 +310,20 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Past Conferences
+              </Link>
+              <Link
+                href="/brochure"
+                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Download Brochure
+              </Link>
+              <Link
+                href="/sponsorship"
+                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Sponsorship
               </Link>
               {siteSettings?.journal?.showJournal && (
                 <Link

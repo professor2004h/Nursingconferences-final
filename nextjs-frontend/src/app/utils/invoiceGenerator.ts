@@ -25,12 +25,12 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
   const { default: jsPDF } = await import('jspdf');
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
-  const pageHeight = doc.internal.pageSize.height;
-  
-  // Colors
-  const primaryColor = '#1e40af';
-  const secondaryColor = '#64748b';
-  const lightGray = '#f1f5f9';
+  // const pageHeight = doc.internal.pageSize.height;
+
+  // Colors (defined inline where used)
+  // const primaryColor = '#1e40af';
+  // const secondaryColor = '#64748b';
+  // const lightGray = '#f1f5f9';
   
   // Header
   doc.setFillColor(30, 64, 175); // Primary blue

@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPastConferenceBySlug, getPastConferences, type PastConferenceType } from "../../getPastConferences";
+import { getPastConferenceBySlug, getPastConferences } from "../../getPastConferences";
+// import type { PastConferenceType } from "../../getPastConferences";
 import PortableTextRenderer from "../../components/PortableTextRenderer";
 
 interface PageProps {

@@ -84,7 +84,7 @@ export function useNavigationLoading({
       }, 300);
     };
 
-    const resetTimeout = () => {
+    const _resetTimeout = () => {
       setState(prev => ({ 
         ...prev, 
         hasTimedOut: false, 

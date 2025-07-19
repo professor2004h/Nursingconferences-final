@@ -1,7 +1,7 @@
 import { createClient } from "next-sanity";
 
 // Validate required environment variables
-const projectId = "tq1qdk3m";
+const projectId = "n3no08m3";
 const dataset = "production";
 const apiVersion = "2023-05-03";
 
@@ -116,7 +116,7 @@ export async function testSanityConnection(): Promise<boolean> {
     // Provide troubleshooting guidance
     console.error('🔧 Troubleshooting:');
     console.error('1. Ensure Sanity Studio is running on port 3334');
-    console.error('2. Check project ID: tq1qdk3m');
+    console.error('2. Check project ID: n3no08m3');
     console.error('3. Check dataset: production');
     console.error('4. Verify network connectivity');
 

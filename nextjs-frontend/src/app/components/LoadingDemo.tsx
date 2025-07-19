@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BrandedSpinner, NavigationProgressBar, LoadingOverlay } from './NavigationLoader';
+import { BrandedSpinner, LoadingOverlay } from './NavigationLoader';
 import { useNavigationLoading } from './NavigationLoadingProvider';
 
 export default function LoadingDemo() {

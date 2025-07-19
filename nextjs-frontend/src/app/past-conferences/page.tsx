@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getPastConferences, getPastConferencesStats, type PastConferenceType } from "../getPastConferences";
-import { PortableText } from "@portabletext/react";
+// import { PortableText } from "@portabletext/react";
 
 export const metadata = {
   title: "Past Conferences | Intelli Global Conferences",

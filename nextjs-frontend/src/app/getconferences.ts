@@ -1,4 +1,4 @@
-import { client } from './sanity/client';
+// import { client } from './sanity/client';
 import { optimizedFetch } from './lib/optimizedFetching';
 import { PortableTextBlock } from '@portabletext/types';
 

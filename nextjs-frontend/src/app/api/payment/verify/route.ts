@@ -5,16 +5,16 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
+      razorpay_order_id: razorpayOrderId,
+      razorpay_payment_id: razorpayPaymentId,
+      razorpay_signature: razorpaySignature,
       sponsorshipData
     } = body;
 
     console.log('🔍 Payment verification request:', {
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
-      hasSignature: !!razorpay_signature
+      orderId: razorpayOrderId,
+      paymentId: razorpayPaymentId,
+      hasSignature: !!razorpaySignature
     });
 
     // Handle all test payment types
@@ -23,38 +23,38 @@ export async function POST(request: NextRequest) {
       'order_reliable_', 'order_basic_', 'order_emergency_', 'order_test_'
     ];
 
-    const isTestOrder = testOrderPrefixes.some(prefix => razorpay_order_id?.startsWith(prefix));
+    const isTestOrder = testOrderPrefixes.some(prefix => razorpayOrderId?.startsWith(prefix));
 
     if (isTestOrder) {
       let paymentType = 'test';
 
       // Determine payment type from order ID
-      if (razorpay_order_id.startsWith('order_mock_')) paymentType = 'mock';
-      else if (razorpay_order_id.startsWith('order_fallback_')) paymentType = 'fallback';
-      else if (razorpay_order_id.startsWith('order_working_')) paymentType = 'working';
-      else if (razorpay_order_id.startsWith('order_reliable_')) paymentType = 'reliable';
-      else if (razorpay_order_id.startsWith('order_basic_')) paymentType = 'basic';
-      else if (razorpay_order_id.startsWith('order_emergency_')) paymentType = 'emergency';
+      if (razorpayOrderId.startsWith('order_mock_')) paymentType = 'mock';
+      else if (razorpayOrderId.startsWith('order_fallback_')) paymentType = 'fallback';
+      else if (razorpayOrderId.startsWith('order_working_')) paymentType = 'working';
+      else if (razorpayOrderId.startsWith('order_reliable_')) paymentType = 'reliable';
+      else if (razorpayOrderId.startsWith('order_basic_')) paymentType = 'basic';
+      else if (razorpayOrderId.startsWith('order_emergency_')) paymentType = 'emergency';
 
       console.log(`🧪 Processing ${paymentType} payment verification...`);
 
       // Generate invoice number for successful payment
-      const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
 
       return NextResponse.json({
         success: true,
         verified: true,
         [paymentType]: true,
         message: `${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)} payment verified successfully`,
-        paymentId: razorpay_payment_id || `pay_${paymentType}_${Date.now()}`,
-        orderId: razorpay_order_id,
+        paymentId: razorpayPaymentId || `pay_${paymentType}_${Date.now()}`,
+        orderId: razorpayOrderId,
         invoiceNumber: invoiceNumber,
         timestamp: new Date().toISOString()
       });
     }
 
     // Handle real Razorpay payments
-    if (razorpay_order_id && !isTestOrder && razorpay_payment_id && razorpay_signature) {
+    if (razorpayOrderId && !isTestOrder && razorpayPaymentId && razorpaySignature) {
       console.log('🔍 Processing real Razorpay payment verification...');
 
       try {
@@ -64,13 +64,13 @@ export async function POST(request: NextRequest) {
           throw new Error('Razorpay secret key not found');
         }
 
-        const body = razorpay_order_id + '|' + razorpay_payment_id;
+        const body = razorpayOrderId + '|' + razorpayPaymentId;
         const expectedSignature = crypto
           .createHmac('sha256', secret)
           .update(body.toString())
           .digest('hex');
 
-        const isSignatureValid = expectedSignature === razorpay_signature;
+        const isSignatureValid = expectedSignature === razorpaySignature;
 
         if (isSignatureValid) {
           console.log('✅ Real Razorpay payment verified successfully');
@@ -83,8 +83,8 @@ export async function POST(request: NextRequest) {
             verified: true,
             razorpay: true,
             message: 'Real Razorpay payment verified successfully',
-            paymentId: razorpay_payment_id,
-            orderId: razorpay_order_id,
+            paymentId: razorpayPaymentId,
+            orderId: razorpayOrderId,
             invoiceNumber: invoiceNumber,
             timestamp: new Date().toISOString(),
             sponsorshipData: sponsorshipData
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate required fields for other payments
-    if (!razorpay_order_id || !razorpay_payment_id) {
+    if (!razorpayOrderId || !razorpayPaymentId) {
       return NextResponse.json(
         { error: 'Missing required payment verification data' },
         { status: 400 }
@@ -122,16 +122,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body_string = razorpay_order_id + '|' + razorpay_payment_id;
-    
-    const expected_signature = crypto
+    const bodyString = razorpayOrderId + '|' + razorpayPaymentId;
+
+    const expectedSignature = crypto
       .createHmac('sha256', secret)
-      .update(body_string)
+      .update(bodyString)
       .digest('hex');
 
-    const is_authentic = expected_signature === razorpay_signature;
+    const isAuthentic = expectedSignature === razorpaySignature;
 
-    if (!is_authentic) {
+    if (!isAuthentic) {
       console.error('❌ Payment signature verification failed');
       return NextResponse.json(
         { error: 'Payment verification failed' },
@@ -140,8 +140,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Payment verified successfully:', {
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
+      orderId: razorpayOrderId,
+      paymentId: razorpayPaymentId,
     });
 
     // Generate invoice number
@@ -150,8 +150,8 @@ export async function POST(request: NextRequest) {
     // Prepare payment confirmation data with UPI support
     const paymentConfirmation = {
       success: true,
-      paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id,
+      paymentId: razorpayPaymentId,
+      orderId: razorpayOrderId,
       invoiceNumber,
       timestamp: new Date().toISOString(),
       sponsorshipData,

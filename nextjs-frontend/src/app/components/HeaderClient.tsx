@@ -44,6 +44,12 @@ export default function HeaderClient({ siteSettings }: HeaderClientProps) {
           Past Conferences
         </Link>
         <Link
+          href="/brochure"
+          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+        >
+          Download Brochure
+        </Link>
+        <Link
           href="/sponsorship"
           className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
         >
@@ -130,6 +136,13 @@ export default function HeaderClient({ siteSettings }: HeaderClientProps) {
               onClick={() => setIsMenuOpen(false)}
             >
               Past Conferences
+            </Link>
+            <Link
+              href="/brochure"
+              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Download Brochure
             </Link>
             <Link
               href="/sponsorship"

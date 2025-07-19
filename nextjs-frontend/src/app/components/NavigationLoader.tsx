@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, memo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import LoadingSpinner from './LoadingSpinner';
+// import LoadingSpinner from './LoadingSpinner';
 
 interface NavigationLoaderProps {
   threshold?: number; // milliseconds
@@ -115,7 +115,7 @@ export default function NavigationLoader({
   timeout = 10000 
 }: NavigationLoaderProps) {
   const router = useRouter();
-  const pathname = usePathname();
+  const _pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
   const [hasTimedOut, setHasTimedOut] = useState(false);

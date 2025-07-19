@@ -136,7 +136,7 @@ export default function SponsorRegistrationForm({ sponsorshipTiers, conferences 
   };
 
   const [currentStep, setCurrentStep] = useState(initializeCurrentStep);
-  const [loading, setLoading] = useState(false);
+  const [_loading, _setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [formData, setFormData] = useState(initializeFormState);
@@ -272,7 +272,7 @@ export default function SponsorRegistrationForm({ sponsorshipTiers, conferences 
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
-    let newFormData = {
+    const newFormData = {
       ...formData,
       [name]: type === 'checkbox' ? checked : value
     };
@@ -836,7 +836,7 @@ export default function SponsorRegistrationForm({ sponsorshipTiers, conferences 
                     name="conferenceId"
                     value={formData.conferenceId}
                     onChange={handleInputChange}
-                    disabled={loading}
+                    disabled={_loading}
                     className={`mobile-form-select w-full px-3 md:px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                       errors.conferenceId ? 'border-red-500 error' : 'border-gray-300'
                     }`}
@@ -898,7 +898,7 @@ export default function SponsorRegistrationForm({ sponsorshipTiers, conferences 
                             name="tierId"
                             value={formData.tierId}
                             onChange={handleInputChange}
-                            disabled={loading}
+                            disabled={_loading}
                             className={`mobile-form-select w-full px-3 md:px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                               errors.tierId ? 'border-red-500 error' : 'border-gray-300'
                             }`}
@@ -959,7 +959,7 @@ export default function SponsorRegistrationForm({ sponsorshipTiers, conferences 
                               value={formData.customAmount}
                               onChange={handleInputChange}
                               placeholder="Enter amount (any positive value)"
-                              disabled={loading}
+                              disabled={_loading}
                               className={`mobile-form-input w-full pl-8 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                                 errors.customAmount ? 'border-red-500 error' : 'border-gray-300'
                               }`}
@@ -1641,7 +1641,7 @@ export default function SponsorRegistrationForm({ sponsorshipTiers, conferences 
                 <button
                   type="button"
                   onClick={handleNext}
-                  disabled={loading}
+                  disabled={_loading}
                   className="mobile-form-button mobile-form-button-primary tablet-form-button px-4 md:px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
                 >
                   {currentStep === 3 ? 'Proceed to Payment' : 'Next'}

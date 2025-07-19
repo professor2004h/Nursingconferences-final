@@ -33,12 +33,12 @@ const MAP_LOCATIONS_QUERY = `
 
 // No test data - only use Sanity CMS data
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     console.log('🗺️ Fetching map locations from Sanity...');
 
     let locations: MapLocation[] = [];
-    let dataSource = 'sanity';
+    const dataSource: 'sanity' | 'test' = 'sanity';
 
     // Fetch map locations from Sanity CMS only
     locations = await client.fetch(
@@ -90,9 +90,6 @@ export async function GET(request: NextRequest) {
         count: validLocations.length,
         dataSource: dataSource,
         timestamp: new Date().toISOString(),
-        ...(dataSource === 'test' && {
-          note: 'Using test data. Configure Sanity CMS for dynamic locations.'
-        }),
       },
       {
         status: 200,
@@ -128,7 +125,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Handle OPTIONS request for CORS
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, {
     status: 200,
     headers: {

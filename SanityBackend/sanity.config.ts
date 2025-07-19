@@ -3,6 +3,7 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {colorInput} from '@sanity/color-input'
+import {table} from '@sanity/table'
 import {schemaTypes} from './schemaTypes'
 import deskStructure from './deskStructure'
 
@@ -10,11 +11,11 @@ export default defineConfig({
   name: 'default',
   title: 'Eventapp',
 
-  projectId: 'tq1qdk3m',
+  projectId: 'n3no08m3',
   dataset: 'production',
   apiVersion: '2023-05-03',
 
-  plugins: [structureTool({structure: deskStructure}), visionTool(), colorInput()],
+  plugins: [structureTool({structure: deskStructure}), visionTool(), colorInput(), table()],
 
   schema: {
     types: schemaTypes,

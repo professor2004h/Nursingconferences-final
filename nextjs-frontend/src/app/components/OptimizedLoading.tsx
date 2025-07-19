@@ -117,18 +117,21 @@ const LoadingSkeleton = memo(function LoadingSkeleton({
 export const HeroLoading = memo(() => (
   <LoadingSkeleton variant="hero" className="w-full" />
 ));
+HeroLoading.displayName = 'HeroLoading';
 
 export const ConferenceCardLoading = memo(({ count = 3 }: { count?: number }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     <LoadingSkeleton variant="card" count={count} />
   </div>
 ));
+ConferenceCardLoading.displayName = 'ConferenceCardLoading';
 
 export const StatsLoading = memo(() => (
   <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
     <LoadingSkeleton variant="stats" count={4} />
   </div>
 ));
+StatsLoading.displayName = 'StatsLoading';
 
 export const AboutLoading = memo(() => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -144,10 +147,12 @@ export const AboutLoading = memo(() => (
     <LoadingSkeleton variant="image" className="h-96" />
   </div>
 ));
+AboutLoading.displayName = 'AboutLoading';
 
 export const ContactFormLoading = memo(() => (
   <LoadingSkeleton variant="form" className="max-w-2xl mx-auto" />
 ));
+ContactFormLoading.displayName = 'ContactFormLoading';
 
 // Full page loading component
 export const PageLoading = memo(() => (
@@ -166,5 +171,6 @@ export const PageLoading = memo(() => (
     </div>
   </div>
 ));
+PageLoading.displayName = 'PageLoading';
 
 export default LoadingSkeleton;

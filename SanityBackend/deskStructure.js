@@ -1,4 +1,6 @@
 // Custom Sanity Studio structure to include Map Location in the sidebar
+import {DocumentIcon, DownloadIcon, PinIcon} from '@sanity/icons'
+import BrochureTableView from './components/BrochureTableView'
 
 export default (S) =>
   S.list()
@@ -17,9 +19,46 @@ export default (S) =>
       S.listItem().title('Past Conferences Section Styling').schemaType('pastConferencesSection').child(S.documentTypeList('pastConferencesSection')),
       S.listItem().title('Journal Section Styling').schemaType('journalSection').child(S.documentTypeList('journalSection')),
       S.listItem().title('Custom Content Section').schemaType('customContentSection').child(S.documentTypeList('customContentSection')),
+      // Add Brochure Settings
+      S.listItem()
+        .title('Brochure Settings')
+        .id('brochureSettings')
+        .icon(DocumentIcon)
+        .schemaType('brochureSettings')
+        .child(S.documentTypeList('brochureSettings').title('Brochure Settings')),
+      // Add Brochure Downloads with Table View
+      S.listItem()
+        .title('Brochure Downloads')
+        .id('brochureDownloads')
+        .icon(DownloadIcon)
+        .child(
+          S.list()
+            .title('Brochure Download Management')
+            .items([
+              // Custom Interactive Table View with Export
+              S.listItem()
+                .title('📊 Downloads Table')
+                .id('brochureDownloadsTable')
+                .child(
+                  S.component(BrochureTableView)
+                    .title('Brochure Download Submissions - Table View')
+                ),
+              // Traditional Document List View
+              S.listItem()
+                .title('📄 Downloads List')
+                .id('brochureDownloadsList')
+                .child(
+                  S.documentTypeList('brochureDownload')
+                    .title('Brochure Download Submissions - List View')
+                    .defaultOrdering([{field: 'downloadTimestamp', direction: 'desc'}])
+                )
+            ])
+        ),
       // Add Map Location with icon
       S.listItem()
-        .title('🗺️ Map Locations')
+        .title('Map Locations')
+        .id('mapLocations')
+        .icon(PinIcon)
         .schemaType('mapLocation')
         .child(S.documentTypeList('mapLocation').title('Map Locations'))
     ])

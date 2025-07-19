@@ -1,6 +1,6 @@
 import { getSiteSettingsFresh } from '../getSiteSettings';
-import { PortableText } from '@portabletext/react';
-import Link from 'next/link';
+// import { PortableText } from '@portabletext/react';
+// import Link from 'next/link';
 import FAQClient from './FAQClient';
 
 interface FAQ {

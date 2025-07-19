@@ -12,8 +12,8 @@ const client = createClient({
 });
 
 // Razorpay test credentials
-const RAZORPAY_KEY_ID = 'rzp_test_tuQ7OPOieO2QPl';
-const RAZORPAY_KEY_SECRET = 'ilWNxeVD5Iqm8AVchC8yWbba';
+const _RAZORPAY_KEY_ID = 'rzp_test_tuQ7OPOieO2QPl';
+const _RAZORPAY_KEY_SECRET = 'ilWNxeVD5Iqm8AVchC8yWbba';
 
 export async function POST(request: NextRequest) {
   try {

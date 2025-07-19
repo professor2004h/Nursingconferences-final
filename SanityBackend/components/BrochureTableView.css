@@ -1,0 +1,127 @@
+/* Theme-aware table styling for Brochure Downloads */
+
+.brochure-table-container {
+  /* Use CSS custom properties that adapt to Sanity's theme */
+  --table-bg: var(--card-bg-color, #ffffff);
+  --table-border: var(--card-border-color, #e1e3e6);
+  --table-text: var(--card-fg-color, #1a1a1a);
+  --table-text-muted: var(--card-muted-fg-color, #666666);
+  --table-header-bg: var(--card-code-bg-color, #f1f3f6);
+  --table-hover: var(--card-focus-ring-color, #f0f2f5);
+  --table-alternate: var(--card-skeleton-color-from, #fafbfc);
+}
+
+/* Dark theme overrides */
+@media (prefers-color-scheme: dark) {
+  .brochure-table-container {
+    --table-bg: #1a1a1a;
+    --table-border: #404040;
+    --table-text: #ffffff;
+    --table-text-muted: #cccccc;
+    --table-header-bg: #3a3a3a;
+    --table-hover: #333333;
+    --table-alternate: #252525;
+  }
+}
+
+/* Sanity Studio dark theme class override */
+[data-ui="ThemeProvider"][data-scheme="dark"] .brochure-table-container {
+  --table-bg: #1a1a1a;
+  --table-border: #404040;
+  --table-text: #ffffff;
+  --table-text-muted: #cccccc;
+  --table-header-bg: #3a3a3a;
+  --table-hover: #333333;
+  --table-alternate: #252525;
+}
+
+.brochure-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: var(--table-bg);
+  color: var(--table-text);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.brochure-table th {
+  padding: 12px 8px;
+  text-align: left;
+  background-color: var(--table-header-bg);
+  color: var(--table-text);
+  font-weight: 600;
+  border-right: 1px solid var(--table-border);
+  border-bottom: 2px solid var(--table-border);
+}
+
+.brochure-table th:last-child {
+  border-right: none;
+}
+
+.brochure-table td {
+  padding: 12px 8px;
+  border-right: 1px solid var(--table-border);
+  border-bottom: 1px solid var(--table-border);
+  color: var(--table-text);
+}
+
+.brochure-table td:last-child {
+  border-right: none;
+}
+
+.brochure-table td.muted {
+  color: var(--table-text-muted);
+}
+
+.brochure-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.brochure-table tbody tr:nth-child(even) {
+  background-color: var(--table-alternate);
+}
+
+.brochure-table tbody tr:hover {
+  background-color: var(--table-hover) !important;
+}
+
+.brochure-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--table-border);
+  border-radius: 6px;
+  background-color: var(--table-bg);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .brochure-table {
+    font-size: 12px;
+  }
+  
+  .brochure-table th,
+  .brochure-table td {
+    padding: 8px 6px;
+  }
+}
+
+/* Export button styling */
+.export-button {
+  background: var(--card-focus-ring-color, #0066cc);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.export-button:hover {
+  background: var(--card-focus-ring-color, #0052a3);
+}
+
+.export-button:disabled {
+  background: var(--table-text-muted);
+  cursor: not-allowed;
+}
