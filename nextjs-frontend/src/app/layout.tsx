@@ -4,7 +4,6 @@ import "./globals.css";
 import HeaderWrapper from "./components/HeaderWrapper";
 import { getSiteSettingsSSR, getSiteSettingsFresh, getImageUrl } from './getSiteSettings';
 import Footer from "./components/Footer";
-import ErrorBoundary from "./components/ErrorBoundary";
 
 // Import client-side components
 import {
@@ -12,6 +11,7 @@ import {
   FaviconManager,
   CacheBuster,
   ClientErrorBoundary,
+  ErrorBoundary,
   PerformanceMonitor,
   ConnectionStatus,
   PerformanceInit

@@ -23,6 +23,11 @@ export const ClientErrorBoundary = dynamic(() => import("./ClientErrorBoundary")
   loading: () => null
 });
 
+export const ErrorBoundary = dynamic(() => import("./ErrorBoundary"), {
+  ssr: false,
+  loading: () => null
+});
+
 export const PerformanceMonitor = dynamic(() => import("./PerformanceMonitor"), {
   ssr: false,
   loading: () => null
