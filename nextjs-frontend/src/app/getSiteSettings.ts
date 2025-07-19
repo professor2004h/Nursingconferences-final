@@ -262,9 +262,8 @@ export async function getSiteSettingsFresh(): Promise<SiteSettings | null> {
 
     const siteSettings = await client.fetch(query, {}, {
       next: {
-        revalidate: 0, // No caching - always fresh
+        revalidate: 60, // Cache for 60 seconds
       },
-      cache: 'no-store', // Bypass all caching layers
     });
 
     return siteSettings;
@@ -348,9 +347,8 @@ export async function getSiteSettingsForHeader(): Promise<SiteSettings | null> {
       cacheBust: `header-${timestamp}-${randomId}`
     }, {
       next: {
-        revalidate: 0, // No caching
+        revalidate: 30, // Cache for 30 seconds
       },
-      cache: 'no-store', // Bypass all caching layers
     });
 
     // Clear any existing cache when fetching for header

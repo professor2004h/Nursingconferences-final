@@ -45,7 +45,6 @@ export async function GET(_request: NextRequest) {
       MAP_LOCATIONS_QUERY,
       {},
       {
-        cache: 'no-store', // Always fetch fresh data for real-time updates
         next: { revalidate: 60 }, // Revalidate every 60 seconds
       }
     );
