@@ -11,7 +11,7 @@ import {
   FaviconManager,
   CacheBuster,
   ClientErrorBoundary,
-  ErrorBoundary,
+  // ErrorBoundary, // Temporarily disabled due to dynamic import issues
   PerformanceMonitor,
   ConnectionStatus,
   PerformanceInit
@@ -143,7 +143,7 @@ export default async function RootLayout({
     <html lang="en" className="h-full">
       <body className={`${inter.variable} font-sans antialiased h-full bg-white`}>
         <div className="flex flex-col min-h-screen">
-          <ErrorBoundary>
+          {/* <ErrorBoundary> Temporarily disabled due to dynamic import issues */}
             <ClientErrorBoundary>
               <NavigationLoadingProvider
                 threshold={300}
@@ -174,7 +174,7 @@ export default async function RootLayout({
                 <Footer />
               </NavigationLoadingProvider>
             </ClientErrorBoundary>
-          </ErrorBoundary>
+          {/* </ErrorBoundary> Temporarily disabled due to dynamic import issues */}
         </div>
       </body>
     </html>

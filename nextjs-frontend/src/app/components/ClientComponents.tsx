@@ -23,10 +23,8 @@ export const ClientErrorBoundary = dynamic(() => import("./ClientErrorBoundary")
   loading: () => null
 });
 
-export const ErrorBoundary = dynamic(() => import("./ErrorBoundary"), {
-  ssr: false,
-  loading: () => null
-});
+// Direct import for ErrorBoundary since it's a class component
+export { default as ErrorBoundary } from "./ErrorBoundary";
 
 export const PerformanceMonitor = dynamic(() => import("./PerformanceMonitor"), {
   ssr: false,
