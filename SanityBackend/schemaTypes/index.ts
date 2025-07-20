@@ -16,8 +16,12 @@ import brochureDownload from './brochureDownload';
 
 import mapLocation from './mapLocation';
 
-
-
+// Registration system schemas
+import { registrationSettings } from './registrationSettings';
+import { registrationTypes } from './registrationTypes';
+import { sponsorshipTiersRegistration } from './sponsorshipTiersRegistration';
+import { accommodationOptions } from './accommodationOptions';
+import { conferenceRegistration } from './conferenceRegistration';
 
 export const schemaTypes = [
   conferenceEvent,
@@ -35,5 +39,11 @@ export const schemaTypes = [
   customContentSection,
   brochureSettings,
   brochureDownload,
-  mapLocation
+  mapLocation,
+  // Registration system schemas
+  registrationSettings,
+  registrationTypes,
+  sponsorshipTiersRegistration,
+  accommodationOptions,
+  conferenceRegistration
 ]

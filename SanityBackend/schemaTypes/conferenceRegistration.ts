@@ -1,0 +1,382 @@
+import { defineType, defineField } from 'sanity'
+
+export const conferenceRegistration = defineType({
+  name: 'conferenceRegistration',
+  title: 'Conference Registration',
+  type: 'document',
+  icon: () => '📝',
+  fields: [
+    defineField({
+      name: 'registrationId',
+      title: 'Registration ID',
+      type: 'string',
+      validation: Rule => Rule.required(),
+      description: 'Unique registration identifier',
+      readOnly: true,
+    }),
+
+    defineField({
+      name: 'registrationType',
+      title: 'Registration Type',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Regular Registration', value: 'regular' },
+          { title: 'Sponsorship Registration', value: 'sponsorship' },
+        ],
+      },
+      validation: Rule => Rule.required(),
+      description: 'Type of registration - regular or sponsorship',
+    }),
+
+    defineField({
+      name: 'personalDetails',
+      title: 'Personal Details',
+      type: 'object',
+      fields: [
+        {
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Mr', value: 'Mr' },
+              { title: 'Ms', value: 'Ms' },
+              { title: 'Mrs', value: 'Mrs' },
+              { title: 'Prof', value: 'Prof' },
+              { title: 'Dr', value: 'Dr' },
+            ],
+          },
+        },
+        {
+          name: 'firstName',
+          title: 'First Name',
+          type: 'string',
+          validation: Rule => Rule.required().min(2),
+        },
+        {
+          name: 'lastName',
+          title: 'Last Name',
+          type: 'string',
+          validation: Rule => Rule.required().min(2),
+        },
+        {
+          name: 'email',
+          title: 'Email',
+          type: 'email',
+          validation: Rule => Rule.required(),
+        },
+        {
+          name: 'phoneNumber',
+          title: 'Phone Number',
+          type: 'string',
+          validation: Rule => Rule.required(),
+        },
+        {
+          name: 'country',
+          title: 'Country',
+          type: 'string',
+          validation: Rule => Rule.required(),
+        },
+        {
+          name: 'abstractCategory',
+          title: 'Abstract Category',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Poster', value: 'poster' },
+              { title: 'Oral', value: 'oral' },
+              { title: 'Delegate', value: 'delegate' },
+              { title: 'Other', value: 'other' },
+            ],
+          },
+        },
+        {
+          name: 'fullPostalAddress',
+          title: 'Full Postal Address',
+          type: 'text',
+          validation: Rule => Rule.required().min(10),
+        },
+        {
+          name: 'organization',
+          title: 'Organization/Institution',
+          type: 'string',
+        },
+        {
+          name: 'designation',
+          title: 'Designation/Position',
+          type: 'string',
+        },
+        {
+          name: 'specialDietaryRequirements',
+          title: 'Special Dietary Requirements',
+          type: 'text',
+        },
+      ],
+    }),
+
+    // Sponsorship Details (only for sponsorship registrations)
+    defineField({
+      name: 'sponsorshipDetails',
+      title: 'Sponsorship Details',
+      type: 'object',
+      hidden: ({ document }) => document?.registrationType !== 'sponsorship',
+      fields: [
+        {
+          name: 'sponsorshipTier',
+          title: 'Sponsorship Tier',
+          type: 'reference',
+          to: [{ type: 'sponsorshipTiersRegistration' }],
+        },
+        {
+          name: 'companyName',
+          title: 'Company Name',
+          type: 'string',
+        },
+        {
+          name: 'companyWebsite',
+          title: 'Company Website',
+          type: 'url',
+        },
+        {
+          name: 'companyLogo',
+          title: 'Company Logo',
+          type: 'image',
+        },
+        {
+          name: 'sponsorshipBenefitsIncluded',
+          title: 'Sponsorship Benefits Included',
+          type: 'array',
+          of: [{ type: 'string' }],
+          readOnly: true,
+        },
+      ],
+    }),
+
+    defineField({
+      name: 'selectedRegistrationType',
+      title: 'Selected Registration Type',
+      type: 'reference',
+      to: [{ type: 'registrationTypes' }],
+      description: 'Selected registration type (only for regular registrations)',
+      hidden: ({ document }) => document?.registrationType === 'sponsorship',
+    }),
+
+    defineField({
+      name: 'accommodationOption',
+      title: 'Accommodation Option',
+      type: 'object',
+      fields: [
+        {
+          name: 'hotel',
+          title: 'Selected Hotel',
+          type: 'reference',
+          to: [{ type: 'accommodationOptions' }],
+        },
+        {
+          name: 'roomType',
+          title: 'Room Type',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Single Occupancy', value: 'single' },
+              { title: 'Double Occupancy', value: 'double' },
+              { title: 'Triple Occupancy', value: 'triple' },
+            ],
+          },
+        },
+        {
+          name: 'nights',
+          title: 'Number of Nights',
+          type: 'number',
+          options: {
+            list: [
+              { title: '2 Nights', value: 2 },
+              { title: '3 Nights', value: 3 },
+              { title: '5 Nights', value: 5 },
+            ],
+          },
+        },
+        {
+          name: 'checkInDate',
+          title: 'Check-in Date',
+          type: 'date',
+        },
+        {
+          name: 'checkOutDate',
+          title: 'Check-out Date',
+          type: 'date',
+        },
+      ],
+    }),
+
+    defineField({
+      name: 'numberOfParticipants',
+      title: 'Number of Participants',
+      type: 'number',
+      validation: Rule => Rule.required().min(1).max(50),
+      initialValue: 1,
+    }),
+
+    defineField({
+      name: 'pricing',
+      title: 'Pricing Details',
+      type: 'object',
+      fields: [
+        {
+          name: 'registrationPrice',
+          title: 'Registration Price',
+          type: 'number',
+          validation: Rule => Rule.required().min(0),
+        },
+        {
+          name: 'accommodationPrice',
+          title: 'Accommodation Price',
+          type: 'number',
+          validation: Rule => Rule.min(0),
+          initialValue: 0,
+        },
+        {
+          name: 'totalPrice',
+          title: 'Total Price',
+          type: 'number',
+          validation: Rule => Rule.required().min(0),
+        },
+        {
+          name: 'currency',
+          title: 'Currency',
+          type: 'string',
+          initialValue: 'USD',
+        },
+        {
+          name: 'pricingPeriod',
+          title: 'Pricing Period',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Early Bird', value: 'earlyBird' },
+              { title: 'Next Round', value: 'nextRound' },
+              { title: 'Spot Registration', value: 'spotRegistration' },
+            ],
+          },
+        },
+        {
+          name: 'participantCategory',
+          title: 'Participant Category',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Academia', value: 'academia' },
+              { title: 'Business/Industry', value: 'business' },
+            ],
+          },
+          description: 'Category affecting pricing (Academia vs Business/Industry)',
+        },
+      ],
+    }),
+
+    defineField({
+      name: 'paymentStatus',
+      title: 'Payment Status',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Pending', value: 'pending' },
+          { title: 'Completed', value: 'completed' },
+          { title: 'Failed', value: 'failed' },
+          { title: 'Refunded', value: 'refunded' },
+        ],
+      },
+      initialValue: 'pending',
+      validation: Rule => Rule.required(),
+    }),
+
+    defineField({
+      name: 'paymentId',
+      title: 'Payment ID',
+      type: 'string',
+      description: 'Payment gateway transaction ID',
+    }),
+
+    defineField({
+      name: 'razorpayOrderId',
+      title: 'Razorpay Order ID',
+      type: 'string',
+      description: 'Razorpay order identifier',
+    }),
+
+    defineField({
+      name: 'registrationDate',
+      title: 'Registration Date',
+      type: 'datetime',
+      validation: Rule => Rule.required(),
+      initialValue: () => new Date().toISOString(),
+    }),
+
+    defineField({
+      name: 'lastUpdated',
+      title: 'Last Updated',
+      type: 'datetime',
+      validation: Rule => Rule.required(),
+      initialValue: () => new Date().toISOString(),
+    }),
+
+    defineField({
+      name: 'notes',
+      title: 'Admin Notes',
+      type: 'text',
+      description: 'Internal notes for admin use',
+    }),
+
+    defineField({
+      name: 'isActive',
+      title: 'Active Registration',
+      type: 'boolean',
+      description: 'Is this registration active?',
+      initialValue: true,
+    }),
+  ],
+
+  orderings: [
+    {
+      title: 'Registration Date (Newest First)',
+      name: 'registrationDateDesc',
+      by: [{ field: 'registrationDate', direction: 'desc' }],
+    },
+    {
+      title: 'Payment Status',
+      name: 'paymentStatusAsc',
+      by: [{ field: 'paymentStatus', direction: 'asc' }],
+    },
+    {
+      title: 'Last Name',
+      name: 'lastNameAsc',
+      by: [{ field: 'personalDetails.lastName', direction: 'asc' }],
+    },
+  ],
+
+  preview: {
+    select: {
+      firstName: 'personalDetails.firstName',
+      lastName: 'personalDetails.lastName',
+      email: 'personalDetails.email',
+      paymentStatus: 'paymentStatus',
+      totalPrice: 'pricing.totalPrice',
+      currency: 'pricing.currency',
+    },
+    prepare({ firstName, lastName, email, paymentStatus, totalPrice, currency }) {
+      const statusEmoji = {
+        pending: '⏳',
+        completed: '✅',
+        failed: '❌',
+        refunded: '🔄',
+      }[paymentStatus] || '❓';
+
+      return {
+        title: `${firstName} ${lastName}`,
+        subtitle: `${email} - ${statusEmoji} ${paymentStatus.toUpperCase()} - ${currency} ${totalPrice}`,
+        media: statusEmoji,
+      }
+    },
+  },
+})

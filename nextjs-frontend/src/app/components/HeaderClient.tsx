@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { type SiteSettings } from '../getSiteSettings';
 
@@ -8,69 +8,88 @@ interface HeaderClientProps {
   siteSettings: SiteSettings | null;
 }
 
-export default function HeaderClient({ siteSettings }: HeaderClientProps) {
+// Memoized component to prevent unnecessary re-renders
+const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  // Stable toggle function to prevent re-renders
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   return (
     <>
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center space-x-8">
-        <Link
-          href="/"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-        >
-          Home
-        </Link>
-        <Link
-          href="/about"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-        >
-          About Us
-        </Link>
-        <Link
-          href="/conferences"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-        >
-          All Conferences
-        </Link>
-        <Link
-          href="/past-conferences"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-        >
-          Past Conferences
-        </Link>
-        <Link
-          href="/brochure"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-        >
-          Download Brochure
-        </Link>
-        <Link
-          href="/sponsorship"
-          className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-        >
-          Sponsorship
-        </Link>
-        {siteSettings?.journal?.showJournal && (
+      {/* Desktop Navigation - Optimized for better spacing and responsiveness */}
+      <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0">
+        {/* Main navigation links with responsive spacing */}
+        <div className="flex items-center space-x-3 md:space-x-4 lg:space-x-5 xl:space-x-6 overflow-visible flex-wrap">
           <Link
-            href={siteSettings.journal.journalUrl || "/journal"}
-            target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
-            rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+            href="/"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
-            Journal
+            Home
           </Link>
-        )}
-        <Link
-          href="/contact"
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          Contact Us
-        </Link>
+          <Link
+            href="/about"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            About Us
+          </Link>
+          <Link
+            href="/conferences"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            All Conferences
+          </Link>
+          <Link
+            href="/past-conferences"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Past Conferences
+          </Link>
+          <Link
+            href="/brochure"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Brochure Download
+          </Link>
+          <Link
+            href="/sponsorship"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Sponsorship
+          </Link>
+          {siteSettings?.journal?.showJournal && (
+            <Link
+              href={siteSettings.journal.journalUrl || "/journal"}
+              target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
+              rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
+              className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            >
+              Journal
+            </Link>
+          )}
+          <Link
+            href="/registration"
+            className="bg-green-600 text-white px-3 lg:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
+          >
+            Register Now
+          </Link>
+        </div>
+
+        {/* Contact button with responsive spacing */}
+        <div className="ml-3 lg:ml-4 xl:ml-6">
+          <Link
+            href="/contact"
+            className="bg-blue-600 text-white px-4 lg:px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
+          >
+            Contact Us
+          </Link>
+        </div>
       </div>
 
       {/* Mobile menu button */}
@@ -112,42 +131,42 @@ export default function HeaderClient({ siteSettings }: HeaderClientProps) {
             <Link
               href="/"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
             >
               Home
             </Link>
             <Link
               href="/about"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
             >
               About Us
             </Link>
             <Link
               href="/conferences"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
             >
               All Conferences
             </Link>
             <Link
               href="/past-conferences"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
             >
               Past Conferences
             </Link>
             <Link
               href="/brochure"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
             >
-              Download Brochure
+              Brochure Download
             </Link>
             <Link
               href="/sponsorship"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
             >
               Sponsorship
             </Link>
@@ -157,7 +176,7 @@ export default function HeaderClient({ siteSettings }: HeaderClientProps) {
                 target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
                 rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
                 className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMenu}
               >
                 Journal
               </Link>
@@ -165,7 +184,7 @@ export default function HeaderClient({ siteSettings }: HeaderClientProps) {
             <Link
               href="/contact"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={closeMenu}
             >
               Contact Us
             </Link>
@@ -174,4 +193,6 @@ export default function HeaderClient({ siteSettings }: HeaderClientProps) {
       )}
     </>
   );
-}
+});
+
+export default HeaderClient;

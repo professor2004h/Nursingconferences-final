@@ -6,12 +6,29 @@ export default (S) =>
   S.list()
     .title('Content')
     .items([
+      // Main Content
       S.listItem().title('Conference Event').schemaType('conferenceEvent').child(S.documentTypeList('conferenceEvent')),
       S.listItem().title('Past Conference').schemaType('pastConference').child(S.documentTypeList('pastConference')),
       S.listItem().title('About Us').schemaType('about').child(S.documentTypeList('about')),
       S.listItem().title('Hero Section').schemaType('heroSection').child(S.documentTypeList('heroSection')),
       S.listItem().title('Conferences Section').schemaType('conferences').child(S.documentTypeList('conferences')),
       S.listItem().title('Site Settings').schemaType('siteSettings').child(S.documentTypeList('siteSettings')),
+
+      // Registration System
+      S.divider(),
+      S.listItem()
+        .title('📝 Registration System')
+        .child(
+          S.list()
+            .title('Registration Management')
+            .items([
+              S.listItem().title('⚙️ Registration Settings').schemaType('registrationSettings').child(S.documentTypeList('registrationSettings')),
+              S.listItem().title('🎫 Registration Types').schemaType('registrationTypes').child(S.documentTypeList('registrationTypes')),
+              S.listItem().title('🏆 Sponsorship Tiers').schemaType('sponsorshipTiersRegistration').child(S.documentTypeList('sponsorshipTiersRegistration')),
+              S.listItem().title('🏨 Accommodation Options').schemaType('accommodationOptions').child(S.documentTypeList('accommodationOptions')),
+              S.listItem().title('📋 Conference Registrations').schemaType('conferenceRegistration').child(S.documentTypeList('conferenceRegistration')),
+            ])
+        ),
       S.listItem().title('Statistics Section').schemaType('statistics').child(S.documentTypeList('statistics')),
       S.listItem().title('Sponsorship Tiers').schemaType('sponsorshipTiers').child(S.documentTypeList('sponsorshipTiers')),
       S.listItem().title('Sponsor Registration').schemaType('sponsorRegistration').child(S.documentTypeList('sponsorRegistration')),
