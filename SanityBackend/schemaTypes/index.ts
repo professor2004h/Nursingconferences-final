@@ -19,9 +19,11 @@ import mapLocation from './mapLocation';
 // Registration system schemas
 import { registrationSettings } from './registrationSettings';
 import { registrationTypes } from './registrationTypes';
-import { sponsorshipTiersRegistration } from './sponsorshipTiersRegistration';
+// import { sponsorshipTiersRegistration } from './sponsorshipTiersRegistration'; // Using existing sponsorshipTiers instead
 import { accommodationOptions } from './accommodationOptions';
 import { conferenceRegistration } from './conferenceRegistration';
+import { pricingPeriods } from './pricingPeriods';
+import { formConfiguration } from './formConfiguration';
 
 export const schemaTypes = [
   conferenceEvent,
@@ -43,7 +45,9 @@ export const schemaTypes = [
   // Registration system schemas
   registrationSettings,
   registrationTypes,
-  sponsorshipTiersRegistration,
+  // sponsorshipTiersRegistration, // Using existing sponsorshipTiers instead
   accommodationOptions,
-  conferenceRegistration
+  conferenceRegistration,
+  pricingPeriods,
+  formConfiguration
 ]

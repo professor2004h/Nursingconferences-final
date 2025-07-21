@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation';
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
-  const registrationId = searchParams.get('registrationId');
-  const paymentId = searchParams.get('paymentId');
+  const registrationId = searchParams?.get('registrationId');
+  const paymentId = searchParams?.get('paymentId');
   
   const [registration, setRegistration] = useState<any>(null);
   const [loading, setLoading] = useState(true);

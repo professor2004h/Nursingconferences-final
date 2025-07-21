@@ -4,7 +4,6 @@ export const accommodationOptions = defineType({
   name: 'accommodationOptions',
   title: 'Accommodation Options',
   type: 'document',
-  icon: () => '🏨',
   fields: [
     defineField({
       name: 'hotelName',
@@ -286,7 +285,6 @@ export const accommodationOptions = defineType({
       return {
         title: title,
         subtitle: `${category} ${!isActive ? '- INACTIVE' : ''}`,
-        media: media || '🏨',
       }
     },
   },

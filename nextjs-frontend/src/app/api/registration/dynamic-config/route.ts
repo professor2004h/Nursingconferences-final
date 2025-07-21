@@ -1,0 +1,141 @@
+import { NextResponse } from 'next/server';
+import { client } from '@/app/sanity/client';
+
+export async function GET() {
+  try {
+    console.log('🚀 Fetching registration configuration...');
+
+    // Fetch all required data for registration
+    const [pricingPeriods, registrationTypes, sponsorshipTiers, accommodationOptions] = await Promise.all([
+      // Pricing Periods - simplified query
+      client.fetch(`*[_type == "pricingPeriods" && isActive == true] | order(displayOrder asc) {
+        _id,
+        periodId,
+        title,
+        startDate,
+        endDate,
+        isActive,
+        displayOrder
+      }`),
+
+      // Registration Types - simplified query
+      client.fetch(`*[_type == "registrationTypes" && isActive == true && category in ["speaker-inperson", "speaker-virtual", "listener-inperson", "listener-virtual", "student-inperson", "student-virtual", "eposter-virtual", "exhibitor"]] | order(displayOrder asc) {
+        _id,
+        name,
+        category,
+        description,
+        earlyBirdPrice,
+        nextRoundPrice,
+        onSpotPrice,
+        benefits,
+        isActive,
+        displayOrder
+      }`),
+
+      // Sponsorship Tiers (using correct pricing from sponsorshipTiers)
+      client.fetch(`*[_type == "sponsorshipTiers" && active == true] | order(order asc) {
+        _id,
+        name,
+        price,
+        description,
+        benefits,
+        color,
+        active,
+        order,
+        featured,
+        slug
+      }`),
+
+      // Accommodation Options
+      client.fetch(`*[_type == "accommodationOptions" && isActive == true] | order(displayOrder asc) {
+        _id,
+        hotelName,
+        hotelCategory,
+        description,
+        roomOptions[] {
+          roomType,
+          pricePerNight,
+          roomDescription,
+          maxGuests,
+          isAvailable
+        },
+        packageOptions[] {
+          packageName,
+          nights,
+          checkInDate,
+          checkOutDate,
+          inclusions,
+          isActive
+        },
+        location,
+        amenities,
+        isActive,
+        displayOrder,
+        maxRooms,
+        currentBookings,
+        availableFrom,
+        availableUntil,
+        images
+      }`),
+    ]);
+
+    console.log(`✅ Found ${registrationTypes.length} registration types, ${pricingPeriods.length} pricing periods, ${sponsorshipTiers.length} sponsorship tiers, ${accommodationOptions.length} accommodation options`);
+
+    // Determine current active pricing period
+    const now = new Date();
+    const activePeriod = pricingPeriods.find((period: any) => {
+      const startDate = new Date(period.startDate);
+      const endDate = new Date(period.endDate);
+      return now >= startDate && now <= endDate && period.isActive;
+    });
+
+    // Process registration types with period-specific pricing
+    const processedRegistrationTypes = registrationTypes.map((type: any) => {
+      // Create pricing by period using the period-specific prices
+      const pricingByPeriod: any = {};
+
+      // Map period IDs to price fields
+      const periodPriceMap: { [key: string]: string } = {
+        'earlyBird': 'earlyBirdPrice',
+        'nextRound': 'nextRoundPrice',
+        'spotRegistration': 'onSpotPrice'
+      };
+
+      // Apply the appropriate price to each active pricing period
+      pricingPeriods.forEach((period: any) => {
+        if (period.isActive) {
+          const priceField = periodPriceMap[period.periodId] || 'earlyBirdPrice';
+          pricingByPeriod[period.periodId] = {
+            price: type[priceField] || 0,
+            period: period,
+          };
+        }
+      });
+
+      return {
+        ...type,
+        pricingByPeriod
+      };
+    });
+
+    const response = {
+      registrationTypes: processedRegistrationTypes,
+      pricingPeriods,
+      activePeriod,
+      sponsorshipTiers,
+      accommodationOptions,
+      currentDate: now.toISOString(),
+      lastFetched: new Date().toISOString()
+    };
+
+    console.log('✅ Registration configuration fetched successfully');
+    return NextResponse.json(response);
+
+  } catch (error) {
+    console.error('❌ Error fetching registration configuration:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch registration configuration' },
+      { status: 500 }
+    );
+  }
+}

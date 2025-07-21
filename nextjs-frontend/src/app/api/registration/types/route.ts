@@ -5,13 +5,25 @@ export async function GET(request: NextRequest) {
   try {
     console.log('📝 Fetching registration types...');
 
-    // Fetch registration types from Sanity
+    // Fetch registration types with pricing periods from Sanity
     const query = `*[_type == "registrationTypes"] | order(displayOrder asc) {
       _id,
       name,
       category,
       description,
-      pricing,
+      pricing[] {
+        pricingPeriod-> {
+          _id,
+          periodId,
+          title,
+          startDate,
+          endDate,
+          isActive
+        },
+        academiaPrice,
+        businessPrice,
+        isActive
+      },
       benefits,
       isActive,
       displayOrder,

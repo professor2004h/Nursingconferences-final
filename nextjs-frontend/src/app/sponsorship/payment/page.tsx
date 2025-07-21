@@ -15,8 +15,8 @@ export default function PaymentPage() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
 
-  const registrationId = searchParams.get('registrationId');
-  const amount = searchParams.get('amount');
+  const registrationId = searchParams?.get('registrationId');
+  const amount = searchParams?.get('amount');
 
   useEffect(() => {
     // Load registration data from sessionStorage

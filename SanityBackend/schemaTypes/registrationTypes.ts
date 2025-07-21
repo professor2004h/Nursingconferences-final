@@ -4,7 +4,6 @@ export const registrationTypes = defineType({
   name: 'registrationTypes',
   title: 'Registration Types',
   type: 'document',
-  icon: () => '🎫',
   fields: [
     defineField({
       name: 'name',
@@ -19,17 +18,14 @@ export const registrationTypes = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Speaker', value: 'speaker' },
-          { title: 'Delegate', value: 'delegate' },
-          { title: 'Student', value: 'student' },
-          { title: 'Poster Presenter', value: 'poster' },
-          { title: 'Online Participant', value: 'online' },
-          { title: 'Accompanying Person', value: 'accompanying' },
-          { title: 'Young Researcher', value: 'young_researcher' },
-          { title: 'Industry Professional', value: 'industry' },
-          { title: 'Academic', value: 'academic' },
-          { title: 'International Delegate', value: 'international' },
-          { title: 'Local Delegate', value: 'local' },
+          { title: 'Speaker/Poster (In-Person)', value: 'speaker-inperson' },
+          { title: 'Speaker/Poster (Virtual)', value: 'speaker-virtual' },
+          { title: 'Listener (In-Person)', value: 'listener-inperson' },
+          { title: 'Listener (Virtual)', value: 'listener-virtual' },
+          { title: 'Student (In-Person)', value: 'student-inperson' },
+          { title: 'Student (Virtual)', value: 'student-virtual' },
+          { title: 'E-poster (Virtual)', value: 'eposter-virtual' },
+          { title: 'Exhibitor', value: 'exhibitor' },
         ],
       },
       validation: Rule => Rule.required(),
@@ -43,68 +39,27 @@ export const registrationTypes = defineType({
     }),
 
     defineField({
-      name: 'pricing',
-      title: 'Pricing Structure',
-      type: 'object',
-      fields: [
-        {
-          name: 'earlyBird',
-          title: 'Early Bird Pricing',
-          type: 'object',
-          fields: [
-            {
-              name: 'academiaPrice',
-              title: 'Academia Price',
-              type: 'number',
-              validation: Rule => Rule.required().min(0),
-            },
-            {
-              name: 'businessPrice',
-              title: 'Business/Industry Price',
-              type: 'number',
-              validation: Rule => Rule.required().min(0),
-            },
-          ],
-        },
-        {
-          name: 'nextRound',
-          title: 'Next Round Pricing',
-          type: 'object',
-          fields: [
-            {
-              name: 'academiaPrice',
-              title: 'Academia Price',
-              type: 'number',
-              validation: Rule => Rule.required().min(0),
-            },
-            {
-              name: 'businessPrice',
-              title: 'Business/Industry Price',
-              type: 'number',
-              validation: Rule => Rule.required().min(0),
-            },
-          ],
-        },
-        {
-          name: 'spotRegistration',
-          title: 'Spot Registration Pricing',
-          type: 'object',
-          fields: [
-            {
-              name: 'academiaPrice',
-              title: 'Academia Price',
-              type: 'number',
-              validation: Rule => Rule.required().min(0),
-            },
-            {
-              name: 'businessPrice',
-              title: 'Business/Industry Price',
-              type: 'number',
-              validation: Rule => Rule.required().min(0),
-            },
-          ],
-        },
-      ],
+      name: 'earlyBirdPrice',
+      title: 'Early Bird Registration Price',
+      type: 'number',
+      description: 'Price during the early bird registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'nextRoundPrice',
+      title: 'Next Round Registration Price',
+      type: 'number',
+      description: 'Price during the mid-term registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'onSpotPrice',
+      title: 'OnSpot Registration Price',
+      type: 'number',
+      description: 'Price during the final/spot registration period',
+      validation: Rule => Rule.required().min(0),
     }),
 
     defineField({
@@ -138,19 +93,7 @@ export const registrationTypes = defineType({
       description: 'Maximum number of people who can register for this type (leave empty for unlimited)',
     }),
 
-    defineField({
-      name: 'availableFrom',
-      title: 'Available From Date',
-      type: 'date',
-      description: 'Date when this registration type becomes available',
-    }),
 
-    defineField({
-      name: 'availableUntil',
-      title: 'Available Until Date',
-      type: 'date',
-      description: 'Last date when this registration type is available',
-    }),
   ],
   
   orderings: [
@@ -171,13 +114,18 @@ export const registrationTypes = defineType({
       title: 'name',
       category: 'category',
       isActive: 'isActive',
-      earlyBirdAcademia: 'pricing.earlyBird.academiaPrice',
+      earlyBirdPrice: 'earlyBirdPrice',
+      nextRoundPrice: 'nextRoundPrice',
+      onSpotPrice: 'onSpotPrice',
     },
-    prepare({ title, category, isActive, earlyBirdAcademia }) {
+    prepare({ title, category, isActive, earlyBirdPrice, nextRoundPrice, onSpotPrice }) {
+      const priceDisplay = earlyBirdPrice ?
+        `$${earlyBirdPrice}/$${nextRoundPrice}/$${onSpotPrice}` :
+        'No prices set';
+
       return {
         title: title,
-        subtitle: `${category} - $${earlyBirdAcademia} (Early Bird) ${!isActive ? '- INACTIVE' : ''}`,
-        media: isActive ? '✅' : '❌',
+        subtitle: `${category} - ${priceDisplay} ${!isActive ? '- INACTIVE' : ''}`,
       }
     },
   },

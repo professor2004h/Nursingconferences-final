@@ -8,9 +8,9 @@ export default function RegistrationSuccessPage() {
   const [registrationDetails, setRegistrationDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const paymentId = searchParams.get('payment_id');
-  const orderId = searchParams.get('order_id');
-  const registrationId = searchParams.get('registration_id');
+  const paymentId = searchParams?.get('payment_id');
+  const orderId = searchParams?.get('order_id');
+  const registrationId = searchParams?.get('registration_id');
 
   useEffect(() => {
     if (registrationId) {

@@ -115,10 +115,12 @@ export default function TestRegistrationPage() {
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Registration Type</h2>
               <div className="space-y-3">
+                {/* Note: This test page should be updated to use dynamic data from Sanity CMS */}
+                {/* For now, using placeholder data - consider integrating with the dynamic registration system */}
                 {[
-                  { id: 'speaker', name: 'Speaker Registration', price: 299 },
-                  { id: 'delegate', name: 'Delegate Registration', price: 199 },
-                  { id: 'student', name: 'Student Registration', price: 99 },
+                  { id: 'speaker-inperson', name: 'Speaker/Poster (In-Person)', price: 799 },
+                  { id: 'listener-inperson', name: 'Listener (In-Person)', price: 859 },
+                  { id: 'student-inperson', name: 'Student (In-Person)', price: 559 },
                 ].map((type) => (
                   <div key={type.id} className="border border-gray-200 rounded-lg p-4">
                     <label className="flex items-start space-x-3 cursor-pointer">

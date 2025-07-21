@@ -6,20 +6,8 @@ export const brochureDownload = defineType({
   title: 'Brochure Download',
   type: 'document',
   icon: DownloadIcon,
-  // Add table view configuration
-  options: {
-    table: {
-      columns: [
-        { name: 'fullName', title: 'Name' },
-        { name: 'email', title: 'Email' },
-        { name: 'phone', title: 'Phone' },
-        { name: 'organization', title: 'Organization' },
-        { name: 'country', title: 'Country' },
-        { name: 'professionalTitle', title: 'Title' },
-        { name: 'downloadTimestamp', title: 'Downloaded' }
-      ]
-    }
-  },
+  // Note: Table view configuration is handled by the table plugin
+  // The table plugin will automatically detect and display document fields
   fields: [
     defineField({
       name: 'fullName',

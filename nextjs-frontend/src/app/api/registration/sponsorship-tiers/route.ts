@@ -6,21 +6,17 @@ export async function GET(request: NextRequest) {
     console.log('📝 Fetching sponsorship tiers...');
 
     // Fetch sponsorship tiers from Sanity
-    const query = `*[_type == "sponsorshipTiersRegistration"] | order(displayOrder asc) {
+    const query = `*[_type == "sponsorshipTiers"] | order(order asc) {
       _id,
-      tierName,
-      tierLevel,
+      name,
+      slug,
       price,
       description,
       benefits,
-      inclusions,
-      isActive,
-      displayOrder,
-      maxSponsors,
-      currentSponsors,
-      availableFrom,
-      availableUntil,
-      highlightColor
+      color,
+      active,
+      order,
+      featured
     }`;
 
     const tiers = await client.fetch(query);

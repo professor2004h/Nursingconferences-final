@@ -1,6 +1,7 @@
 // Custom Sanity Studio structure to include Map Location in the sidebar
-import {DocumentIcon, DownloadIcon, PinIcon} from '@sanity/icons'
+import {DocumentIcon, DownloadIcon, PinIcon, UserIcon} from '@sanity/icons'
 import BrochureTableView from './components/BrochureTableView'
+import RegistrationTableView from './components/RegistrationTableView'
 
 export default (S) =>
   S.list()
@@ -22,11 +23,11 @@ export default (S) =>
           S.list()
             .title('Registration Management')
             .items([
-              S.listItem().title('⚙️ Registration Settings').schemaType('registrationSettings').child(S.documentTypeList('registrationSettings')),
-              S.listItem().title('🎫 Registration Types').schemaType('registrationTypes').child(S.documentTypeList('registrationTypes')),
-              S.listItem().title('🏆 Sponsorship Tiers').schemaType('sponsorshipTiersRegistration').child(S.documentTypeList('sponsorshipTiersRegistration')),
-              S.listItem().title('🏨 Accommodation Options').schemaType('accommodationOptions').child(S.documentTypeList('accommodationOptions')),
-              S.listItem().title('📋 Conference Registrations').schemaType('conferenceRegistration').child(S.documentTypeList('conferenceRegistration')),
+              S.listItem().title('Registration Settings').schemaType('registrationSettings').child(S.documentTypeList('registrationSettings')),
+              S.listItem().title('Registration Types').schemaType('registrationTypes').child(S.documentTypeList('registrationTypes')),
+              // Sponsorship Tiers moved to main section to avoid duplication
+              S.listItem().title('Accommodation Options').schemaType('accommodationOptions').child(S.documentTypeList('accommodationOptions')),
+              S.listItem().title('Conference Registrations').schemaType('conferenceRegistration').child(S.documentTypeList('conferenceRegistration')),
             ])
         ),
       S.listItem().title('Statistics Section').schemaType('statistics').child(S.documentTypeList('statistics')),
@@ -68,6 +69,34 @@ export default (S) =>
                   S.documentTypeList('brochureDownload')
                     .title('Brochure Download Submissions - List View')
                     .defaultOrdering([{field: 'downloadTimestamp', direction: 'desc'}])
+                )
+            ])
+        ),
+      // Add Conference Registrations with Table View
+      S.listItem()
+        .title('Conference Registrations')
+        .id('conferenceRegistrations')
+        .icon(UserIcon)
+        .child(
+          S.list()
+            .title('Registration Management')
+            .items([
+              // Custom Interactive Table View with Export
+              S.listItem()
+                .title('📊 Registrations Table')
+                .id('registrationsTable')
+                .child(
+                  S.component(RegistrationTableView)
+                    .title('Conference Registrations - Table View')
+                ),
+              // Traditional Document List View
+              S.listItem()
+                .title('📄 Registrations List')
+                .id('registrationsList')
+                .child(
+                  S.documentTypeList('conferenceRegistration')
+                    .title('Conference Registrations - List View')
+                    .defaultOrdering([{field: 'registrationDate', direction: 'desc'}])
                 )
             ])
         ),

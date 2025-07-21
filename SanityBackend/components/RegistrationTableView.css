@@ -1,0 +1,200 @@
+/* Theme-aware table styling for Registration Data */
+
+.registration-table-container {
+  /* Use CSS custom properties that adapt to Sanity's theme */
+  --table-bg: var(--card-bg-color, #ffffff);
+  --table-border: var(--card-border-color, #e1e3e6);
+  --table-text: var(--card-fg-color, #1a1a1a);
+  --table-text-muted: var(--card-muted-fg-color, #666666);
+  --table-header-bg: var(--card-code-bg-color, #f1f3f6);
+  --table-hover: var(--card-focus-ring-color, #f0f2f5);
+  --table-alternate: var(--card-skeleton-color-from, #fafbfc);
+}
+
+/* Dark theme support */
+[data-ui="dark"] .registration-table-container {
+  --table-bg: var(--card-bg-color, #1a1a1a);
+  --table-border: var(--card-border-color, #2a2a2a);
+  --table-text: var(--card-fg-color, #ffffff);
+  --table-text-muted: var(--card-muted-fg-color, #999999);
+  --table-header-bg: var(--card-code-bg-color, #2a2a2a);
+  --table-hover: var(--card-focus-ring-color, #333333);
+  --table-alternate: var(--card-skeleton-color-from, #222222);
+}
+
+.registration-table-wrapper {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid var(--table-border);
+  background: var(--table-bg);
+}
+
+.registration-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: var(--table-text);
+  background: var(--table-bg);
+}
+
+.registration-table thead {
+  background: var(--table-header-bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.registration-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid var(--table-border);
+  color: var(--table-text);
+  white-space: nowrap;
+}
+
+.registration-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--table-border);
+  vertical-align: top;
+  color: var(--table-text);
+}
+
+.registration-table tbody tr:hover {
+  background: var(--table-hover);
+}
+
+.registration-table tbody tr.even {
+  background: var(--table-alternate);
+}
+
+.registration-table tbody tr.odd {
+  background: var(--table-bg);
+}
+
+.registration-table tbody tr.even:hover,
+.registration-table tbody tr.odd:hover {
+  background: var(--table-hover);
+}
+
+/* Column-specific styling */
+.registration-table .registration-id {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 12px;
+  color: var(--table-text-muted);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.registration-table .name {
+  font-weight: 500;
+  min-width: 150px;
+}
+
+.registration-table .email {
+  color: var(--table-text-muted);
+  font-size: 13px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.registration-table .country {
+  min-width: 100px;
+}
+
+.registration-table .type {
+  min-width: 120px;
+  font-size: 13px;
+}
+
+.registration-table .amount {
+  font-weight: 600;
+  text-align: right;
+  min-width: 80px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+.registration-table .status {
+  min-width: 100px;
+}
+
+.registration-table .participants {
+  text-align: center;
+  min-width: 60px;
+}
+
+.registration-table .date {
+  color: var(--table-text-muted);
+  font-size: 12px;
+  min-width: 100px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .registration-table-wrapper {
+    font-size: 12px;
+  }
+  
+  .registration-table th,
+  .registration-table td {
+    padding: 8px 12px;
+  }
+  
+  .registration-table .email {
+    max-width: 150px;
+  }
+  
+  .registration-table .registration-id {
+    max-width: 80px;
+  }
+}
+
+/* Loading and empty states */
+.registration-table-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--table-text-muted);
+}
+
+.registration-table-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--table-text-muted);
+}
+
+/* Status badge styling adjustments */
+.registration-table .status [data-ui="Badge"] {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Accessibility improvements */
+.registration-table th:focus,
+.registration-table td:focus {
+  outline: 2px solid var(--card-focus-ring-color);
+  outline-offset: -2px;
+}
+
+/* Print styles */
+@media print {
+  .registration-table-container {
+    --table-bg: white;
+    --table-border: #000;
+    --table-text: #000;
+    --table-text-muted: #666;
+    --table-header-bg: #f5f5f5;
+  }
+  
+  .registration-table {
+    border: 1px solid #000;
+  }
+  
+  .registration-table th,
+  .registration-table td {
+    border: 1px solid #000;
+  }
+}

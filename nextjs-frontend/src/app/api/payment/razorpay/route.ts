@@ -171,7 +171,7 @@ export async function PUT(request: NextRequest) {
       paymentDetails: {
         paymentId: razorpay_payment_id,
         orderId: razorpay_order_id,
-        amount: payment.amount / 100, // Convert back to currency units
+        amount: Number(payment.amount) / 100, // Convert back to currency units
         currency: payment.currency,
         status: payment.status,
       },

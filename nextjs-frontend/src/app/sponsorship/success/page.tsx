@@ -9,8 +9,8 @@ export default function PaymentSuccessPage() {
   const [loading, setLoading] = useState(true);
   const [invoiceGenerated, setInvoiceGenerated] = useState(false);
 
-  const paymentId = searchParams.get('paymentId');
-  const registrationId = searchParams.get('registrationId');
+  const paymentId = searchParams?.get('paymentId');
+  const registrationId = searchParams?.get('registrationId');
 
   useEffect(() => {
     // Simulate invoice generation process

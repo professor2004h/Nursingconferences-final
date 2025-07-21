@@ -53,11 +53,11 @@ export async function POST(request: NextRequest) {
     // Validate the request data
     const validationResult = registrationSchema.safeParse(body);
     if (!validationResult.success) {
-      console.error('❌ Validation failed:', validationResult.error.errors);
+      console.error('❌ Validation failed:', validationResult.error.issues);
       return NextResponse.json(
-        { 
-          error: 'Invalid registration data', 
-          details: validationResult.error.errors 
+        {
+          error: 'Invalid registration data',
+          details: validationResult.error.issues
         },
         { status: 400 }
       );
@@ -78,14 +78,15 @@ export async function POST(request: NextRequest) {
       registrationId,
       registrationType: registrationData.sponsorType ? 'sponsorship' : 'regular',
       personalDetails: {
-        title: registrationData.title,
-        firstName: registrationData.firstName,
-        lastName: registrationData.lastName,
-        email: registrationData.email,
-        phoneNumber: registrationData.phoneNumber,
-        country: registrationData.country,
-        abstractCategory: registrationData.abstractCategory,
-        fullPostalAddress: registrationData.fullPostalAddress,
+        title: registrationData.title || '',
+        firstName: registrationData.firstName || '',
+        lastName: registrationData.lastName || '',
+        fullName: `${registrationData.title || ''} ${registrationData.firstName || ''} ${registrationData.lastName || ''}`.trim(),
+        email: registrationData.email || '',
+        phoneNumber: registrationData.phoneNumber || '',
+        country: registrationData.country || '',
+        abstractCategory: registrationData.abstractCategory || '',
+        fullPostalAddress: registrationData.fullPostalAddress || '',
       },
       // Sponsorship Details (only for sponsorship registrations)
       ...(registrationData.sponsorType && {
@@ -101,16 +102,26 @@ export async function POST(request: NextRequest) {
       } : null,
       numberOfParticipants: registrationData.numberOfParticipants,
       pricing: {
-        registrationFee: registrationData.registrationFee,
-        accommodationFee: registrationData.accommodationFee,
-        totalPrice: registrationData.totalPrice,
+        registrationFee: registrationData.registrationFee || 0,
+        accommodationFee: registrationData.accommodationFee || 0,
+        totalPrice: registrationData.totalPrice || 0,
         currency: 'USD',
-        pricingPeriod: registrationData.pricingPeriod,
+        pricingPeriod: registrationData.pricingPeriod || 'unknown',
+        formattedTotalPrice: `$${registrationData.totalPrice || 0} USD`, // For table display
       },
       paymentStatus: 'pending',
       registrationDate: new Date().toISOString(),
       lastUpdated: new Date().toISOString(),
       isActive: true,
+
+      // Additional fields for better table display and filtering
+      registrationSummary: {
+        registrationType: registrationData.sponsorType ? 'Sponsorship' : 'Regular Registration',
+        selectedOption: registrationData.sponsorType || registrationData.selectedRegistration || 'Not specified',
+        participantCount: registrationData.numberOfParticipants || 1,
+        hasAccommodation: !!(registrationData.accommodationType && registrationData.accommodationNights),
+        registrationMonth: new Date().toISOString().substring(0, 7), // YYYY-MM format for grouping
+      },
     };
 
     // Save to Sanity (with error handling)

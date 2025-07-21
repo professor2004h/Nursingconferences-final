@@ -18,7 +18,7 @@ interface RegistrationDetails {
 
 export default function PaymentPage() {
   const searchParams = useSearchParams();
-  const registrationId = searchParams.get('registrationId');
+  const registrationId = searchParams?.get('registrationId');
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

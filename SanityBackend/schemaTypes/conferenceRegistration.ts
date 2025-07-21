@@ -5,6 +5,8 @@ export const conferenceRegistration = defineType({
   title: 'Conference Registration',
   type: 'document',
   icon: () => '📝',
+  // Note: Table view configuration is handled by the table plugin
+  // The table plugin will automatically detect and display document fields
   fields: [
     defineField({
       name: 'registrationId',
@@ -126,7 +128,7 @@ export const conferenceRegistration = defineType({
           name: 'sponsorshipTier',
           title: 'Sponsorship Tier',
           type: 'reference',
-          to: [{ type: 'sponsorshipTiersRegistration' }],
+          to: [{ type: 'sponsorshipTiers' }],
         },
         {
           name: 'companyName',
@@ -335,6 +337,53 @@ export const conferenceRegistration = defineType({
       description: 'Is this registration active?',
       initialValue: true,
     }),
+
+    // Computed fields for better table display
+    defineField({
+      name: 'fullName',
+      title: 'Full Name',
+      type: 'string',
+      description: 'Computed full name for table display',
+      readOnly: true,
+    }),
+
+    defineField({
+      name: 'formattedTotalPrice',
+      title: 'Formatted Total Price',
+      type: 'string',
+      description: 'Formatted price with currency for table display',
+      readOnly: true,
+    }),
+
+    defineField({
+      name: 'registrationSummary',
+      title: 'Registration Summary',
+      type: 'object',
+      description: 'Summary information for quick filtering and display',
+      readOnly: true,
+      fields: [
+        {
+          name: 'registrationTypeDisplay',
+          title: 'Registration Type Display',
+          type: 'string',
+        },
+        {
+          name: 'accommodationSummary',
+          title: 'Accommodation Summary',
+          type: 'string',
+        },
+        {
+          name: 'totalParticipants',
+          title: 'Total Participants',
+          type: 'number',
+        },
+        {
+          name: 'paymentStatusDisplay',
+          title: 'Payment Status Display',
+          type: 'string',
+        },
+      ],
+    }),
   ],
 
   orderings: [
@@ -365,12 +414,14 @@ export const conferenceRegistration = defineType({
       currency: 'pricing.currency',
     },
     prepare({ firstName, lastName, email, paymentStatus, totalPrice, currency }) {
-      const statusEmoji = {
+      const statusEmojiMap = {
         pending: '⏳',
         completed: '✅',
         failed: '❌',
         refunded: '🔄',
-      }[paymentStatus] || '❓';
+      } as const;
+
+      const statusEmoji = statusEmojiMap[paymentStatus as keyof typeof statusEmojiMap] || '❓';
 
       return {
         title: `${firstName} ${lastName}`,

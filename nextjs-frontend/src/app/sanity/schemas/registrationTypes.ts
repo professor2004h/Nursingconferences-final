@@ -19,12 +19,14 @@ export const registrationTypes = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Speaker', value: 'speaker' },
-          { title: 'Delegate', value: 'delegate' },
-          { title: 'Student', value: 'student' },
-          { title: 'Poster Presenter', value: 'poster' },
-          { title: 'Online Participant', value: 'online' },
-          { title: 'Accompanying Person', value: 'accompanying' },
+          { title: 'Speaker/Poster (In-Person)', value: 'speaker-inperson' },
+          { title: 'Speaker/Poster (Virtual)', value: 'speaker-virtual' },
+          { title: 'Listener (In-Person)', value: 'listener-inperson' },
+          { title: 'Listener (Virtual)', value: 'listener-virtual' },
+          { title: 'Student (In-Person)', value: 'student-inperson' },
+          { title: 'Student (Virtual)', value: 'student-virtual' },
+          { title: 'E-poster (Virtual)', value: 'eposter-virtual' },
+          { title: 'Exhibitor', value: 'exhibitor' },
         ],
       },
       validation: Rule => Rule.required(),
@@ -99,6 +101,73 @@ export const registrationTypes = defineType({
             },
           ],
         },
+      ],
+    }),
+
+    // Alternative simple pricing structure (for easier data entry)
+    defineField({
+      name: 'simplePricing',
+      title: 'Simple Pricing Structure (Alternative)',
+      type: 'object',
+      description: 'Use this for quick setup instead of the complex pricing array above',
+      fields: [
+        defineField({
+          name: 'earlyBird',
+          title: 'Early Bird Pricing',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'academiaPrice',
+              title: 'Academia Price',
+              type: 'number',
+              validation: Rule => Rule.min(0),
+            }),
+            defineField({
+              name: 'businessPrice',
+              title: 'Business Price',
+              type: 'number',
+              validation: Rule => Rule.min(0),
+            }),
+          ],
+        }),
+        defineField({
+          name: 'nextRound',
+          title: 'Next Round Pricing',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'academiaPrice',
+              title: 'Academia Price',
+              type: 'number',
+              validation: Rule => Rule.min(0),
+            }),
+            defineField({
+              name: 'businessPrice',
+              title: 'Business Price',
+              type: 'number',
+              validation: Rule => Rule.min(0),
+            }),
+          ],
+        }),
+        defineField({
+          name: 'spotRegistration',
+          title: 'Spot Registration Pricing',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'academiaPrice',
+              title: 'Academia Price',
+              type: 'number',
+              validation: Rule => Rule.min(0),
+            }),
+            defineField({
+              name: 'businessPrice',
+              title: 'Business Price',
+              type: 'number',
+              validation: Rule => Rule.min(0),
+            }),
+          ],
+        }),
       ],
     }),
 
