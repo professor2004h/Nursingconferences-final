@@ -24,6 +24,7 @@ import { accommodationOptions } from './accommodationOptions';
 import { conferenceRegistration } from './conferenceRegistration';
 import { pricingPeriods } from './pricingPeriods';
 import { formConfiguration } from './formConfiguration';
+import { paymentRecord } from './paymentRecord';
 
 export const schemaTypes = [
   conferenceEvent,
@@ -49,5 +50,6 @@ export const schemaTypes = [
   accommodationOptions,
   conferenceRegistration,
   pricingPeriods,
-  formConfiguration
+  formConfiguration,
+  paymentRecord
 ]

@@ -27,19 +27,32 @@ export default function RegistrationTableView() {
           lastName,
           email,
           phoneNumber,
-          country
+          country,
+          fullPostalAddress
         },
+        selectedRegistrationName,
         selectedRegistrationType-> {
           name,
           category
         },
         sponsorshipDetails {
           sponsorshipTier-> {
+            name,
             tierName,
             price
           }
         },
+        accommodationDetails {
+          accommodationType,
+          accommodationNights
+        },
+        accommodationOption {
+          roomType,
+          nights
+        },
         pricing {
+          registrationPrice,
+          accommodationPrice,
           totalPrice,
           currency,
           pricingPeriod,
@@ -48,11 +61,7 @@ export default function RegistrationTableView() {
         paymentStatus,
         paymentId,
         registrationDate,
-        numberOfParticipants,
-        accommodationOption {
-          roomType,
-          nights
-        }
+        numberOfParticipants
       }`
 
       const result = await client.fetch(query)
@@ -124,16 +133,64 @@ export default function RegistrationTableView() {
   }
 
   const getRegistrationTypeName = (registration) => {
-    if (registration.registrationType === 'sponsorship') {
-      return registration.sponsorshipDetails?.sponsorshipTier?.tierName || 'Sponsorship'
+    // Priority hierarchy for registration type display
+
+    // 1. Direct stored name (most reliable)
+    if (registration.selectedRegistrationName) {
+      return registration.selectedRegistrationName
     }
-    return registration.selectedRegistrationType?.name || 'Unknown'
+
+    // 2. Reference lookup name
+    if (registration.selectedRegistrationType?.name) {
+      return registration.selectedRegistrationType.name
+    }
+
+    // 3. Sponsorship tier name (for sponsorship registrations)
+    if (registration.registrationType === 'sponsorship') {
+      return registration.sponsorshipDetails?.sponsorshipTier?.name ||
+             registration.sponsorshipDetails?.sponsorshipTier?.tierName ||
+             'Sponsorship'
+    }
+
+    // 4. Final fallback
+    return 'Unknown'
   }
 
   const getAccommodationInfo = (registration) => {
-    const acc = registration.accommodationOption
-    if (!acc || !acc.roomType) return 'None'
-    return `${acc.roomType} (${acc.nights || 0} nights)`
+    // Check both accommodationDetails and accommodationOption
+    const accDetails = registration.accommodationDetails
+    const accOption = registration.accommodationOption
+
+    if (accDetails && accDetails.accommodationType) {
+      const nights = accDetails.accommodationNights || 0
+      return `${accDetails.accommodationType} (${nights} nights)`
+    }
+
+    if (accOption && accOption.roomType) {
+      const nights = accOption.nights || 0
+      return `${accOption.roomType} (${nights} nights)`
+    }
+
+    return 'None'
+  }
+
+  const getRegistrationPrice = (registration) => {
+    const price = registration.pricing?.registrationPrice || 0
+    const currency = registration.pricing?.currency || 'USD'
+    return `${currency} ${price}`
+  }
+
+  const getAccommodationPrice = (registration) => {
+    const price = registration.pricing?.accommodationPrice || 0
+    if (price === 0) return 'N/A'
+    const currency = registration.pricing?.currency || 'USD'
+    return `${currency} ${price}`
+  }
+
+  const getTotalPrice = (registration) => {
+    const price = registration.pricing?.totalPrice || 0
+    const currency = registration.pricing?.currency || 'USD'
+    return `${currency} ${price}`
   }
 
   const getStatusBadge = (status) => {
@@ -214,9 +271,14 @@ export default function RegistrationTableView() {
                       React.createElement('th', null, 'ID'),
                       React.createElement('th', null, 'Name'),
                       React.createElement('th', null, 'Email'),
+                      React.createElement('th', null, 'Phone'),
                       React.createElement('th', null, 'Country'),
+                      React.createElement('th', null, 'Address'),
                       React.createElement('th', null, 'Type'),
-                      React.createElement('th', null, 'Amount'),
+                      React.createElement('th', null, 'Accommodation'),
+                      React.createElement('th', null, 'Reg. Price'),
+                      React.createElement('th', null, 'Acc. Price'),
+                      React.createElement('th', null, 'Total'),
                       React.createElement('th', null, 'Status'),
                       React.createElement('th', null, 'Participants'),
                       React.createElement('th', null, 'Date')
@@ -234,19 +296,34 @@ export default function RegistrationTableView() {
                         React.createElement('td', { className: 'name' }, 
                           getFullName(registration)
                         ),
-                        React.createElement('td', { className: 'email' }, 
+                        React.createElement('td', { className: 'email' },
                           registration.personalDetails?.email || 'N/A'
                         ),
-                        React.createElement('td', { className: 'country' }, 
+                        React.createElement('td', { className: 'phone' },
+                          registration.personalDetails?.phoneNumber || 'N/A'
+                        ),
+                        React.createElement('td', { className: 'country' },
                           registration.personalDetails?.country || 'N/A'
                         ),
-                        React.createElement('td', { className: 'type' }, 
+                        React.createElement('td', { className: 'address' },
+                          registration.personalDetails?.fullPostalAddress || 'N/A'
+                        ),
+                        React.createElement('td', { className: 'type' },
                           getRegistrationTypeName(registration)
                         ),
-                        React.createElement('td', { className: 'amount' }, 
-                          `${registration.pricing?.currency || 'USD'} ${registration.pricing?.totalPrice || 0}`
+                        React.createElement('td', { className: 'accommodation' },
+                          getAccommodationInfo(registration)
                         ),
-                        React.createElement('td', { className: 'status' }, 
+                        React.createElement('td', { className: 'reg-price' },
+                          getRegistrationPrice(registration)
+                        ),
+                        React.createElement('td', { className: 'acc-price' },
+                          getAccommodationPrice(registration)
+                        ),
+                        React.createElement('td', { className: 'total-price' },
+                          getTotalPrice(registration)
+                        ),
+                        React.createElement('td', { className: 'status' },
                           getStatusBadge(registration.paymentStatus)
                         ),
                         React.createElement('td', { className: 'participants' }, 

@@ -13,7 +13,6 @@ interface FormData {
   email: string;
   phoneNumber: string;
   country: string;
-  abstractCategory: string;
   fullPostalAddress: string;
   selectedRegistration: string;
   sponsorType: string;
@@ -110,7 +109,6 @@ export default function RegistrationPage() {
     email: '',
     phoneNumber: '',
     country: '',
-    abstractCategory: '',
     fullPostalAddress: '',
     selectedRegistration: '',
     sponsorType: '',
@@ -390,7 +388,7 @@ export default function RegistrationPage() {
         return;
       }
 
-      if (!formData.country || !formData.abstractCategory || !formData.fullPostalAddress) {
+      if (!formData.country || !formData.fullPostalAddress) {
         alert('Please fill in all required information fields');
         return;
       }
@@ -404,6 +402,14 @@ export default function RegistrationPage() {
         return;
       }
 
+      // Get the registration type name for display
+      let selectedRegistrationName = '';
+      if (selectedRegistrationType) {
+        const regTypeId = selectedRegistrationType.split('-')[0]; // Extract the registration type ID
+        const selectedRegType = dynamicData.registrationTypes?.find(type => type._id === regTypeId);
+        selectedRegistrationName = selectedRegType?.name || '';
+      }
+
       // Prepare registration data for API
       const registrationData = {
         // Personal Details
@@ -415,11 +421,11 @@ export default function RegistrationPage() {
 
         // Further Information
         country: formData.country,
-        abstractCategory: formData.abstractCategory,
         fullPostalAddress: formData.fullPostalAddress,
 
         // Registration Selection (using new format)
         selectedRegistration: selectedRegistrationType || '',
+        selectedRegistrationName: selectedRegistrationName,
         sponsorType: selectedSponsorType || '',
 
         // Accommodation (using new selection format)
@@ -466,7 +472,6 @@ export default function RegistrationPage() {
           email: '',
           phoneNumber: '',
           country: '',
-          abstractCategory: '',
           fullPostalAddress: '',
           selectedRegistration: '',
           sponsorType: '',
@@ -479,8 +484,44 @@ export default function RegistrationPage() {
         return;
       }
 
-      // Initialize Razorpay payment
-      await initializeRazorpayPayment(result.registrationId, priceCalculation.totalPrice, registrationData);
+      // **TEST MODE: Bypass Razorpay payment processing**
+      // Simulate successful payment processing
+      console.log('🧪 TEST MODE: Bypassing Razorpay payment processing');
+
+      // Create test payment record
+      const testPaymentData = {
+        registrationId: result.registrationId,
+        paymentId: `TEST_PAY_${Date.now()}`,
+        orderId: `TEST_ORDER_${Date.now()}`,
+        amount: priceCalculation.totalPrice,
+        currency: 'USD',
+        paymentMethod: 'test_payment',
+        paymentStatus: 'completed',
+        paymentDate: new Date().toISOString(),
+        isTestPayment: true,
+      };
+
+      // Update registration with test payment information
+      const paymentResponse = await fetch('/api/registration/update-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(testPaymentData),
+      });
+
+      const paymentResult = await paymentResponse.json();
+
+      if (paymentResult.success) {
+        // Show success message
+        alert(`✅ Registration and Payment Successful!\n\nRegistration ID: ${result.registrationId}\nPayment ID: ${testPaymentData.paymentId}\nAmount: $${priceCalculation.totalPrice} USD\n\nThis is a test payment - no actual charges were made.`);
+
+        // Redirect to success page with test payment details
+        const successUrl = `/registration/success?registration_id=${result.registrationId}&payment_id=${testPaymentData.paymentId}&order_id=${testPaymentData.orderId}&test_mode=true`;
+        window.location.href = successUrl;
+      } else {
+        throw new Error('Failed to process test payment');
+      }
 
     } catch (error) {
       console.error('Registration error:', error);
@@ -685,21 +726,7 @@ export default function RegistrationPage() {
                   </select>
                 </div>
 
-                {/* Abstract Category */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Abstract Category</label>
-                  <select
-                    value={formData.abstractCategory}
-                    onChange={(e) => handleInputChange('abstractCategory', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select Category</option>
-                    <option value="Poster">Poster</option>
-                    <option value="Oral">Oral</option>
-                    <option value="Delegate">Delegate</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
+
               </div>
 
               {/* Full Postal Address */}

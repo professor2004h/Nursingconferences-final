@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { client } from '@/app/sanity/client';
+import { writeClient } from '@/app/sanity/client';
 import { z } from 'zod';
 
 // Validation schema for registration data
@@ -9,15 +9,15 @@ const registrationSchema = z.object({
   firstName: z.string().min(2),
   lastName: z.string().min(2),
   email: z.string().email(),
-  phoneNumber: z.string().min(10),
+  phoneNumber: z.string().min(5, "Phone number must be at least 5 characters"),
 
   // Further Information
   country: z.string().min(1),
-  abstractCategory: z.string().min(1),
   fullPostalAddress: z.string().min(10),
 
   // Registration Selection
   selectedRegistration: z.string().optional(),
+  selectedRegistrationName: z.string().optional(),
   participantCategory: z.string().optional(),
 
   // Sponsor Registration
@@ -37,11 +37,13 @@ const registrationSchema = z.object({
   pricingPeriod: z.enum(['earlyBird', 'nextRound', 'spotRegistration']),
 });
 
-// Generate unique registration ID
+// Generate unique registration ID with microsecond precision
 function generateRegistrationId(): string {
-  const timestamp = Date.now().toString(36);
-  const randomStr = Math.random().toString(36).substring(2, 8);
-  return `REG-${timestamp}-${randomStr}`.toUpperCase();
+  const now = new Date();
+  const timestamp = now.getTime().toString(36); // milliseconds
+  const microseconds = (performance.now() % 1000).toFixed(3).replace('.', '');
+  const randomStr = Math.random().toString(36).substring(2, 10);
+  return `REG-${timestamp}${microseconds}-${randomStr}`.toUpperCase();
 }
 
 export async function POST(request: NextRequest) {
@@ -85,7 +87,6 @@ export async function POST(request: NextRequest) {
         email: registrationData.email || '',
         phoneNumber: registrationData.phoneNumber || '',
         country: registrationData.country || '',
-        abstractCategory: registrationData.abstractCategory || '',
         fullPostalAddress: registrationData.fullPostalAddress || '',
       },
       // Sponsorship Details (only for sponsorship registrations)
@@ -95,6 +96,7 @@ export async function POST(request: NextRequest) {
         }
       }),
       selectedRegistration: registrationData.selectedRegistration,
+      selectedRegistrationName: registrationData.selectedRegistrationName || registrationData.selectedRegistration,
       participantCategory: registrationData.participantCategory,
       accommodationDetails: registrationData.accommodationType ? {
         accommodationType: registrationData.accommodationType,
@@ -121,17 +123,31 @@ export async function POST(request: NextRequest) {
         participantCount: registrationData.numberOfParticipants || 1,
         hasAccommodation: !!(registrationData.accommodationType && registrationData.accommodationNights),
         registrationMonth: new Date().toISOString().substring(0, 7), // YYYY-MM format for grouping
+        paymentStatusDisplay: 'PENDING',
       },
+
+      // Computed fields for table display
+      fullName: `${registrationData.title || ''} ${registrationData.firstName || ''} ${registrationData.lastName || ''}`.trim(),
+      formattedTotalPrice: `$${registrationData.totalPrice || 0} USD`,
     };
 
-    // Save to Sanity (with error handling)
+    // Save to Sanity using write client with API token
     let result;
+    let sanityError = null;
     try {
-      result = await client.create(registrationRecord);
-      console.log('✅ Registration saved to Sanity:', result._id);
-    } catch (sanityError) {
-      console.warn('⚠️ Sanity save failed, using mock response:', sanityError);
-      // Mock response for development
+      console.log('💾 Attempting to save registration to Sanity with write client...');
+      result = await writeClient.create(registrationRecord);
+      console.log('✅ Registration saved to Sanity successfully:', result._id);
+    } catch (error) {
+      sanityError = error;
+      console.error('❌ Sanity save failed:', error);
+
+      // Check if it's a permissions error
+      if (error.statusCode === 403) {
+        console.error('🔒 Sanity permissions error - API token may be invalid or missing write permissions');
+      }
+
+      // Mock response for development/testing when Sanity fails
       result = {
         _id: `mock-${Date.now()}`,
         ...registrationRecord,
@@ -142,12 +158,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       registrationId,
-      message: 'Registration submitted successfully',
+      message: sanityError
+        ? 'Registration submitted successfully (test mode - data not saved to Sanity due to permissions)'
+        : 'Registration submitted successfully',
       data: {
         id: result._id,
         registrationId,
         totalPrice: registrationData.totalPrice,
         paymentStatus: 'pending',
+        testMode: !!sanityError,
+        sanityStatus: sanityError ? 'failed' : 'success',
       },
     });
 

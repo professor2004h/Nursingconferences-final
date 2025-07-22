@@ -218,7 +218,7 @@ export const registrationSettings = defineType({
                   { title: 'Email', value: 'email' },
                   { title: 'Phone Number', value: 'phoneNumber' },
                   { title: 'Country', value: 'country' },
-                  { title: 'Abstract Category', value: 'abstractCategory' },
+
                   { title: 'Full Postal Address', value: 'fullPostalAddress' },
                 ],
               },
@@ -226,36 +226,7 @@ export const registrationSettings = defineType({
           ],
           initialValue: ['firstName', 'lastName', 'email', 'phoneNumber', 'country', 'fullPostalAddress'],
         },
-        {
-          name: 'abstractCategories',
-          title: 'Abstract Categories',
-          type: 'array',
-          of: [
-            {
-              type: 'object',
-              fields: [
-                {
-                  name: 'value',
-                  title: 'Value',
-                  type: 'string',
-                  validation: Rule => Rule.required(),
-                },
-                {
-                  name: 'label',
-                  title: 'Display Label',
-                  type: 'string',
-                  validation: Rule => Rule.required(),
-                },
-              ],
-            },
-          ],
-          initialValue: [
-            { value: 'poster', label: 'Poster' },
-            { value: 'oral', label: 'Oral' },
-            { value: 'delegate', label: 'Delegate' },
-            { value: 'other', label: 'Other' },
-          ],
-        },
+
       ],
     }),
   ],

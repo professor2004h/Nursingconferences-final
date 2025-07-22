@@ -11,7 +11,6 @@ interface FormData {
   email: string;
   phoneNumber: string;
   country: string;
-  abstractCategory: string;
   fullPostalAddress: string;
   numberOfParticipants: number;
 }
@@ -58,7 +57,6 @@ export default function DynamicRegistrationForm() {
     email: '',
     phoneNumber: '',
     country: '',
-    abstractCategory: '',
     fullPostalAddress: '',
     numberOfParticipants: 1,
   });

@@ -12,7 +12,7 @@ export const conferenceRegistration = defineType({
       name: 'registrationId',
       title: 'Registration ID',
       type: 'string',
-      validation: Rule => Rule.required(),
+      validation: Rule => Rule.required().unique(),
       description: 'Unique registration identifier',
       readOnly: true,
     }),
@@ -80,19 +80,7 @@ export const conferenceRegistration = defineType({
           type: 'string',
           validation: Rule => Rule.required(),
         },
-        {
-          name: 'abstractCategory',
-          title: 'Abstract Category',
-          type: 'string',
-          options: {
-            list: [
-              { title: 'Poster', value: 'poster' },
-              { title: 'Oral', value: 'oral' },
-              { title: 'Delegate', value: 'delegate' },
-              { title: 'Other', value: 'other' },
-            ],
-          },
-        },
+
         {
           name: 'fullPostalAddress',
           title: 'Full Postal Address',
@@ -162,6 +150,13 @@ export const conferenceRegistration = defineType({
       to: [{ type: 'registrationTypes' }],
       description: 'Selected registration type (only for regular registrations)',
       hidden: ({ document }) => document?.registrationType === 'sponsorship',
+    }),
+
+    defineField({
+      name: 'selectedRegistrationName',
+      title: 'Registration Type Name',
+      type: 'string',
+      description: 'Display name of the selected registration type for table view',
     }),
 
     defineField({
@@ -308,6 +303,28 @@ export const conferenceRegistration = defineType({
     }),
 
     defineField({
+      name: 'paymentMethod',
+      title: 'Payment Method',
+      type: 'string',
+      description: 'Method used for payment (razorpay, test_payment, etc.)',
+    }),
+
+    defineField({
+      name: 'paymentDate',
+      title: 'Payment Date',
+      type: 'datetime',
+      description: 'When the payment was completed',
+    }),
+
+    defineField({
+      name: 'isTestPayment',
+      title: 'Test Payment',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Whether this is a test payment (no actual charges)',
+    }),
+
+    defineField({
       name: 'registrationDate',
       title: 'Registration Date',
       type: 'datetime',
@@ -426,7 +443,6 @@ export const conferenceRegistration = defineType({
       return {
         title: `${firstName} ${lastName}`,
         subtitle: `${email} - ${statusEmoji} ${paymentStatus.toUpperCase()} - ${currency} ${totalPrice}`,
-        media: statusEmoji,
       }
     },
   },

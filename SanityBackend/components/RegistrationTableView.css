@@ -60,21 +60,12 @@
   color: var(--table-text);
 }
 
-.registration-table tbody tr:hover {
-  background: var(--table-hover);
-}
-
 .registration-table tbody tr.even {
   background: var(--table-alternate);
 }
 
 .registration-table tbody tr.odd {
   background: var(--table-bg);
-}
-
-.registration-table tbody tr.even:hover,
-.registration-table tbody tr.odd:hover {
-  background: var(--table-hover);
 }
 
 /* Column-specific styling */
@@ -100,15 +91,63 @@
   text-overflow: ellipsis;
 }
 
+.registration-table .phone {
+  color: var(--table-text-muted);
+  font-size: 13px;
+  min-width: 120px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
 .registration-table .country {
   min-width: 100px;
 }
 
+.registration-table .address {
+  color: var(--table-text-muted);
+  font-size: 12px;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .registration-table .type {
-  min-width: 120px;
+  min-width: 140px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.registration-table .accommodation {
+  min-width: 150px;
+  font-size: 12px;
+  color: var(--table-text-muted);
+}
+
+.registration-table .reg-price {
+  min-width: 80px;
+  text-align: right;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.registration-table .acc-price {
+  min-width: 80px;
+  text-align: right;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 12px;
+  color: var(--table-text-muted);
+}
+
+.registration-table .total-price {
+  font-weight: 600;
+  text-align: right;
+  min-width: 80px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   font-size: 13px;
 }
 
+/* Legacy amount class for backward compatibility */
 .registration-table .amount {
   font-weight: 600;
   text-align: right;
@@ -145,7 +184,25 @@
   .registration-table .email {
     max-width: 150px;
   }
-  
+
+  .registration-table .phone {
+    max-width: 100px;
+  }
+
+  .registration-table .address {
+    max-width: 150px;
+  }
+
+  .registration-table .accommodation {
+    max-width: 120px;
+  }
+
+  .registration-table .reg-price,
+  .registration-table .acc-price,
+  .registration-table .total-price {
+    min-width: 70px;
+  }
+
   .registration-table .registration-id {
     max-width: 80px;
   }

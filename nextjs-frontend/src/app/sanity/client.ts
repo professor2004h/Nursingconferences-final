@@ -1,9 +1,10 @@
 import { createClient } from "next-sanity";
 
 // Validate required environment variables
-const projectId = "n3no08m3";
-const dataset = "production";
-const apiVersion = "2023-05-03";
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "n3no08m3";
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
+const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2023-05-03";
+const token = process.env.SANITY_API_TOKEN;
 
 if (!projectId) {
   throw new Error("Missing SANITY_PROJECT_ID environment variable");
@@ -12,6 +13,14 @@ if (!projectId) {
 if (!dataset) {
   throw new Error("Missing SANITY_DATASET environment variable");
 }
+
+console.log('🔑 Sanity Client Configuration:', {
+  projectId,
+  dataset,
+  apiVersion,
+  hasToken: !!token,
+  tokenLength: token ? token.length : 0
+});
 
 // Enhanced client configuration for optimal performance
 const baseClientConfig = {
@@ -25,6 +34,13 @@ const baseClientConfig = {
   // Enhanced retry configuration with exponential backoff
   maxRetries: 3,
   retryDelay: (attempt: number) => Math.min(Math.pow(2, attempt) * 1000, 10000),
+};
+
+// Write client configuration with API token
+const writeClientConfig = {
+  ...baseClientConfig,
+  token, // Include the API token for write operations
+  useCdn: false, // Never use CDN for write operations
 };
 
 // Primary client with CDN optimization
@@ -42,6 +58,16 @@ export const freshClient = createClient({
   maxRetries: 2,
   retryDelay: (attempt: number) => Math.pow(2, attempt) * 500,
 });
+
+// Write client with API token for create/update/delete operations
+export const writeClient = createClient(writeClientConfig);
+
+// Log write client status
+if (token) {
+  console.log('✅ Write client configured with API token');
+} else {
+  console.warn('⚠️ Write client configured WITHOUT API token - write operations will fail');
+}
 
 // Client specifically for header requests - optimized for speed
 export const headerClient = createClient({

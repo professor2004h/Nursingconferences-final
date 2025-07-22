@@ -11,6 +11,7 @@ export default function RegistrationSuccessPage() {
   const paymentId = searchParams?.get('payment_id');
   const orderId = searchParams?.get('order_id');
   const registrationId = searchParams?.get('registration_id');
+  const testMode = searchParams?.get('test_mode') === 'true';
 
   useEffect(() => {
     if (registrationId) {
@@ -61,11 +62,20 @@ export default function RegistrationSuccessPage() {
               <div className="space-y-6">
                 {/* Payment Information */}
                 {paymentId && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-blue-900 mb-2">Payment Confirmed</h3>
-                    <div className="text-sm text-blue-800">
+                  <div className={`border rounded-lg p-4 ${testMode ? 'bg-orange-50 border-orange-200' : 'bg-blue-50 border-blue-200'}`}>
+                    <h3 className={`text-lg font-semibold mb-2 ${testMode ? 'text-orange-900' : 'text-blue-900'}`}>
+                      {testMode ? '🧪 Test Payment Confirmed' : 'Payment Confirmed'}
+                    </h3>
+                    <div className={`text-sm ${testMode ? 'text-orange-800' : 'text-blue-800'}`}>
                       <p><strong>Payment ID:</strong> {paymentId}</p>
                       {orderId && <p><strong>Order ID:</strong> {orderId}</p>}
+                      {testMode && (
+                        <div className="mt-2 p-2 bg-orange-100 rounded border border-orange-300">
+                          <p className="text-xs text-orange-700 font-medium">
+                            ⚠️ This is a test payment - no actual charges were made to your account.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
