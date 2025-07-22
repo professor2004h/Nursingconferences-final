@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeClient } from '@/app/sanity/client';
+import { writeClient, client } from '@/app/sanity/client';
 import { z } from 'zod';
 
 // Validation schema for registration data
@@ -83,25 +83,25 @@ export async function POST(request: NextRequest) {
         title: registrationData.title || '',
         firstName: registrationData.firstName || '',
         lastName: registrationData.lastName || '',
-        fullName: `${registrationData.title || ''} ${registrationData.firstName || ''} ${registrationData.lastName || ''}`.trim(),
         email: registrationData.email || '',
         phoneNumber: registrationData.phoneNumber || '',
         country: registrationData.country || '',
         fullPostalAddress: registrationData.fullPostalAddress || '',
       },
-      // Sponsorship Details (only for sponsorship registrations)
-      ...(registrationData.sponsorType && {
-        sponsorshipDetails: {
-          sponsorType: registrationData.sponsorType,
-        }
+      // For regular registrations
+      ...(registrationData.selectedRegistration && {
+        selectedRegistration: registrationData.selectedRegistration,
+        selectedRegistrationName: registrationData.selectedRegistrationName || registrationData.selectedRegistration,
       }),
-      selectedRegistration: registrationData.selectedRegistration,
-      selectedRegistrationName: registrationData.selectedRegistrationName || registrationData.selectedRegistration,
-      participantCategory: registrationData.participantCategory,
-      accommodationDetails: registrationData.accommodationType ? {
+      // For sponsorship registrations - store the tier directly
+      ...(registrationData.sponsorType && {
+        sponsorType: registrationData.sponsorType, // Gold, Diamond, Platinum
+      }),
+      // Accommodation details
+      ...(registrationData.accommodationType && {
         accommodationType: registrationData.accommodationType,
         accommodationNights: registrationData.accommodationNights,
-      } : null,
+      }),
       numberOfParticipants: registrationData.numberOfParticipants,
       pricing: {
         registrationFee: registrationData.registrationFee || 0,
@@ -109,26 +109,11 @@ export async function POST(request: NextRequest) {
         totalPrice: registrationData.totalPrice || 0,
         currency: 'USD',
         pricingPeriod: registrationData.pricingPeriod || 'unknown',
-        formattedTotalPrice: `$${registrationData.totalPrice || 0} USD`, // For table display
       },
       paymentStatus: 'pending',
       registrationDate: new Date().toISOString(),
       lastUpdated: new Date().toISOString(),
       isActive: true,
-
-      // Additional fields for better table display and filtering
-      registrationSummary: {
-        registrationType: registrationData.sponsorType ? 'Sponsorship' : 'Regular Registration',
-        selectedOption: registrationData.sponsorType || registrationData.selectedRegistration || 'Not specified',
-        participantCount: registrationData.numberOfParticipants || 1,
-        hasAccommodation: !!(registrationData.accommodationType && registrationData.accommodationNights),
-        registrationMonth: new Date().toISOString().substring(0, 7), // YYYY-MM format for grouping
-        paymentStatusDisplay: 'PENDING',
-      },
-
-      // Computed fields for table display
-      fullName: `${registrationData.title || ''} ${registrationData.firstName || ''} ${registrationData.lastName || ''}`.trim(),
-      formattedTotalPrice: `$${registrationData.totalPrice || 0} USD`,
     };
 
     // Save to Sanity using write client with API token
@@ -138,12 +123,12 @@ export async function POST(request: NextRequest) {
       console.log('💾 Attempting to save registration to Sanity with write client...');
       result = await writeClient.create(registrationRecord);
       console.log('✅ Registration saved to Sanity successfully:', result._id);
-    } catch (error) {
+    } catch (error: any) {
       sanityError = error;
       console.error('❌ Sanity save failed:', error);
 
       // Check if it's a permissions error
-      if (error.statusCode === 403) {
+      if (error?.statusCode === 403) {
         console.error('🔒 Sanity permissions error - API token may be invalid or missing write permissions');
       }
 

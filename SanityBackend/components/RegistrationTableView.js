@@ -30,46 +30,26 @@ export default function RegistrationTableView() {
           country,
           fullPostalAddress
         },
+        selectedRegistration,
         selectedRegistrationName,
-        selectedRegistrationType-> {
-          name,
-          category
-        },
-        sponsorshipDetails {
-          sponsorshipTier-> {
-            name,
-            tierName,
-            price,
-            displayName
-          },
-          companyName
-        },
+        sponsorType,
         accommodationDetails {
           accommodationType,
           accommodationNights
         },
-        accommodationOption {
-          hotel-> {
-            name,
-            location
-          },
-          roomType,
-          nights,
-          checkInDate,
-          checkOutDate
-        },
+        accommodationType,
+        accommodationNights,
+        numberOfParticipants,
         pricing {
-          registrationPrice,
-          accommodationPrice,
+          registrationFee,
+          accommodationFee,
           totalPrice,
           currency,
-          pricingPeriod,
-          participantCategory
+          pricingPeriod
         },
         paymentStatus,
         paymentId,
-        registrationDate,
-        numberOfParticipants
+        registrationDate
       }`
 
       const result = await client.fetch(query)
@@ -143,17 +123,32 @@ export default function RegistrationTableView() {
   const getRegistrationTypeName = (registration) => {
     // Priority hierarchy for registration type display
 
-    // 1. For sponsorship registrations, show specific tier
-    if (registration.registrationType === 'sponsorship' && registration.sponsorshipDetails?.sponsorshipTier) {
-      const tier = registration.sponsorshipDetails.sponsorshipTier
-      const tierName = tier.displayName || tier.name || tier.tierName
-      const companyName = registration.sponsorshipDetails.companyName
+    // 1. For sponsorship registrations, show specific tier with "Sponsorship-" prefix
+    if (registration.registrationType === 'sponsorship') {
+      // Check multiple possible sources for sponsorship tier
+      let tierName = null
       
-      if (tierName && companyName) {
-        return `${tierName} Sponsor (${companyName})`
-      } else if (tierName) {
-        return `${tierName} Sponsor`
+      // From direct sponsorType field (new schema)
+      if (registration.sponsorType) {
+        tierName = registration.sponsorType
       }
+      
+      // From sponsorshipDetails reference (old schema)
+      if (!tierName && registration.sponsorshipDetails?.sponsorshipTier) {
+        const tier = registration.sponsorshipDetails.sponsorshipTier
+        tierName = tier.name || tier.displayName || tier.tierName
+      }
+      
+      // From selectedOption field (fallback)
+      if (!tierName && registration.selectedOption) {
+        tierName = registration.selectedOption
+      }
+      
+      if (tierName) {
+        return `Sponsorship-${tierName}`
+      }
+      
+      return 'Sponsorship'
     }
 
     // 2. Direct stored name (most reliable)
@@ -166,34 +161,78 @@ export default function RegistrationTableView() {
       return registration.selectedRegistrationType.name
     }
 
-    // 4. Generic sponsorship fallback
-    if (registration.registrationType === 'sponsorship') {
-      return 'Sponsorship'
-    }
-
-    // 5. Final fallback
-    return 'Unknown'
+    // 4. Final fallback
+    return registration.registrationType === 'regular' ? 'Regular' : 'Unknown'
   }
 
   const getAccommodationInfo = (registration) => {
-    // Check both accommodationDetails and accommodationOption
+    // Check accommodationDetails first (new structure)
     const accDetails = registration.accommodationDetails
-    const accOption = registration.accommodationOption
-
     if (accDetails && accDetails.accommodationType) {
-      const nights = accDetails.accommodationNights || 0
-      return `${accDetails.accommodationType} (${nights} nights)`
+      if (typeof accDetails.accommodationType === 'string' && accDetails.accommodationType.includes('-')) {
+        const parts = accDetails.accommodationType.split('-')
+        const hotelId = parts[0] // First part is hotel ID
+        const roomType = parts[1] // Second part is room type
+        const nights = accDetails.accommodationNights || parts[2] || 0
+        
+        // Map hotel ID to hotel name
+        const hotelNames = {
+          'YaUKtSRJPGGV5DwX1UOi6E': 'Grand Convention Hotel',
+          'YaUKtSRJPGGV5DwX1UOiIZ': 'Business Inn & Suites'
+        }
+        
+        const hotelName = hotelNames[hotelId] || 'Unknown Hotel'
+        
+        const roomTypeDisplay = {
+          'single': 'Single Room',
+          'double': 'Double Room', 
+          'triple': 'Triple Room'
+        }[roomType] || roomType
+        
+        return `${hotelName} - ${roomTypeDisplay} (${nights} nights)`
+      } else {
+        const nights = accDetails.accommodationNights || 0
+        return `${accDetails.accommodationType} (${nights} nights)`
+      }
     }
 
+    // Fallback to old structure (accommodationType and accommodationNights at root level)
+    if (registration.accommodationType) {
+      if (typeof registration.accommodationType === 'string' && registration.accommodationType.includes('-')) {
+        const parts = registration.accommodationType.split('-')
+        const hotelId = parts[0]
+        const roomType = parts[1]
+        const nights = registration.accommodationNights || parts[2] || 0
+        
+        const hotelNames = {
+          'YaUKtSRJPGGV5DwX1UOi6E': 'Grand Convention Hotel',
+          'YaUKtSRJPGGV5DwX1UOiIZ': 'Business Inn & Suites'
+        }
+        
+        const hotelName = hotelNames[hotelId] || 'Unknown Hotel'
+        
+        const roomTypeDisplay = {
+          'single': 'Single Room',
+          'double': 'Double Room', 
+          'triple': 'Triple Room'
+        }[roomType] || roomType
+        
+        return `${hotelName} - ${roomTypeDisplay} (${nights} nights)`
+      } else {
+        const nights = registration.accommodationNights || 0
+        return `${registration.accommodationType} (${nights} nights)`
+      }
+    }
+
+    // Handle accommodationOption format (if exists)
+    const accOption = registration.accommodationOption
     if (accOption) {
       const parts = []
       
-      // Add hotel name if available
-      if (accOption.hotel?.name) {
-        parts.push(accOption.hotel.name)
+      if (accOption.hotel?.hotelName) {
+        parts.push(accOption.hotel.hotelName)
       }
       
-      // Add room type
       if (accOption.roomType) {
         const roomTypeDisplay = {
           'single': 'Single Room',
@@ -203,20 +242,12 @@ export default function RegistrationTableView() {
         parts.push(roomTypeDisplay)
       }
       
-      // Add nights
       if (accOption.nights) {
         parts.push(`${accOption.nights} nights`)
       }
       
-      // Add dates if available
-      if (accOption.checkInDate && accOption.checkOutDate) {
-        const checkIn = new Date(accOption.checkInDate).toLocaleDateString()
-        const checkOut = new Date(accOption.checkOutDate).toLocaleDateString()
-        parts.push(`${checkIn} - ${checkOut}`)
-      }
-      
       if (parts.length > 0) {
-        return parts.join(' | ')
+        return parts.join(' - ')
       }
     }
 
@@ -224,15 +255,70 @@ export default function RegistrationTableView() {
   }
 
   const getRegistrationPrice = (registration) => {
-    const price = registration.pricing?.registrationPrice
-    if (price === undefined || price === null) return 'N/A'
+    // Try to get from pricing object first
+    let price = registration.pricing?.registrationPrice
+    
+    // If not available, try to calculate from other fields
+    if (price === undefined || price === null) {
+      // Check if we have registrationFee field (from debug data)
+      if (registration.pricing?.registrationFee) {
+        price = registration.pricing.registrationFee
+      } else {
+        // For sponsorship registrations, we might need to get the tier price
+        if (registration.registrationType === 'sponsorship' && registration.sponsorshipDetails?.sponsorshipTier?.price) {
+          price = registration.sponsorshipDetails.sponsorshipTier.price
+        } else {
+          return 'N/A'
+        }
+      }
+    }
+    
     const currency = registration.pricing?.currency || 'USD'
     return `${currency} ${price.toLocaleString()}`
   }
 
   const getAccommodationPrice = (registration) => {
-    const price = registration.pricing?.accommodationPrice
-    if (price === undefined || price === null || price === 0) return 'N/A'
+    // Try to get from pricing object first
+    let price = registration.pricing?.accommodationPrice
+    
+    // If not available, try to calculate from other fields
+    if (price === undefined || price === null || price === 0) {
+      // Check if we have accommodationFee field (from debug data)
+      if (registration.pricing?.accommodationFee) {
+        price = registration.pricing.accommodationFee
+      } else {
+        // Try to calculate from accommodation details and hotel rates
+        const accDetails = registration.accommodationDetails
+        if (accDetails && accDetails.accommodationType && accDetails.accommodationType.includes('-')) {
+          const parts = accDetails.accommodationType.split('-')
+          const hotelId = parts[0]
+          const roomType = parts[1]
+          const nights = parseInt(accDetails.accommodationNights) || 0
+          
+          // Hotel room rates (from debug data)
+          const hotelRates = {
+            'YaUKtSRJPGGV5DwX1UOi6E': { // Grand Convention Hotel
+              'single': 180,
+              'double': 250
+            },
+            'YaUKtSRJPGGV5DwX1UOiIZ': { // Business Inn & Suites
+              'single': 121,
+              'double': 160
+            }
+          }
+          
+          const ratePerNight = hotelRates[hotelId]?.[roomType]
+          if (ratePerNight && nights > 0) {
+            price = ratePerNight * nights
+          } else {
+            return 'N/A'
+          }
+        } else {
+          return 'N/A'
+        }
+      }
+    }
+    
     const currency = registration.pricing?.currency || 'USD'
     return `${currency} ${price.toLocaleString()}`
   }
