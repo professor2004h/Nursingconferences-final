@@ -39,16 +39,24 @@ export default function RegistrationTableView() {
           sponsorshipTier-> {
             name,
             tierName,
-            price
-          }
+            price,
+            displayName
+          },
+          companyName
         },
         accommodationDetails {
           accommodationType,
           accommodationNights
         },
         accommodationOption {
+          hotel-> {
+            name,
+            location
+          },
           roomType,
-          nights
+          nights,
+          checkInDate,
+          checkOutDate
         },
         pricing {
           registrationPrice,
@@ -135,24 +143,35 @@ export default function RegistrationTableView() {
   const getRegistrationTypeName = (registration) => {
     // Priority hierarchy for registration type display
 
-    // 1. Direct stored name (most reliable)
+    // 1. For sponsorship registrations, show specific tier
+    if (registration.registrationType === 'sponsorship' && registration.sponsorshipDetails?.sponsorshipTier) {
+      const tier = registration.sponsorshipDetails.sponsorshipTier
+      const tierName = tier.displayName || tier.name || tier.tierName
+      const companyName = registration.sponsorshipDetails.companyName
+      
+      if (tierName && companyName) {
+        return `${tierName} Sponsor (${companyName})`
+      } else if (tierName) {
+        return `${tierName} Sponsor`
+      }
+    }
+
+    // 2. Direct stored name (most reliable)
     if (registration.selectedRegistrationName) {
       return registration.selectedRegistrationName
     }
 
-    // 2. Reference lookup name
+    // 3. Reference lookup name
     if (registration.selectedRegistrationType?.name) {
       return registration.selectedRegistrationType.name
     }
 
-    // 3. Sponsorship tier name (for sponsorship registrations)
+    // 4. Generic sponsorship fallback
     if (registration.registrationType === 'sponsorship') {
-      return registration.sponsorshipDetails?.sponsorshipTier?.name ||
-             registration.sponsorshipDetails?.sponsorshipTier?.tierName ||
-             'Sponsorship'
+      return 'Sponsorship'
     }
 
-    // 4. Final fallback
+    // 5. Final fallback
     return 'Unknown'
   }
 
@@ -166,31 +185,63 @@ export default function RegistrationTableView() {
       return `${accDetails.accommodationType} (${nights} nights)`
     }
 
-    if (accOption && accOption.roomType) {
-      const nights = accOption.nights || 0
-      return `${accOption.roomType} (${nights} nights)`
+    if (accOption) {
+      const parts = []
+      
+      // Add hotel name if available
+      if (accOption.hotel?.name) {
+        parts.push(accOption.hotel.name)
+      }
+      
+      // Add room type
+      if (accOption.roomType) {
+        const roomTypeDisplay = {
+          'single': 'Single Room',
+          'double': 'Double Room', 
+          'triple': 'Triple Room'
+        }[accOption.roomType] || accOption.roomType
+        parts.push(roomTypeDisplay)
+      }
+      
+      // Add nights
+      if (accOption.nights) {
+        parts.push(`${accOption.nights} nights`)
+      }
+      
+      // Add dates if available
+      if (accOption.checkInDate && accOption.checkOutDate) {
+        const checkIn = new Date(accOption.checkInDate).toLocaleDateString()
+        const checkOut = new Date(accOption.checkOutDate).toLocaleDateString()
+        parts.push(`${checkIn} - ${checkOut}`)
+      }
+      
+      if (parts.length > 0) {
+        return parts.join(' | ')
+      }
     }
 
     return 'None'
   }
 
   const getRegistrationPrice = (registration) => {
-    const price = registration.pricing?.registrationPrice || 0
+    const price = registration.pricing?.registrationPrice
+    if (price === undefined || price === null) return 'N/A'
     const currency = registration.pricing?.currency || 'USD'
-    return `${currency} ${price}`
+    return `${currency} ${price.toLocaleString()}`
   }
 
   const getAccommodationPrice = (registration) => {
-    const price = registration.pricing?.accommodationPrice || 0
-    if (price === 0) return 'N/A'
+    const price = registration.pricing?.accommodationPrice
+    if (price === undefined || price === null || price === 0) return 'N/A'
     const currency = registration.pricing?.currency || 'USD'
-    return `${currency} ${price}`
+    return `${currency} ${price.toLocaleString()}`
   }
 
   const getTotalPrice = (registration) => {
-    const price = registration.pricing?.totalPrice || 0
+    const price = registration.pricing?.totalPrice
+    if (price === undefined || price === null) return 'N/A'
     const currency = registration.pricing?.currency || 'USD'
-    return `${currency} ${price}`
+    return `${currency} ${price.toLocaleString()}`
   }
 
   const getStatusBadge = (status) => {
