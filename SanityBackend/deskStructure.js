@@ -1,7 +1,8 @@
 // Custom Sanity Studio structure to include Map Location in the sidebar
-import {DocumentIcon, DownloadIcon, PinIcon, UserIcon} from '@sanity/icons'
+import {DocumentIcon, DownloadIcon, PinIcon, UserIcon, EditIcon, UsersIcon} from '@sanity/icons'
 import BrochureTableView from './components/BrochureTableView'
 import RegistrationTableView from './components/RegistrationTableView'
+import AbstractTableView from './components/AbstractTableView.jsx'
 
 export default (S) =>
   S.list()
@@ -99,6 +100,94 @@ export default (S) =>
                     .defaultOrdering([{field: 'registrationDate', direction: 'desc'}])
                 )
             ])
+        ),
+      // Add Abstract Submission System
+      S.listItem()
+        .title('📝 Abstract')
+        .id('abstractSubmissionSystem')
+        .icon(EditIcon)
+        .child(
+          S.list()
+            .title('Abstract Management')
+            .items([
+              // Abstract Settings
+              S.listItem()
+                .title('⚙️ Abstract Settings')
+                .id('abstractSettings')
+                .child(
+                  S.documentTypeList('abstractSettings')
+                    .title('Abstract Settings')
+                ),
+              // Abstract Submissions Table View
+              S.listItem()
+                .title('📊 Abstract Submissions')
+                .id('abstractSubmissionsTable')
+                .child(
+                  S.component(AbstractTableView)
+                    .title('Abstract Submissions - Table View')
+                ),
+              // Traditional Document List View
+              S.listItem()
+                .title('📄 Abstract List')
+                .id('abstractSubmissionsList')
+                .child(
+                  S.documentTypeList('abstractSubmission')
+                    .title('Abstract Submissions - List View')
+                    .defaultOrdering([{field: 'submissionDate', direction: 'desc'}])
+                )
+            ])
+        ),
+      // Add Organizing Committee
+      S.listItem()
+        .title('Organizing Committee')
+        .id('organizingCommittee')
+        .icon(UsersIcon)
+        .schemaType('organizingCommittee')
+        .child(
+          S.documentTypeList('organizingCommittee')
+            .title('Organizing Committee Members')
+            .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
+        ),
+      // Add Speakers
+      S.listItem()
+        .title('Conference Speakers')
+        .id('speakers')
+        .icon(() => '🎤')
+        .schemaType('speakers')
+        .child(
+          S.documentTypeList('speakers')
+            .title('Conference Speakers')
+            .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
+        ),
+      // Add Speaker Guidelines
+      S.listItem()
+        .title('Speaker Guidelines')
+        .id('speakerGuidelines')
+        .icon(() => '🎤')
+        .schemaType('speakerGuidelines')
+        .child(
+          S.documentTypeList('speakerGuidelines')
+            .title('Speaker Guidelines')
+        ),
+      // Add Venue Settings
+      S.listItem()
+        .title('Venue Settings')
+        .id('venueSettings')
+        .icon(() => '🏨')
+        .schemaType('venueSettings')
+        .child(
+          S.documentTypeList('venueSettings')
+            .title('Venue Settings')
+        ),
+      // Add Cancellation Policy
+      S.listItem()
+        .title('Cancellation Policy')
+        .id('cancellationPolicy')
+        .icon(() => '📋')
+        .schemaType('cancellationPolicy')
+        .child(
+          S.documentTypeList('cancellationPolicy')
+            .title('Cancellation Policy')
         ),
       // Add Map Location with icon
       S.listItem()

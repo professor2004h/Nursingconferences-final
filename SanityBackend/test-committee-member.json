@@ -1,0 +1,25 @@
+{
+  "_type": "organizingCommittee",
+  "name": "Dr. Sarah Johnson",
+  "title": "Professor of Nursing",
+  "institution": "Johns Hopkins University School of Nursing",
+  "country": "United States",
+  "bio": "Dr. Sarah Johnson is a distinguished professor with over 20 years of experience in nursing education and research. She specializes in critical care nursing and has published extensively on patient safety and quality improvement initiatives. Dr. Johnson has received numerous awards for her contributions to nursing education and serves on several editorial boards of prestigious nursing journals.",
+  "specialization": "Critical Care Nursing",
+  "email": "sarah.johnson@jhu.edu",
+  "linkedinUrl": "https://linkedin.com/in/sarah-johnson-nursing",
+  "displayOrder": 1,
+  "isChairperson": true,
+  "isActive": true,
+  "yearsOfExperience": 20,
+  "achievements": [
+    "American Academy of Nursing Fellow",
+    "Excellence in Nursing Education Award 2022",
+    "Published over 50 peer-reviewed articles",
+    "Principal Investigator on $2M NIH grant"
+  ],
+  "publications": [
+    "Johnson, S. et al. (2023). \"Innovations in Critical Care Nursing Education.\" Journal of Nursing Education.",
+    "Johnson, S. & Smith, M. (2022). \"Patient Safety Protocols in ICU Settings.\" Critical Care Nursing Quarterly."
+  ]
+}

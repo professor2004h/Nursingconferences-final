@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
+import PayPalPaymentSection from '@/app/components/PayPalPaymentSection';
 
 // Form data interface
 interface FormData {
@@ -63,6 +64,10 @@ const countries = [
 export default function RegistrationPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [currentRegistrationId, setCurrentRegistrationId] = useState<string | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [showPayPalSection, setShowPayPalSection] = useState(false);
   const [currentPricingPeriod, setCurrentPricingPeriod] = useState<'earlyBird' | 'nextRound' | 'spotRegistration'>('earlyBird');
 
   // Dynamic registration data
@@ -247,6 +252,34 @@ export default function RegistrationPage() {
   };
 
   const priceCalculation = calculateTotalPrice();
+
+  // Handle payment success
+  const handlePaymentSuccess = (paymentData: any) => {
+    console.log('✅ Payment successful:', paymentData);
+    setPaymentSuccess(true);
+    setShowPayPalSection(false);
+
+    // Redirect to success page with payment details
+    const successUrl = `/registration/success?` +
+      `registration_id=${paymentData.registrationId}&` +
+      `payment_id=${paymentData.paymentId}&` +
+      `order_id=${paymentData.orderId}&` +
+      `amount=${paymentData.amount}&` +
+      `currency=${paymentData.currency}&` +
+      `payment_method=paypal&` +
+      `status=completed&` +
+      `test_mode=true`;
+
+    router.push(successUrl);
+  };
+
+  // Handle payment error
+  const handlePaymentError = (error: any) => {
+    console.error('❌ Payment failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Payment failed';
+    alert(`Payment failed: ${errorMessage}\nYour registration is saved and you can complete payment later.`);
+    setIsLoading(false);
+  };
 
   // Initialize Razorpay payment
   const initializeRazorpayPayment = async (registrationId: string, amount: number, registrationData: any) => {
@@ -484,44 +517,11 @@ export default function RegistrationPage() {
         return;
       }
 
-      // **TEST MODE: Bypass Razorpay payment processing**
-      // Simulate successful payment processing
-      console.log('🧪 TEST MODE: Bypassing Razorpay payment processing');
-
-      // Create test payment record
-      const testPaymentData = {
-        registrationId: result.registrationId,
-        paymentId: `TEST_PAY_${Date.now()}`,
-        orderId: `TEST_ORDER_${Date.now()}`,
-        amount: priceCalculation.totalPrice,
-        currency: 'USD',
-        paymentMethod: 'test_payment',
-        paymentStatus: 'completed',
-        paymentDate: new Date().toISOString(),
-        isTestPayment: true,
-      };
-
-      // Update registration with test payment information
-      const paymentResponse = await fetch('/api/registration/update-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(testPaymentData),
-      });
-
-      const paymentResult = await paymentResponse.json();
-
-      if (paymentResult.success) {
-        // Show success message
-        alert(`✅ Registration and Payment Successful!\n\nRegistration ID: ${result.registrationId}\nPayment ID: ${testPaymentData.paymentId}\nAmount: $${priceCalculation.totalPrice} USD\n\nThis is a test payment - no actual charges were made.`);
-
-        // Redirect to success page with test payment details
-        const successUrl = `/registration/success?registration_id=${result.registrationId}&payment_id=${testPaymentData.paymentId}&order_id=${testPaymentData.orderId}&test_mode=true`;
-        window.location.href = successUrl;
-      } else {
-        throw new Error('Failed to process test payment');
-      }
+      // Show PayPal payment section for payment processing
+      console.log('💳 Proceeding to payment for registration:', result.registrationId);
+      setCurrentRegistrationId(result.registrationId);
+      setShowPayPalSection(true);
+      setIsLoading(false);
 
     } catch (error) {
       console.error('Registration error:', error);
@@ -1230,60 +1230,82 @@ export default function RegistrationPage() {
               </div>
             </div>
 
-            {/* Choose Payment Method */}
+            {/* Registration Action */}
             <div className="bg-white rounded-lg shadow-sm border">
               <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
-                <h2 className="text-lg font-bold text-white">Choose Payment Method</h2>
+                <h2 className="text-lg font-bold text-white">Complete Registration</h2>
               </div>
               <div className="p-6">
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="razorpay"
-                        defaultChecked
-                        className="mr-2"
-                      />
-                      <img
-                        src="/api/placeholder/120/40"
-                        alt="Razorpay"
-                        className="h-8"
-                      />
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="ccavenue"
-                        className="mr-2"
-                      />
-                      <img
-                        src="/api/placeholder/120/40"
-                        alt="CC Avenue"
-                        className="h-8"
-                      />
-                    </label>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <span className="text-blue-500 text-lg mr-2">💳</span>
+                      <div>
+                        <p className="text-sm font-medium text-blue-800">Pay with PayPal</p>
+                        <p className="text-xs text-blue-600">
+                          Click "Register Now" to save your registration. PayPal payment options will appear below.
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="mt-6">
-                    <button
-                      type="submit"
-                      disabled={isLoading || priceCalculation.totalPrice === 0}
-                      className="w-full bg-blue-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {isLoading ? 'Processing...' : 'Register Now'}
-                    </button>
+                  {/* PayPal Preview Section */}
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-white text-blue-600 px-4 py-2 rounded-lg text-lg font-bold mr-4">
+                          PayPal
+                        </div>
+                        <div>
+                          <p className="font-semibold">Secure Payment Processing</p>
+                          <p className="text-sm text-blue-100">
+                            Pay safely with your PayPal account or credit card
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold">
+                          ${priceCalculation.totalPrice.toFixed(2)}
+                        </p>
+                        <p className="text-sm text-blue-100">Total Amount</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-center space-x-6 text-sm">
+                      <div className="flex items-center">
+                        <span className="mr-2">🔒</span>
+                        <span>Secure</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2">🌍</span>
+                        <span>Global</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2">⚡</span>
+                        <span>Instant</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2">🛡️</span>
+                        <span>Protected</span>
+                      </div>
+                    </div>
                   </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading || priceCalculation.totalPrice === 0}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isLoading ? 'Processing...' : 'Register Now'}
+                  </button>
 
                   <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600 mb-2">Payment secured by</p>
                     <div className="flex justify-center space-x-2">
-                      <img src="/api/placeholder/40/25" alt="PayPal" className="h-6" />
-                      <img src="/api/placeholder/40/25" alt="Visa" className="h-6" />
-                      <img src="/api/placeholder/40/25" alt="Mastercard" className="h-6" />
-                      <img src="/api/placeholder/40/25" alt="American Express" className="h-6" />
+                      <span className="text-sm bg-blue-100 text-blue-800 px-3 py-2 rounded-lg font-medium">💳 PayPal</span>
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Secure</span>
+                      <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">Global</span>
+                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Trusted</span>
                     </div>
                   </div>
                 </div>
@@ -1291,6 +1313,91 @@ export default function RegistrationPage() {
             </div>
           </div>
         </form>
+
+        {/* PayPal Payment Section */}
+        {showPayPalSection && currentRegistrationId && (
+          <div className="mt-8 mb-8 w-full max-w-4xl mx-auto relative z-10">
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Complete Your Payment</h2>
+              <p className="text-gray-600 text-sm">
+                Your registration has been saved. Please complete your payment below to confirm your spot.
+              </p>
+            </div>
+            <PayPalPaymentSection
+              amount={priceCalculation.totalPrice}
+              currency="USD"
+              registrationId={currentRegistrationId}
+              registrationData={formData}
+              onSuccess={handlePaymentSuccess}
+              onError={handlePaymentError}
+              disabled={isLoading}
+            />
+          </div>
+        )}
+
+        {/* Payment Component */}
+        {showPayment && currentRegistrationId && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="bg-blue-800 text-white px-6 py-4 rounded-t-lg">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold">Complete Payment</h2>
+                  <button
+                    onClick={() => {
+                      setShowPayment(false);
+                      setCurrentRegistrationId(null);
+                    }}
+                    className="text-white hover:text-gray-200 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                <p className="text-blue-100 text-sm mt-1">
+                  Registration ID: {currentRegistrationId}
+                </p>
+              </div>
+
+              <div className="p-6">
+                <PayPalOnlyPayment
+                  amount={priceCalculation.totalPrice}
+                  currency="USD"
+                  registrationId={currentRegistrationId}
+                  registrationData={formData}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {paymentSuccess && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+              <div className="bg-green-600 text-white px-6 py-4 rounded-t-lg">
+                <h2 className="text-xl font-bold">Registration Successful! 🎉</h2>
+              </div>
+              <div className="p-6 text-center">
+                <div className="text-6xl mb-4">✅</div>
+                <p className="text-gray-700 mb-4">
+                  Your registration and payment have been processed successfully!
+                </p>
+                <button
+                  onClick={() => {
+                    setPaymentSuccess(false);
+                    // Optionally redirect to home or success page
+                    window.location.href = '/';
+                  }}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

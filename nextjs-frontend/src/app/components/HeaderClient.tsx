@@ -52,6 +52,18 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
             Past Conferences
           </Link>
           <Link
+            href="/organizing-committee"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Committee
+          </Link>
+          <Link
+            href="/speakers"
+            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Speakers
+          </Link>
+          <Link
             href="/brochure"
             className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
@@ -155,6 +167,20 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               onClick={closeMenu}
             >
               Past Conferences
+            </Link>
+            <Link
+              href="/organizing-committee"
+              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={closeMenu}
+            >
+              Committee
+            </Link>
+            <Link
+              href="/speakers"
+              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={closeMenu}
+            >
+              Speakers
             </Link>
             <Link
               href="/brochure"

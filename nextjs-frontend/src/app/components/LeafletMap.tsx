@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useMapHoverOverlay } from '@/app/hooks/useMapHoverOverlay';
+import MapHoverOverlay from './MapHoverOverlay';
 // Removed DMS coordinate processing - using decimal only
 
 // Fix for default markers in Leaflet with Next.js
@@ -34,21 +36,116 @@ interface LeafletMapProps {
 const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const {
+    isMobile,
+    showOverlay,
+    handleMouseEnter,
+    handleMouseLeave,
+    overlayContent
+  } = useMapHoverOverlay();
 
   useEffect(() => {
     // Only run on client side
     if (typeof window === 'undefined' || !mapRef.current || locations.length === 0) return;
 
-    // Initialize map
+    // Initialize map with platform-specific controls
     const map = L.map(mapRef.current, {
       zoomControl: true,
-      scrollWheelZoom: true,
+      scrollWheelZoom: false, // Disable default scroll zoom
       doubleClickZoom: true,
-      touchZoom: true,
+      touchZoom: isMobile ? 'center' : false, // Enable touch zoom only on mobile
       dragging: true,
+      tap: true,
+      tapTolerance: 15,
+      bounceAtZoomLimits: false,
     });
 
     mapInstanceRef.current = map;
+
+    // Platform-specific zoom controls
+    if (!isMobile) {
+      // Desktop: Ctrl + scroll zoom
+      let isCtrlPressed = false;
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.ctrlKey || e.metaKey) {
+          isCtrlPressed = true;
+        }
+      };
+
+      const handleKeyUp = (e: KeyboardEvent) => {
+        if (!e.ctrlKey && !e.metaKey) {
+          isCtrlPressed = false;
+        }
+      };
+
+      const handleWheel = (e: WheelEvent) => {
+        if (isCtrlPressed) {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? -1 : 1;
+          const currentZoom = map.getZoom();
+          map.setZoom(currentZoom + delta);
+        }
+      };
+
+      // Add event listeners
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
+      if (mapRef.current) {
+        mapRef.current.addEventListener('wheel', handleWheel, { passive: false });
+      }
+
+      // Cleanup function for desktop controls
+      const cleanupDesktopControls = () => {
+        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener('keyup', handleKeyUp);
+        if (mapRef.current) {
+          mapRef.current.removeEventListener('wheel', handleWheel);
+        }
+      };
+
+      // Store cleanup function
+      (map as any)._cleanupDesktopControls = cleanupDesktopControls;
+    } else {
+      // Mobile-specific touch handling for better two-finger zoom
+      let touchCount = 0;
+
+      const handleTouchStart = (e: TouchEvent) => {
+        touchCount = e.touches.length;
+        if (touchCount === 2) {
+          // Two fingers detected - enable zoom
+          map.touchZoom.enable();
+        } else {
+          // Single finger - disable zoom to allow panning
+          map.touchZoom.disable();
+        }
+      };
+
+      const handleTouchEnd = (e: TouchEvent) => {
+        touchCount = e.touches.length;
+        if (touchCount < 2) {
+          // Less than two fingers - disable zoom
+          map.touchZoom.disable();
+        }
+      };
+
+      // Add mobile touch event listeners
+      if (mapRef.current) {
+        mapRef.current.addEventListener('touchstart', handleTouchStart, { passive: true });
+        mapRef.current.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        // Cleanup function for mobile controls
+        const cleanupMobileControls = () => {
+          if (mapRef.current) {
+            mapRef.current.removeEventListener('touchstart', handleTouchStart);
+            mapRef.current.removeEventListener('touchend', handleTouchEnd);
+          }
+        };
+
+        // Store cleanup function
+        (map as any)._cleanupMobileControls = cleanupMobileControls;
+      }
+    }
 
     // Add CartoDB Positron tiles (English-only labels, clean design)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -232,6 +329,14 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
     // Cleanup function
     return () => {
       if (mapInstanceRef.current) {
+        // Cleanup desktop controls if they exist
+        if ((mapInstanceRef.current as any)._cleanupDesktopControls) {
+          (mapInstanceRef.current as any)._cleanupDesktopControls();
+        }
+        // Cleanup mobile controls if they exist
+        if ((mapInstanceRef.current as any)._cleanupMobileControls) {
+          (mapInstanceRef.current as any)._cleanupMobileControls();
+        }
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
@@ -249,7 +354,18 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
           zIndex: 1,
           isolation: 'isolate'
         }}
-      />
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        role="application"
+        aria-label="Interactive map showing global locations"
+        aria-describedby="map-zoom-instruction"
+      >
+        <MapHoverOverlay
+          show={showOverlay}
+          text={overlayContent.text}
+          icon={overlayContent.icon}
+        />
+      </div>
       <style jsx global>{`
         .custom-popup .leaflet-popup-content-wrapper {
           border-radius: 12px;

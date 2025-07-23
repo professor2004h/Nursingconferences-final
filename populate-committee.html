@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Populate Committee Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .button {
+            background: #007cba;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+            min-width: 200px;
+        }
+        .button:hover {
+            background: #005a87;
+        }
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .member-list {
+            margin: 15px 0;
+        }
+        .member-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 3px;
+            border-left: 4px solid #007cba;
+        }
+        .chairperson {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Populate Organizing Committee Data</h1>
+        
+        <div class="info-box">
+            <h3>📋 What this will create:</h3>
+            <ul>
+                <li><strong>8 Committee Members</strong> with complete profiles</li>
+                <li><strong>1 Chairperson</strong> (Dr. Sarah Johnson)</li>
+                <li><strong>International representation</strong> from 5 countries</li>
+                <li><strong>Complete data</strong> including achievements and publications</li>
+            </ul>
+        </div>
+        
+        <button id="populateBtn" class="button" onclick="populateCommitteeData()">
+            🚀 Populate Committee Data
+        </button>
+        
+        <button id="checkBtn" class="button" onclick="checkExistingData()" style="background: #28a745;">
+            🔍 Check Existing Data
+        </button>
+        
+        <div id="status" class="status"></div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function populateCommitteeData() {
+            const button = document.getElementById('populateBtn');
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            
+            button.disabled = true;
+            button.textContent = '⏳ Creating committee members...';
+            
+            status.style.display = 'block';
+            status.className = 'status info';
+            status.innerHTML = '🔄 Sending request to populate committee data...';
+            
+            try {
+                const response = await fetch('/api/populate-committee', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.className = 'status success';
+                    status.innerHTML = `
+                        <h3>✅ Success!</h3>
+                        <p>${data.message}</p>
+                        <div class="member-list">
+                            ${data.results.map(member => `
+                                <div class="member-item ${member.isChairperson ? 'chairperson' : ''}">
+                                    ${member.isChairperson ? '👑 ' : ''}${member.name} (Order: ${member.displayOrder})
+                                </div>
+                            `).join('')}
+                        </div>
+                        <h4>🔄 Next Steps:</h4>
+                        <ul>
+                            ${data.summary.nextSteps.map(step => `<li>${step}</li>`).join('')}
+                        </ul>
+                    `;
+                    
+                    // Show verification buttons
+                    results.innerHTML = `
+                        <div style="margin-top: 20px; text-align: center;">
+                            <a href="http://localhost:3333" target="_blank" class="button" style="display: inline-block; margin: 5px;">
+                                🎛️ Open Sanity Studio
+                            </a>
+                            <a href="http://localhost:3000/organizing-committee" target="_blank" class="button" style="display: inline-block; margin: 5px;">
+                                👥 View Committee Page
+                            </a>
+                            <a href="http://localhost:3000/api/organizing-committee" target="_blank" class="button" style="display: inline-block; margin: 5px;">
+                                🔧 Test API
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    status.className = 'status error';
+                    status.innerHTML = `
+                        <h3>❌ Error</h3>
+                        <p>${data.message}</p>
+                        ${data.existingMembers ? `
+                            <h4>Existing members found:</h4>
+                            <div class="member-list">
+                                ${data.existingMembers.map(member => `
+                                    <div class="member-item">${member.name} (Order: ${member.displayOrder})</div>
+                                `).join('')}
+                            </div>
+                            <p>💡 Delete existing members in Sanity Studio first, or they will be duplicated.</p>
+                        ` : ''}
+                        ${data.errors ? `
+                            <h4>Errors:</h4>
+                            <pre>${JSON.stringify(data.errors, null, 2)}</pre>
+                        ` : ''}
+                    `;
+                }
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.innerHTML = `
+                    <h3>❌ Network Error</h3>
+                    <p>Failed to connect to the API: ${error.message}</p>
+                    <p>Make sure the Next.js frontend is running on port 3000.</p>
+                `;
+            }
+            
+            button.disabled = false;
+            button.textContent = '🚀 Populate Committee Data';
+        }
+        
+        async function checkExistingData() {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            
+            status.style.display = 'block';
+            status.className = 'status info';
+            status.innerHTML = '🔍 Checking existing committee data...';
+            
+            try {
+                const response = await fetch('/api/organizing-committee');
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.className = 'status success';
+                    status.innerHTML = `
+                        <h3>📊 Current Committee Data</h3>
+                        <p>Found ${data.count} committee members:</p>
+                        <div class="member-list">
+                            ${data.data.map(member => `
+                                <div class="member-item ${member.isChairperson ? 'chairperson' : ''}">
+                                    ${member.isChairperson ? '👑 ' : ''}${member.name} - ${member.title}
+                                    <br><small>${member.institution}, ${member.country}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    status.className = 'status info';
+                    status.innerHTML = `
+                        <h3>📭 No Committee Data Found</h3>
+                        <p>No committee members exist yet. You can populate them using the button above.</p>
+                    `;
+                }
+            } catch (error) {
+                status.className = 'status error';
+                status.innerHTML = `
+                    <h3>❌ Error Checking Data</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+        
+        // Check existing data on page load
+        window.onload = function() {
+            checkExistingData();
+        };
+    </script>
+</body>
+</html>

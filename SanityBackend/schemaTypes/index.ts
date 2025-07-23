@@ -26,6 +26,25 @@ import { pricingPeriods } from './pricingPeriods';
 import { formConfiguration } from './formConfiguration';
 import { paymentRecord } from './paymentRecord';
 
+// Abstract submission system schemas
+import abstractSubmission from './abstractSubmission';
+import abstractSettings from './abstractSettings';
+
+// Organizing committee schema
+import organizingCommittee from './organizingCommittee';
+
+// Speakers schema
+import speakers from './speakers';
+
+// Speaker guidelines schema
+import speakerGuidelines from './speakerGuidelines';
+
+// Venue settings schema
+import venueSettings from './venueSettings';
+
+// Cancellation policy schema
+import cancellationPolicy from './cancellationPolicy';
+
 export const schemaTypes = [
   conferenceEvent,
   pastConference,
@@ -51,5 +70,18 @@ export const schemaTypes = [
   conferenceRegistration,
   pricingPeriods,
   formConfiguration,
-  paymentRecord
+  paymentRecord,
+  // Abstract submission system schemas
+  abstractSubmission,
+  abstractSettings,
+  // Organizing committee schema
+  organizingCommittee,
+  // Speakers schema
+  speakers,
+  // Speaker guidelines schema
+  speakerGuidelines,
+  // Venue settings schema
+  venueSettings,
+  // Cancellation policy schema
+  cancellationPolicy
 ]

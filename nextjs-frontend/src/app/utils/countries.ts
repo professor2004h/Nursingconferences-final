@@ -276,7 +276,10 @@ export const normalizeCountryValue = (value: string): string => {
   if (COUNTRIES.some(c => c.name === value)) {
     return value;
   }
-  
+
   // If it's a code, convert to name
   return getCountryName(value);
 };
+
+// Simple array of country names for form dropdowns
+export const countries = COUNTRIES.map(country => country.name).sort();

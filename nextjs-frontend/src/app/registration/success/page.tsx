@@ -12,6 +12,9 @@ export default function RegistrationSuccessPage() {
   const orderId = searchParams?.get('order_id');
   const registrationId = searchParams?.get('registration_id');
   const testMode = searchParams?.get('test_mode') === 'true';
+  const paymentMethod = searchParams?.get('payment_method') || 'unknown';
+  const amount = searchParams?.get('amount');
+  const currency = searchParams?.get('currency') || 'USD';
 
   useEffect(() => {
     if (registrationId) {
@@ -62,21 +65,36 @@ export default function RegistrationSuccessPage() {
               <div className="space-y-6">
                 {/* Payment Information */}
                 {paymentId && (
-                  <div className={`border rounded-lg p-4 ${testMode ? 'bg-orange-50 border-orange-200' : 'bg-blue-50 border-blue-200'}`}>
-                    <h3 className={`text-lg font-semibold mb-2 ${testMode ? 'text-orange-900' : 'text-blue-900'}`}>
-                      {testMode ? '🧪 Test Payment Confirmed' : 'Payment Confirmed'}
+                  <div className={`border rounded-lg p-4 ${testMode ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200'}`}>
+                    <h3 className={`text-lg font-semibold mb-3 ${testMode ? 'text-orange-900' : 'text-green-900'}`}>
+                      {testMode ? '🧪 Test Payment Confirmed' : '✅ Payment Confirmed'}
                     </h3>
-                    <div className={`text-sm ${testMode ? 'text-orange-800' : 'text-blue-800'}`}>
-                      <p><strong>Payment ID:</strong> {paymentId}</p>
-                      {orderId && <p><strong>Order ID:</strong> {orderId}</p>}
-                      {testMode && (
-                        <div className="mt-2 p-2 bg-orange-100 rounded border border-orange-300">
-                          <p className="text-xs text-orange-700 font-medium">
-                            ⚠️ This is a test payment - no actual charges were made to your account.
-                          </p>
-                        </div>
-                      )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className={`text-sm ${testMode ? 'text-orange-800' : 'text-green-800'}`}>
+                        <p><strong>Payment ID:</strong> <span className="font-mono">{paymentId}</span></p>
+                        {orderId && <p><strong>Order ID:</strong> <span className="font-mono">{orderId}</span></p>}
+                        <p><strong>Payment Method:</strong> <span className="capitalize">{paymentMethod}</span></p>
+                      </div>
+                      <div className={`text-sm ${testMode ? 'text-orange-800' : 'text-green-800'}`}>
+                        {amount && <p><strong>Amount:</strong> {currency} {amount}</p>}
+                        <p><strong>Status:</strong> <span className="text-green-600 font-medium">Completed</span></p>
+                        <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                      </div>
                     </div>
+                    {testMode && (
+                      <div className="mt-3 p-3 bg-orange-100 rounded border border-orange-300">
+                        <p className="text-xs text-orange-700 font-medium">
+                          ⚠️ This is a test payment - no actual charges were made to your account.
+                        </p>
+                      </div>
+                    )}
+                    {paymentMethod === 'paypal' && (
+                      <div className="mt-3 p-3 bg-blue-100 rounded border border-blue-300">
+                        <p className="text-xs text-blue-700 font-medium">
+                          💳 Payment processed securely through PayPal
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 

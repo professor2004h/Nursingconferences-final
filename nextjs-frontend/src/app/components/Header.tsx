@@ -242,6 +242,12 @@ export default function Header() {
             <Link href="/past-conferences" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Past Conferences
             </Link>
+            <Link href="/organizing-committee" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Committee
+            </Link>
+            <Link href="/speakers" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Speakers
+            </Link>
             <Link href="/brochure" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Download Brochure
             </Link>
@@ -253,6 +259,9 @@ export default function Header() {
                 Journal
               </Link>
             )}
+            <Link href="/cancellation-policy" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Cancellation Policy
+            </Link>
             <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Contact Us
             </Link>
@@ -312,6 +321,20 @@ export default function Header() {
                 Past Conferences
               </Link>
               <Link
+                href="/organizing-committee"
+                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Committee
+              </Link>
+              <Link
+                href="/speakers"
+                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Speakers
+              </Link>
+              <Link
                 href="/brochure"
                 className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
@@ -334,6 +357,13 @@ export default function Header() {
                   Journal
                 </Link>
               )}
+              <Link
+                href="/cancellation-policy"
+                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Cancellation Policy
+              </Link>
               <Link
                 href="/contact"
                 className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"

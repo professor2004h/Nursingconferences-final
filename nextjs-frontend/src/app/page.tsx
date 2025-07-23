@@ -27,6 +27,8 @@ import {
   getCustomContentSectionData,
   type CustomContentSectionData
 } from "./getCustomContentSectionStyling";
+import FeaturedCommitteeMembers from '@/app/components/FeaturedCommitteeMembers';
+import ConferenceTracksSection from '@/app/components/ConferenceTracksSection';
 
 // Direct imports to avoid SSR bailout
 import ContactForm from "./components/ContactForm";
@@ -157,7 +159,8 @@ function HomePageContent({
       {/* Hero Section with Proper Slideshow */}
       <HeroSlideshow hero={hero} />
 
-
+      {/* Conference Tracks Section */}
+      <ConferenceTracksSection />
 
       {/* About Section */}
       <section className="py-8 md:py-12 bg-white">
@@ -431,6 +434,9 @@ function HomePageContent({
           </div>
         </div>
       </section>
+
+      {/* Featured Committee Members Section */}
+      <FeaturedCommitteeMembers />
 
       {/* Past Conferences Section */}
       {pastConferences && pastConferences.length > 0 && (

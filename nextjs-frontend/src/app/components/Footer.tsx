@@ -205,6 +205,7 @@ export default async function Footer() {
               <li><Link href="/conferences" className="text-white font-medium hover:text-orange-400 transition-colors">All Conferences</Link></li>
               <li><Link href="/past-conferences" className="text-white font-medium hover:text-orange-400 transition-colors">Past Conferences</Link></li>
               <li><Link href="/sponsorship" className="text-white font-medium hover:text-orange-400 transition-colors">Sponsorship</Link></li>
+              <li><Link href="/cancellation-policy" className="text-white font-medium hover:text-orange-400 transition-colors">Cancellation Policy</Link></li>
               <li><Link href="/contact" className="text-white font-medium hover:text-orange-400 transition-colors">Contact Us</Link></li>
             </ul>
           </div>
