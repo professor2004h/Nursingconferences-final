@@ -1,5 +1,5 @@
 # Multi-stage Docker build for Next.js Event Website v2
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Force rebuild timestamp
 RUN echo "Build timestamp: $(date)" > /build-info.txt
@@ -13,7 +13,7 @@ WORKDIR /app
 COPY nextjs-frontend/package.json nextjs-frontend/package-lock.json* ./
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci --frozen-lockfile
+RUN npm install --production=false
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -74,7 +74,7 @@ USER nextjs
 EXPOSE 3000
 
 # Add health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
 # Start the application
