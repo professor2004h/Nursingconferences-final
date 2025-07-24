@@ -76,8 +76,8 @@ export async function getHeroSection(): Promise<HeroSectionType | null> {
       if (!data.slideshowSettings) {
         data.slideshowSettings = {
           enableSlideshow: true,
-          overlayColor: '#2563eb',
-          overlayOpacity: 50,
+          overlayColor: '#000000',
+          overlayOpacity: 40,
           transitionDuration: 5,
           enableZoomEffect: true,
           enableFadeTransition: true,

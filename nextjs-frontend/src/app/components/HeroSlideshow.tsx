@@ -25,10 +25,10 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
   }, [hero?.images]);
 
   // Simple overlay settings
-  const overlayOpacity = hero?.slideshowSettings?.overlayOpacity || 50;
+  const overlayOpacity = hero?.slideshowSettings?.overlayOpacity || 40;
   const overlayColor = typeof hero?.slideshowSettings?.overlayColor === 'string'
     ? hero.slideshowSettings.overlayColor
-    : hero?.slideshowSettings?.overlayColor?.hex || '#2563eb';
+    : hero?.slideshowSettings?.overlayColor?.hex || '#000000';
 
 
 
@@ -55,7 +55,7 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
           ))}
         </div>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#2563eb] to-[#1d4ed8]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d]" />
       )}
 
       {/* Dynamic Overlay from CMS */}
