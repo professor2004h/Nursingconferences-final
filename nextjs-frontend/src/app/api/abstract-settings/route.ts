@@ -111,17 +111,17 @@ export async function GET() {
     }
 
     try {
-      let result
+      let _result
       if (settings) {
         // Update existing document
-        result = await writeClient.patch(settings._id).set({
+        _result = await writeClient.patch(settings._id).set({
           interestedInOptions: defaultData.interestedInOptions,
           trackNames: defaultData.trackNames
         }).commit()
         console.log('✅ Updated existing settings with default arrays')
       } else {
         // Create new document
-        result = await writeClient.create({
+        _result = await writeClient.create({
           _type: 'abstractSettings',
           ...defaultData
         })

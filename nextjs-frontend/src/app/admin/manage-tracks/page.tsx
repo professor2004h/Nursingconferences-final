@@ -39,7 +39,7 @@ const ManageTracksPage: React.FC = () => {
       setSuccess(null);
       
       const response = await fetch('/api/populate-sanity-options');
-      const result = await response.json();
+      const _result = await response.json();
       
       if (response.ok) {
         setSuccess('Successfully populated default tracks!');
@@ -186,7 +186,7 @@ const ManageTracksPage: React.FC = () => {
               </svg>
               <h3 className="mt-2 text-sm font-medium text-gray-900">No tracks found</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Click "Populate Default Tracks" to add default conference tracks.
+                Click &quot;Populate Default Tracks&quot; to add default conference tracks.
               </p>
             </div>
           )}
@@ -198,11 +198,11 @@ const ManageTracksPage: React.FC = () => {
           <div className="space-y-3 text-sm text-blue-800">
             <div className="flex items-start space-x-2">
               <span className="font-medium">1.</span>
-              <span>Use "Populate Default Tracks" to add the default set of nursing conference tracks</span>
+              <span>Use &quot;Populate Default Tracks&quot; to add the default set of nursing conference tracks</span>
             </div>
             <div className="flex items-start space-x-2">
               <span className="font-medium">2.</span>
-              <span>Click "Edit in Sanity Studio" to add, edit, or remove individual tracks</span>
+              <span>Click &quot;Edit in Sanity Studio&quot; to add, edit, or remove individual tracks</span>
             </div>
             <div className="flex items-start space-x-2">
               <span className="font-medium">3.</span>
@@ -210,7 +210,7 @@ const ManageTracksPage: React.FC = () => {
             </div>
             <div className="flex items-start space-x-2">
               <span className="font-medium">4.</span>
-              <span>Each track needs both a "value" (URL-friendly) and "label" (display name)</span>
+              <span>Each track needs both a &quot;value&quot; (URL-friendly) and &quot;label&quot; (display name)</span>
             </div>
           </div>
         </div>
