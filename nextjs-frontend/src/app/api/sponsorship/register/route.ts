@@ -37,8 +37,41 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate registration ID
-    const registrationId = generateRegistrationId();
+    // Generate registration ID with duplicate check
+    let registrationId = generateRegistrationId();
+
+    // Check for duplicate registrationId and regenerate if needed
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      try {
+        const existingRegistration = await writeClient.fetch(
+          `*[_type == "sponsorRegistration" && registrationId == $registrationId][0]`,
+          { registrationId }
+        );
+
+        if (!existingRegistration) {
+          break; // ID is unique, we can use it
+        }
+
+        // ID already exists, generate a new one
+        registrationId = generateRegistrationId();
+        attempts++;
+        console.log(`⚠️ Sponsor Registration ID collision detected, regenerating... (attempt ${attempts})`);
+      } catch (error) {
+        console.error('Error checking for duplicate sponsor registration ID:', error);
+        break; // Continue with current ID if check fails
+      }
+    }
+
+    if (attempts >= maxAttempts) {
+      console.error('❌ Failed to generate unique sponsor registration ID after maximum attempts');
+      return NextResponse.json(
+        { error: 'Unable to generate unique registration ID. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     // Prepare registration data for Sanity
     const registrationData = {

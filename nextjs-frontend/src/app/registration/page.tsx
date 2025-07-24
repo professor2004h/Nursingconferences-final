@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalPaymentSection from '@/app/components/PayPalPaymentSection';
+import NavigationTest from '@/app/components/NavigationTest';
 
 // Form data interface
 interface FormData {
@@ -601,11 +602,13 @@ export default function RegistrationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Test Component */}
+      <NavigationTest />
 
 
       {/* Header with hero background - matching reference site */}
       <div
-        className="relative bg-cover bg-center bg-no-repeat text-white py-20"
+        className="relative bg-cover bg-center bg-no-repeat text-white py-20 z-10"
         style={{
           backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/api/placeholder/1200/400")',
         }}

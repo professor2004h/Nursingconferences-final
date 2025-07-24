@@ -166,7 +166,7 @@ export default async function RootLayout({
                 <HeaderWrapper />
 
                 {/* Main Content */}
-                <main className="flex-1 relative">
+                <main className="flex-1 relative pt-20">
                   {children}
                 </main>
 

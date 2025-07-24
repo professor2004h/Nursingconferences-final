@@ -356,11 +356,15 @@ export async function updateSponsorRegistrationStatus(
   }
 }
 
-// Generate unique registration ID
+// Generate unique sponsor registration ID with high entropy
 export function generateRegistrationId(): string {
-  const timestamp = Date.now().toString(36);
-  const randomStr = Math.random().toString(36).substring(2, 8);
-  return `SPR-${timestamp}-${randomStr}`.toUpperCase();
+  const now = new Date();
+  const timestamp = now.getTime().toString(36);
+  const microseconds = (performance.now() % 1000).toFixed(3).replace('.', '');
+  const randomStr1 = Math.random().toString(36).substring(2, 8);
+  const randomStr2 = Math.random().toString(36).substring(2, 6);
+  const processEntropy = process.hrtime.bigint().toString(36).slice(-4);
+  return `SPR-${timestamp}${microseconds}-${randomStr1}${randomStr2}${processEntropy}`.toUpperCase();
 }
 
 // Generate unique invoice number

@@ -37,13 +37,15 @@ const registrationSchema = z.object({
   pricingPeriod: z.enum(['earlyBird', 'nextRound', 'spotRegistration']),
 });
 
-// Generate unique registration ID with microsecond precision
+// Generate unique registration ID with high entropy
 function generateRegistrationId(): string {
   const now = new Date();
   const timestamp = now.getTime().toString(36); // milliseconds
   const microseconds = (performance.now() % 1000).toFixed(3).replace('.', '');
-  const randomStr = Math.random().toString(36).substring(2, 10);
-  return `REG-${timestamp}${microseconds}-${randomStr}`.toUpperCase();
+  const randomStr1 = Math.random().toString(36).substring(2, 8);
+  const randomStr2 = Math.random().toString(36).substring(2, 6);
+  const processEntropy = process.hrtime.bigint().toString(36).slice(-4);
+  return `REG-${timestamp}${microseconds}-${randomStr1}${randomStr2}${processEntropy}`.toUpperCase();
 }
 
 export async function POST(request: NextRequest) {
@@ -66,7 +68,40 @@ export async function POST(request: NextRequest) {
     }
 
     const registrationData = validationResult.data;
-    const registrationId = generateRegistrationId();
+    let registrationId = generateRegistrationId();
+
+    // Check for duplicate registrationId and regenerate if needed
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      try {
+        const existingRegistration = await writeClient.fetch(
+          `*[_type == "conferenceRegistration" && registrationId == $registrationId][0]`,
+          { registrationId }
+        );
+
+        if (!existingRegistration) {
+          break; // ID is unique, we can use it
+        }
+
+        // ID already exists, generate a new one
+        registrationId = generateRegistrationId();
+        attempts++;
+        console.log(`⚠️ Registration ID collision detected, regenerating... (attempt ${attempts})`);
+      } catch (error) {
+        console.error('Error checking for duplicate registration ID:', error);
+        break; // Continue with current ID if check fails
+      }
+    }
+
+    if (attempts >= maxAttempts) {
+      console.error('❌ Failed to generate unique registration ID after maximum attempts');
+      return NextResponse.json(
+        { error: 'Unable to generate unique registration ID. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     console.log('✅ Registration data validated:', {
       registrationId,

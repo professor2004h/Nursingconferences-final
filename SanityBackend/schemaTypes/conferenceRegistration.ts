@@ -10,7 +10,27 @@ export const conferenceRegistration = defineType({
       name: 'registrationId',
       title: 'Registration ID',
       type: 'string',
-      validation: Rule => Rule.required(),
+      validation: Rule => Rule.required().custom(async (value, context) => {
+        if (!value) return true; // Let required() handle empty values
+
+        // Check for duplicates
+        const { getClient } = context;
+        const client = getClient({ apiVersion: '2023-01-01' });
+
+        const duplicates = await client.fetch(
+          `*[_type == "conferenceRegistration" && registrationId == $registrationId && _id != $currentId]`,
+          {
+            registrationId: value,
+            currentId: context.document?._id || ''
+          }
+        );
+
+        if (duplicates.length > 0) {
+          return 'Registration ID must be unique. This ID already exists.';
+        }
+
+        return true;
+      }),
       description: 'Unique registration identifier',
       readOnly: true,
     }),

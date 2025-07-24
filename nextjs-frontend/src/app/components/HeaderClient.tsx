@@ -12,6 +12,9 @@ interface HeaderClientProps {
 const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Debug logging
+  console.log('HeaderClient rendering:', { siteSettings: !!siteSettings, isMenuOpen });
+
   // Stable toggle function to prevent re-renders
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(prev => !prev);
@@ -24,7 +27,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   return (
     <>
       {/* Desktop Navigation - Optimized for better spacing and responsiveness */}
-      <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0">
+      <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0 relative z-10">
         {/* Main navigation links with responsive spacing */}
         <div className="flex items-center space-x-3 md:space-x-4 lg:space-x-5 xl:space-x-6 overflow-visible flex-wrap">
           <Link
