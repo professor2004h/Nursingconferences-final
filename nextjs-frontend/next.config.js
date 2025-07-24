@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  experimental: {
-    outputFileTracingRoot: undefined,
-  },
+
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -11,7 +9,14 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['cdn.sanity.io'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+        port: '',
+        pathname: '/**',
+      },
+    ],
     unoptimized: false,
   },
   env: {
@@ -21,12 +26,7 @@ const nextConfig = {
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
   },
-  // Disable telemetry
-  telemetry: {
-    disabled: true,
-  },
   // Optimize for production
-  swcMinify: true,
   compress: true,
   poweredByHeader: false,
   // Handle trailing slashes
