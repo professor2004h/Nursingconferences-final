@@ -257,9 +257,9 @@ const AdminCancellationPolicyPage: React.FC = () => {
                             {tier.refundPercentage}%
                           </div>
                           <div className="text-sm text-gray-600">
-                          {tier.daysBeforeConference > 0 
+                          {tier.daysBeforeConference > 0
                           ? `${tier.daysBeforeConference}+ days before`
-                          : &quot;Less than 45 days&quot;
+                          : "Less than 45 days"
                           }
                           </div>
                         </div>
