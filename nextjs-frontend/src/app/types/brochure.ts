@@ -65,6 +65,7 @@ export interface BrochureFormErrors {
   fullName?: string;
   email?: string;
   phone?: string;
+  organization?: string;
   country?: string;
   general?: string;
 }
@@ -102,7 +103,7 @@ export const validateBrochureForm = (data: BrochureFormData): BrochureFormErrors
 
   // Validate full name
   if (!data.fullName || data.fullName.trim().length < 2) {
-    errors.fullName = 'Full name must be at least 2 characters long';
+    errors.fullName = 'Name must be at least 2 characters long';
   }
 
   // Validate email
@@ -120,10 +121,12 @@ export const validateBrochureForm = (data: BrochureFormData): BrochureFormErrors
     errors.phone = 'Phone number must be at least 10 digits';
   }
 
-  // Validate country
-  if (!data.country) {
-    errors.country = 'Please select a country';
+  // Validate organization
+  if (!data.organization || data.organization.trim().length < 2) {
+    errors.organization = 'Organization/Institution is required';
   }
+
+  // Note: Country is now optional for the simplified form
 
   return errors;
 };

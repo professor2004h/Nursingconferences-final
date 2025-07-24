@@ -29,6 +29,7 @@ import {
 } from "./getCustomContentSectionStyling";
 import FeaturedCommitteeMembers from '@/app/components/FeaturedCommitteeMembers';
 import ConferenceTracksSection from '@/app/components/ConferenceTracksSection';
+import NavigationBlocks from '@/app/components/NavigationBlocks';
 
 // Direct imports to avoid SSR bailout
 import ContactForm from "./components/ContactForm";
@@ -158,6 +159,9 @@ function HomePageContent({
     <div className="min-h-screen bg-white">
       {/* Hero Section with Proper Slideshow */}
       <HeroSlideshow hero={hero} />
+
+      {/* Navigation Blocks Section */}
+      <NavigationBlocks />
 
       {/* Conference Tracks Section */}
       <ConferenceTracksSection />

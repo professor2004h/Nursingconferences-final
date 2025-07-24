@@ -55,8 +55,6 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
       doubleClickZoom: true,
       touchZoom: isMobile ? 'center' : false, // Enable touch zoom only on mobile
       dragging: true,
-      tap: true,
-      tapTolerance: 15,
       bounceAtZoomLimits: false,
     });
 
@@ -354,17 +352,16 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
           zIndex: 1,
           isolation: 'isolate'
         }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         role="application"
         aria-label="Interactive map showing global locations"
-        aria-describedby="map-zoom-instruction"
       >
-        <MapHoverOverlay
-          show={showOverlay}
-          text={overlayContent.text}
-          icon={overlayContent.icon}
-        />
+        {/* Fixed zoom instruction at bottom */}
+        <div
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded text-sm whitespace-nowrap z-10"
+          id="map-zoom-instruction"
+        >
+          {isMobile ? 'Use two fingers to zoom' : 'Hold Ctrl + scroll to zoom'}
+        </div>
       </div>
       <style jsx global>{`
         .custom-popup .leaflet-popup-content-wrapper {

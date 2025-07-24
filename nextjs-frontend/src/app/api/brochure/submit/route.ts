@@ -60,11 +60,11 @@ export async function POST(request: NextRequest) {
     const formData: BrochureFormData = await request.json();
     
     // Validate required fields
-    const { fullName, email, phone, country } = formData;
+    const { fullName, email, phone, organization } = formData;
 
-    if (!fullName || !email || !phone || !country) {
+    if (!fullName || !email || !phone || !organization) {
       return NextResponse.json(
-        { error: 'Missing required fields. Full name, email, phone number, and country are required.' },
+        { error: 'Missing required fields. Full name, email, phone number, and organization are required.' },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -143,8 +143,8 @@ export async function POST(request: NextRequest) {
       fullName: formData.fullName,
       email: formData.email,
       phone: formData.phone,
-      organization: formData.organization || null,
-      country: normalizeCountryValue(formData.country), // Ensure we store full country names
+      organization: formData.organization,
+      country: formData.country ? normalizeCountryValue(formData.country) : 'Not specified', // Ensure we store full country names
       professionalTitle: formData.professionalTitle || null,
       downloadTimestamp: new Date().toISOString(),
       ipAddress,

@@ -9,23 +9,24 @@ export async function GET() {
 
     console.log('🎯 API: Hero section data fetched:', {
       hasData: !!heroData,
-      primaryButton: heroData?.primaryButton,
-      secondaryButton: heroData?.secondaryButton,
-      welcomeText: heroData?.welcomeText
+      conferenceTitle: heroData?.conferenceTitle,
+      conferenceSubject: heroData?.conferenceSubject,
+      conferenceDate: heroData?.conferenceDate,
+      showRegisterButton: heroData?.showRegisterButton
     });
 
     // Create response with hero data
     const response = NextResponse.json(heroData || {
-      welcomeText: 'Welcome to Intelli Global Conferences',
-      subtitle: 'A NEVER-ENDING JOURNEY OF SEEKING KNOWLEDGE - WITH PEOPLE AND THEIR THOUGHTS THAT ENABLE A BETTER LIVING',
-      primaryButton: {
-        text: 'View All Conferences',
-        url: '/conferences'
-      },
-      secondaryButton: {
-        text: 'Contact Us',
-        url: '/contact'
-      }
+      conferenceTitle: 'INTERNATIONAL CONFERENCE ON',
+      conferenceSubject: 'MATERIAL CHEMISTRY & NANO MATERIALS',
+      conferenceTheme: 'Theme: Innovative Frontiers in Material Chemistry and Nanotechnology for Sustainable Future',
+      conferenceDate: 'June 23-24, 2025',
+      conferenceVenue: 'Hotel Indigo Kuala Lumpur On The Park, Kuala Lumpur, Malaysia',
+      abstractSubmissionInfo: 'Abstract Submission Opens: March 20, 2024',
+      registrationInfo: 'Early Bird Registration Start: April 15, 2024',
+      showRegisterButton: true,
+      registerButtonText: 'Register Now',
+      registerButtonUrl: '/registration'
     });
 
     // Set headers for caching
@@ -41,16 +42,16 @@ export async function GET() {
       error: 'Failed to fetch hero section data',
       message: error instanceof Error ? error.message : 'Unknown error occurred',
       fallback: {
-        welcomeText: 'Welcome to Intelli Global Conferences',
-        subtitle: 'A NEVER-ENDING JOURNEY OF SEEKING KNOWLEDGE - WITH PEOPLE AND THEIR THOUGHTS THAT ENABLE A BETTER LIVING',
-        primaryButton: {
-          text: 'View All Conferences',
-          url: '/conferences'
-        },
-        secondaryButton: {
-          text: 'Contact Us',
-          url: '/contact'
-        }
+        conferenceTitle: 'INTERNATIONAL CONFERENCE ON',
+        conferenceSubject: 'MATERIAL CHEMISTRY & NANO MATERIALS',
+        conferenceTheme: 'Theme: Innovative Frontiers in Material Chemistry and Nanotechnology for Sustainable Future',
+        conferenceDate: 'June 23-24, 2025',
+        conferenceVenue: 'Hotel Indigo Kuala Lumpur On The Park, Kuala Lumpur, Malaysia',
+        abstractSubmissionInfo: 'Abstract Submission Opens: March 20, 2024',
+        registrationInfo: 'Early Bird Registration Start: April 15, 2024',
+        showRegisterButton: true,
+        registerButtonText: 'Register Now',
+        registerButtonUrl: '/registration'
       }
     }, { status: 500 });
 

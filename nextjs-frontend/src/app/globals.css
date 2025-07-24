@@ -1989,7 +1989,874 @@ select:focus {
   object-position: left center;
 }
 
+/* Improved Desktop Navigation Spacing */
+@media (min-width: 768px) {
+  .header-container nav .hidden.md\\:flex {
+    gap: 1.5rem;
+  }
+
+  .header-container nav .hidden.md\\:flex a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 0.25rem 0;
+  }
+
+  /* Ensure Register button stands out */
+  .header-container nav .hidden.md\\:flex a[href="/registration"] {
+    font-size: 0.875rem;
+    padding: 0.5rem 1.5rem;
+    margin-left: 0.5rem;
+  }
+}
+
+/* Large Desktop Navigation Optimization */
+@media (min-width: 1200px) {
+  .header-container nav .hidden.md\\:flex {
+    gap: 2rem;
+  }
+
+  .header-container nav .hidden.md\\:flex a {
+    font-size: 0.95rem;
+  }
+
+  .header-container nav .hidden.md\\:flex a[href="/registration"] {
+    padding: 0.5rem 1.75rem;
+  }
+}
+
 /* Ensure proper spacing between header and hero section - merged with main rule above */
+
+/* ===== HERO SECTION - MINIMAL CLASSIC LAYOUT ===== */
+
+/* Hero Section Base - Compact Professional Design */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  min-height: 450px;
+  max-height: 650px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1e3a8a 100%);
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Content Container - Classic Beautiful Layout */
+.hero-content-container {
+  width: 100%;
+  max-width: 900px;
+  max-height: 600px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.3rem !important;
+  position: relative;
+  z-index: 30;
+  box-sizing: border-box;
+  height: auto;
+  overflow: visible !important;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Force fit for exact 910x598px constraint */
+.hero-content-container.glass-layout-910x598 {
+  width: 800px !important;
+  height: 500px !important;
+  max-width: 800px !important;
+  max-height: 500px !important;
+  padding: 0.6rem 0.5rem !important;
+  gap: 0.25rem !important;
+  justify-content: space-evenly !important;
+  overflow: visible !important;
+}
+
+/* Conference Title Styling - CLASSIC BEAUTIFUL PROPORTIONS */
+.hero-conference-title {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+  margin-bottom: 0.15rem !important;
+  line-height: 1.2 !important;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9) !important;
+  opacity: 1 !important;
+}
+
+/* Additional specificity for conference title */
+h1.hero-conference-title,
+.hero-content-container .hero-conference-title,
+.hero-content-container h1.hero-conference-title {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.15rem !important;
+}
+
+/* Conference Subject Styling - CLASSIC BEAUTIFUL PROPORTIONS WITH ORANGE COLOR */
+.hero-conference-subject {
+  font-size: 1.8rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+  margin-bottom: 0.4rem !important;
+  line-height: 1.1 !important;
+  color: #f97316 !important;
+  text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9) !important;
+  max-width: 100% !important;
+}
+
+/* Additional specificity for conference subject */
+h2.hero-conference-subject,
+.hero-content-container .hero-conference-subject,
+.hero-content-container h2.hero-conference-subject {
+  font-size: 1.8rem !important;
+  font-weight: 900 !important;
+  margin-bottom: 0.4rem !important;
+  color: #f97316 !important;
+}
+
+/* Conference Theme Styling - 910x598px Optimized */
+.hero-conference-theme {
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0;
+  max-width: 750px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  opacity: 0.95;
+}
+
+/* Date and Venue Container - 910x598px Optimized */
+.hero-date-venue-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin: 0.6rem 0;
+  width: 100%;
+  max-width: 600px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Info Item Styling - Reference Match */
+.hero-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: center;
+  flex: 1;
+}
+
+/* Info Icon Styling - Reference Match with Orange Background */
+.hero-info-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  border: none;
+}
+
+.hero-icon-svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #ffffff;
+}
+
+/* Info Content Styling */
+.hero-info-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero-info-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f97316;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.2rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.hero-info-value {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+}
+
+/* Additional Information Bullets - 910x598px Optimized */
+.hero-additional-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.4rem 0;
+  max-width: 500px;
+}
+
+.hero-info-bullet {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.hero-bullet-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Register Button Container - CLASSIC SPACING */
+.hero-register-container {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+}
+
+/* Additional specificity for register button container */
+.hero-content-container .hero-register-container {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0 !important;
+}
+
+/* Register Button Styling - CLASSIC BEAUTIFUL SINGLE LINE */
+.hero-register-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.75rem 2.2rem !important;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  color: #ffffff !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.12em !important;
+  border-radius: 50px !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5) !important;
+  border: 2px solid transparent !important;
+  min-height: 48px !important;
+  min-width: 200px !important;
+  max-width: 240px !important;
+  white-space: nowrap !important;
+}
+
+/* Additional specificity for register button */
+a.hero-register-button,
+.hero-register-container .hero-register-button,
+.hero-register-container a.hero-register-button,
+.hero-content-container .hero-register-button {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  padding: 0.75rem 2.2rem !important;
+  min-height: 48px !important;
+  min-width: 200px !important;
+  max-width: 240px !important;
+  white-space: nowrap !important;
+}
+
+.hero-register-button:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.6);
+}
+
+.hero-register-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.3);
+}
+
+/* ===== SIMPLIFIED HERO SECTION STYLES ===== */
+
+/* Simplified Info Item Styling - Minimal Design */
+.hero-info-item-simple {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+/* Simplified Info Icon Styling - Smaller, Cleaner */
+.hero-info-icon-simple {
+  width: 2rem;
+  height: 2rem;
+  background: rgba(249, 115, 22, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+/* Simplified Info Content Styling - Clean Layout */
+.hero-info-content-simple {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero-info-label-simple {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #f97316;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.125rem;
+}
+
+.hero-info-value-simple {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* ===== RESPONSIVE DESIGN - COMPACT AND CLEAN LAYOUT ===== */
+
+/* Specific optimization for 910x598px glass container */
+@media (min-width: 900px) and (max-width: 920px) and (min-height: 590px) and (max-height: 610px) {
+  .hero-content-container {
+    max-width: 910px;
+    max-height: 598px;
+    padding: 0.875rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .hero-conference-title {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .hero-conference-subject {
+    font-size: 1.75rem;
+    line-height: 1.05;
+    margin-bottom: 0.25rem;
+  }
+
+  .hero-conference-theme {
+    font-size: 0.85rem;
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-date-venue-container {
+    gap: 1rem;
+    margin: 0.5rem 0;
+  }
+
+  .hero-info-value {
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+
+  .hero-additional-info {
+    gap: 0.3rem;
+    margin: 0.4rem 0;
+  }
+
+  .hero-register-container {
+    margin-top: 0.5rem;
+  }
+
+  .hero-register-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Small mobile devices (320px-374px) */
+@media (max-width: 374px) {
+  .hero-section {
+    min-height: 100vh;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .hero-content-container {
+    padding: 1rem 0.5rem;
+    gap: 0.75rem;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+  }
+
+  .hero-conference-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+
+  .hero-conference-subject {
+    font-size: 1.6rem;
+    line-height: 1.05;
+  }
+
+  .hero-conference-theme {
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .hero-date-venue-container {
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+  }
+
+  .hero-info-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .hero-icon-svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .hero-register-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.75rem;
+    min-width: 120px;
+  }
+}
+
+/* ===== MOBILE HERO SECTION - POWERFUL OVERRIDE ===== */
+/* This section provides comprehensive mobile styling that overrides all conflicting rules */
+
+@media (max-width: 768px) {
+  /* Mobile Hero Section Container - Full Control */
+  .hero-section {
+    min-height: 100vh !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    padding: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  /* Mobile Content Container - Compact Glass Design */
+  .hero-content-container,
+  .hero-content-container.glass-layout-910x598 {
+    width: 100% !important;
+    max-width: 320px !important;
+    min-width: 280px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 0.9rem 0.7rem !important;
+    gap: 0.35rem !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(6px) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7) !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 10 !important;
+  }
+
+  /* Mobile Conference Title - Compact */
+  .hero-conference-title,
+  h1.hero-conference-title,
+  .hero-content-container .hero-conference-title,
+  .hero-content-container h1.hero-conference-title {
+    font-size: 0.6rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    margin: 0 !important;
+    margin-bottom: 0.1rem !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9) !important;
+    color: #ffffff !important;
+  }
+
+  /* Mobile Conference Subject - Prominent */
+  .hero-conference-subject,
+  h2.hero-conference-subject,
+  .hero-content-container .hero-conference-subject,
+  .hero-content-container h2.hero-conference-subject {
+    font-size: 1.1rem !important;
+    font-weight: 900 !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.05em !important;
+    margin: 0 !important;
+    margin-bottom: 0.25rem !important;
+    color: #f97316 !important;
+    text-align: center !important;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9) !important;
+  }
+
+  /* Mobile Conference Theme - Readable */
+  .hero-conference-theme {
+    font-size: 0.55rem !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+    margin-bottom: 0.4rem !important;
+    text-align: center !important;
+    opacity: 0.95 !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8) !important;
+    color: #ffffff !important;
+  }
+
+  /* Mobile Date/Venue Container - Vertical Stack */
+  .hero-date-venue-container {
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+    margin: 0.3rem 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Mobile Info Items - Clean Design */
+  .hero-info-item-simple {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    padding: 0.4rem 0.6rem !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    width: 100% !important;
+    max-width: 260px !important;
+  }
+
+  /* Mobile Info Icons - Compact */
+  .hero-info-icon-simple {
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+    flex-shrink: 0 !important;
+    background: rgba(249, 115, 22, 0.5) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .hero-icon-svg {
+    width: 0.7rem !important;
+    height: 0.7rem !important;
+    color: #f97316 !important;
+  }
+
+  /* Mobile Info Content - Centered */
+  .hero-info-content-simple,
+  .hero-info-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .hero-info-label-simple {
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    opacity: 0.9 !important;
+    color: #f97316 !important;
+    text-transform: uppercase !important;
+  }
+
+  .hero-info-value-simple {
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  /* Mobile Additional Info - Compact Bullets */
+  .hero-additional-info {
+    gap: 0.35rem !important;
+    margin: 0.4rem 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .hero-info-bullet {
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    gap: 0.3rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 0.3rem 0.5rem !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+    border-radius: 5px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    width: 100% !important;
+    max-width: 260px !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .hero-bullet-icon {
+    font-size: 0.8rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Mobile Register Button - Compact */
+  .hero-register-button,
+  a.hero-register-button,
+  .hero-register-container .hero-register-button,
+  .hero-register-container a.hero-register-button,
+  .hero-content-container .hero-register-button {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    min-width: 120px !important;
+    max-width: 160px !important;
+    min-height: 36px !important;
+    white-space: nowrap !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+    color: #ffffff !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    border-radius: 25px !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 4px 16px rgba(249, 115, 22, 0.4) !important;
+    text-decoration: none !important;
+  }
+
+  /* Mobile Register Button Container */
+  .hero-register-container {
+    margin-top: 0.4rem !important;
+    margin-bottom: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+
+  /* Force mobile layout structure */
+  .hero-section .relative.z-10 {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Override any conflicting styles */
+  .hero-content-container * {
+    text-align: center !important;
+  }
+
+  /* Ensure proper stacking */
+  .hero-content-container > * {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Fix any absolute positioning issues */
+  .hero-content-container .hero-date-venue-container,
+  .hero-content-container .hero-additional-info,
+  .hero-content-container .hero-register-container {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+}
+
+/* Tablet and larger devices - Compact */
+@media (min-width: 769px) {
+  .hero-date-venue-container {
+    flex-direction: row;
+    gap: 1.75rem;
+    justify-content: center;
+  }
+
+  .hero-conference-subject {
+    font-size: 2.8rem;
+  }
+
+  .hero-conference-title {
+    font-size: 0.95rem;
+  }
+
+  .hero-conference-theme {
+    font-size: 1rem;
+  }
+
+  /* Compact spacing on tablet */
+  .hero-content-container {
+    padding: 1.75rem 1rem;
+    gap: 1.25rem;
+  }
+
+  /* Tablet bullet points styling */
+  .hero-info-bullet {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .hero-bullet-icon {
+    font-size: 1.3rem;
+  }
+}
+
+/* Large desktop devices - Compact */
+@media (min-width: 1200px) {
+  .hero-conference-subject {
+    font-size: 3.2rem;
+  }
+
+  .hero-conference-title {
+    font-size: 1.05rem;
+  }
+
+  .hero-conference-theme {
+    font-size: 1.1rem;
+  }
+
+  .hero-info-value {
+    font-size: 1rem;
+  }
+
+  .hero-date-venue-container {
+    gap: 2rem;
+  }
+
+  /* Desktop bullet points styling */
+  .hero-info-bullet {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .hero-bullet-icon {
+    font-size: 1.4rem;
+  }
+
+  /* Compact spacing for large desktop */
+  .hero-content-container {
+    padding: 2rem 1.25rem;
+    gap: 1.5rem;
+  }
+}
+
+/* Ultra-wide desktop devices (1440px+) */
+@media (min-width: 1440px) {
+  .hero-conference-subject {
+    font-size: 3.5rem;
+  }
+
+  .hero-conference-title {
+    font-size: 1.1rem;
+  }
+
+  .hero-conference-theme {
+    font-size: 1.15rem;
+  }
+
+  .hero-date-venue-container {
+    gap: 2.25rem;
+  }
+
+  .hero-content-container {
+    padding: 2.25rem 1.5rem;
+    gap: 1.75rem;
+  }
+}
+
+/* Extra large desktop devices - Ensure all content is visible */
+@media (min-width: 1440px) {
+  .hero-section {
+    height: 85vh;
+    max-height: 750px;
+  }
+
+  .hero-content-container {
+    max-height: 80vh;
+    padding: 2rem;
+    gap: 1.5rem;
+  }
+
+  .hero-conference-subject {
+    font-size: 3.5rem;
+  }
+}
+
+/* Ultra-wide displays (1920px+) */
+@media (min-width: 1920px) {
+  .hero-section {
+    height: 70vh;
+    min-height: 700px;
+  }
+
+  .hero-content-container {
+    max-width: 1200px;
+    padding: 2.75rem;
+  }
+
+  .hero-conference-subject {
+    font-size: 4.2rem;
+  }
+
+  .hero-conference-title {
+    font-size: 1.1rem;
+  }
+
+  .hero-conference-theme {
+    font-size: 1.25rem;
+  }
+
+  .hero-info-value-simple {
+    font-size: 0.95rem;
+  }
+
+  .hero-register-button {
+    padding: 0.9rem 1.8rem;
+    font-size: 0.95rem;
+  }
+}
 
 /* Responsive Hero Image Container - Desktop Cover, Mobile Contain */
 .hero-image-responsive {
@@ -3180,6 +4047,223 @@ select:focus {
   }
 }
 
+/* ===== NAVIGATION BLOCKS SECTION ===== */
+/* Positioned directly below hero section with responsive grid layout */
+
+.navigation-blocks-section {
+  background: #ffffff;
+  padding: 2rem 0;
+  width: 100%;
+  position: relative;
+  z-index: 5;
+}
+
+.navigation-blocks-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.navigation-blocks-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.navigation-block {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 140px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.navigation-block:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #f97316;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+}
+
+.navigation-block:hover .navigation-block-icon {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+}
+
+.navigation-block:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
+}
+
+.navigation-block-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.navigation-block-icon {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-radius: 50%;
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease;
+}
+
+.navigation-block-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke-width: 2;
+}
+
+.navigation-block-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.navigation-block-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Mobile responsive design - 2 columns, 3 rows */
+@media (max-width: 768px) {
+  .navigation-blocks-section {
+    padding: 1.5rem 0;
+  }
+
+  .navigation-blocks-container {
+    padding: 0 0.75rem;
+  }
+
+  .navigation-blocks-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .navigation-block {
+    padding: 1.25rem 0.75rem;
+    min-height: 120px;
+    border-radius: 10px;
+  }
+
+  .navigation-block-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .navigation-block-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .navigation-block-title {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .navigation-block-description {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+}
+
+/* Tablet responsive design - 3 columns, 2 rows */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .navigation-blocks-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  .navigation-block {
+    padding: 1.25rem 1rem;
+    min-height: 130px;
+  }
+
+  .navigation-block-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .navigation-block-icon svg {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .navigation-block-title {
+    font-size: 0.85rem;
+  }
+
+  .navigation-block-description {
+    font-size: 0.725rem;
+  }
+}
+
+/* Large desktop optimization */
+@media (min-width: 1200px) {
+  .navigation-blocks-container {
+    padding: 0 2rem;
+  }
+
+  .navigation-blocks-grid {
+    gap: 2rem;
+  }
+
+  .navigation-block {
+    padding: 2rem 1.25rem;
+    min-height: 160px;
+  }
+
+  .navigation-block-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .navigation-block-icon svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .navigation-block-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .navigation-block-description {
+    font-size: 0.8rem;
+  }
+}
+
 /* ===== PAST CONFERENCES SECTION - HERO PROPORTIONAL STYLING ===== */
 /* Match Hero section dimensional proportions with proper content visibility */
 
@@ -3353,5 +4437,3 @@ select:focus {
     background-position: -200% 0;
   }
 }
-
-

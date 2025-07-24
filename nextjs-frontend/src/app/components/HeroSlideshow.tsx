@@ -28,7 +28,7 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
   const overlayOpacity = hero?.slideshowSettings?.overlayOpacity || 50;
   const overlayColor = typeof hero?.slideshowSettings?.overlayColor === 'string'
     ? hero.slideshowSettings.overlayColor
-    : hero?.slideshowSettings?.overlayColor?.hex || '#000000';
+    : hero?.slideshowSettings?.overlayColor?.hex || '#2563eb';
 
 
 
@@ -55,7 +55,7 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
           ))}
         </div>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-900" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#2563eb] to-[#1d4ed8]" />
       )}
 
       {/* Dynamic Overlay from CMS */}
@@ -69,49 +69,172 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
 
       {/* Content */}
       <div className="relative z-10 w-full h-full flex items-center justify-center">
-        <div className="text-center max-w-4xl mx-auto px-4">
-          {/* Dynamic Welcome Text from Sanity */}
+        <div className="hero-content-container glass-layout-910x598">
+          {/* Conference Title */}
           <h1
-            className="hero-welcome-text"
+            className="hero-conference-title"
             style={{
               color: hero?.textColor?.hex || '#ffffff',
-              opacity: hero?.textColor?.alpha || 1
+              opacity: hero?.textColor?.alpha || 1,
+              fontSize: 'clamp(0.6rem, 2vw, 1.1rem)',
+              fontWeight: '700',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              margin: '0',
+              marginBottom: '0.1rem',
+              lineHeight: '1.2'
             }}
           >
-            {hero?.welcomeText || 'Welcome to Intelli Global Conferences'}
+            {hero?.conferenceTitle || 'INTERNATIONAL CONFERENCE ON'}
           </h1>
 
-          {/* Dynamic Subtitle Text from Sanity */}
-          <p
-            className="hero-subtitle-text"
+          {/* Conference Subject */}
+          <h2
+            className="hero-conference-subject"
             style={{
-              color: hero?.textColor?.hex || '#ffffff',
-              opacity: hero?.textColor?.alpha || 1
+              color: '#f97316',
+              opacity: 1,
+              fontSize: 'clamp(1.1rem, 3.5vw, 1.8rem)',
+              fontWeight: '900',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              margin: '0',
+              marginBottom: '0.25rem',
+              lineHeight: '1.1'
             }}
           >
-            {hero?.subtitle || 'A NEVER-ENDING JOURNEY OF SEEKING KNOWLEDGE - WITH PEOPLE AND THEIR THOUGHTS THAT ENABLE A BETTER LIVING'}
-          </p>
+            {hero?.conferenceSubject || 'NURSING'}
+          </h2>
 
-          {/* Dynamic Call to Action Buttons from Sanity */}
-          <div className="hero-buttons-container">
-            {/* Primary Button - Always use Link for internal navigation */}
-            <Link
-              href={hero?.primaryButton?.url || '/conferences'}
-              className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 focus:from-orange-600 focus:to-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-300"
-              aria-label={hero?.primaryButton?.text || 'View all conferences'}
+          {/* Conference Theme */}
+          {hero?.conferenceTheme && (
+            <p
+              className="hero-conference-theme"
+              style={{
+                color: hero?.textColor?.hex || '#ffffff',
+                opacity: hero?.textColor?.alpha || 1
+              }}
             >
-              {hero?.primaryButton?.text || 'VIEW ALL CONFERENCES'}
-            </Link>
+              {hero.conferenceTheme}
+            </p>
+          )}
 
-            {/* Secondary Button - Always use Link for internal navigation */}
-            <Link
-              href={hero?.secondaryButton?.url || '/contact'}
-              className="border-2 border-white text-white hover:bg-white hover:text-gray-900 focus:bg-white focus:text-gray-900 focus:outline-none focus:ring-4 focus:ring-white"
-              aria-label={hero?.secondaryButton?.text || 'Contact us'}
-            >
-              {hero?.secondaryButton?.text || 'CONTACT US'}
-            </Link>
+          {/* Date and Venue Section - Simplified Layout */}
+          <div className="hero-date-venue-container">
+            {/* Date */}
+            <div className="hero-info-item-simple">
+              <div className="hero-info-icon-simple">
+                <svg className="hero-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="hero-info-content-simple">
+                <span className="hero-info-label-simple">Date</span>
+                <span
+                  className="hero-info-value-simple"
+                  style={{
+                    color: hero?.textColor?.hex || '#ffffff',
+                    opacity: hero?.textColor?.alpha || 1,
+                    fontSize: 'clamp(0.65rem, 2.2vw, 0.875rem)'
+                  }}
+                >
+                  {hero?.conferenceDate || 'June 23-24, 2025'}
+                </span>
+              </div>
+            </div>
+
+            {/* Venue */}
+            <div className="hero-info-item-simple">
+              <div className="hero-info-icon-simple">
+                <svg className="hero-icon-svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="hero-info-content-simple">
+                <span className="hero-info-label-simple">Venue</span>
+                <span
+                  className="hero-info-value-simple"
+                  style={{
+                    color: hero?.textColor?.hex || '#ffffff',
+                    opacity: hero?.textColor?.alpha || 1,
+                    fontSize: 'clamp(0.65rem, 2.2vw, 0.875rem)'
+                  }}
+                >
+                  {hero?.conferenceVenue || 'Hotel Indigo Kuala Lumpur On The Park, Kuala Lumpur, Malaysia'}
+                </span>
+              </div>
+            </div>
           </div>
+
+          {/* Additional Information */}
+          <div className="hero-additional-info">
+              {hero?.abstractSubmissionInfo && (
+              <div
+                className="hero-info-bullet"
+                style={{
+                  color: hero?.textColor?.hex || '#ffffff',
+                  opacity: hero?.textColor?.alpha || 1,
+                  fontSize: 'clamp(0.65rem, 2.2vw, 0.875rem)'
+                }}
+              >
+                <span className="hero-bullet-icon">📝</span>
+                {hero.abstractSubmissionInfo}
+              </div>
+            )}
+            {hero?.registrationInfo && (
+              <div
+                className="hero-info-bullet"
+                style={{
+                  color: hero?.textColor?.hex || '#ffffff',
+                  opacity: hero?.textColor?.alpha || 1,
+                  fontSize: 'clamp(0.65rem, 2.2vw, 0.875rem)'
+                }}
+              >
+                <span className="hero-bullet-icon">🎟️</span>
+                {hero.registrationInfo}
+              </div>
+            )}
+          </div>
+
+          {/* Register Button */}
+          {hero?.showRegisterButton && (
+            <div
+              className="hero-register-container"
+              style={{
+                marginTop: 'clamp(0.3rem, 1vw, 0.5rem)',
+                marginBottom: '0',
+                padding: '0'
+              }}
+            >
+              <Link
+                href={hero?.registerButtonUrl || '/registration'}
+                className="hero-register-button"
+                aria-label={hero?.registerButtonText || 'Register for conference'}
+                style={{
+                  fontSize: 'clamp(0.65rem, 2.5vw, 0.95rem)',
+                  padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 4vw, 2.2rem)',
+                  minHeight: 'clamp(36px, 8vw, 48px)',
+                  minWidth: 'clamp(120px, 30vw, 200px)',
+                  maxWidth: 'clamp(160px, 40vw, 240px)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: 'clamp(0.08em, 0.2vw, 0.12em)',
+                  borderRadius: 'clamp(20px, 5vw, 50px)',
+                  textDecoration: 'none',
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                  color: '#ffffff',
+                  boxShadow: '0 4px 16px rgba(249, 115, 22, 0.4)',
+                  border: '2px solid transparent',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {hero?.registerButtonText || 'Register Now'}
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 

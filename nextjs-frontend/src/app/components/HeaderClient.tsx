@@ -40,12 +40,6 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
             About Us
           </Link>
           <Link
-            href="/conferences"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
-          >
-            All Conferences
-          </Link>
-          <Link
             href="/past-conferences"
             className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
@@ -155,13 +149,6 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               About Us
             </Link>
             <Link
-              href="/conferences"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              All Conferences
-            </Link>
-            <Link
               href="/past-conferences"
               className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
@@ -213,6 +200,13 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               onClick={closeMenu}
             >
               Contact Us
+            </Link>
+            <Link
+              href="/registration"
+              className="block mx-3 mt-4 bg-green-600 text-white px-4 py-3 rounded-lg font-medium text-center hover:bg-green-700 transition-all duration-300 shadow-lg"
+              onClick={closeMenu}
+            >
+              Register Now
             </Link>
           </div>
         </div>

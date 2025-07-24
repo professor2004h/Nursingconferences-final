@@ -19,25 +19,25 @@ export interface SlideshowSettings {
 export interface HeroSectionType {
   images: HeroImage[];
   slideshowSettings: SlideshowSettings;
-  welcomeText: string;
-  subtitle: string;
+  conferenceTitle: string;
+  conferenceSubject: string;
+  conferenceTheme: string;
+  conferenceDate: string;
+  conferenceVenue: string;
+  abstractSubmissionInfo: string;
+  registrationInfo: string;
+  showRegisterButton: boolean;
+  registerButtonText: string;
+  registerButtonUrl: string;
   textColor: {
     hex: string;
     alpha: number;
-  };
-  primaryButton: {
-    text: string;
-    url: string;
-  };
-  secondaryButton: {
-    text: string;
-    url: string;
   };
 }
 
 export async function getHeroSection(): Promise<HeroSectionType | null> {
   try {
-    // Complete hero section query with welcome text and buttons
+    // Complete hero section query with conference information
     const query = `*[_type == "heroSection"][0]{
       images[] {
         "url": asset->url
@@ -51,17 +51,17 @@ export async function getHeroSection(): Promise<HeroSectionType | null> {
         enableFadeTransition,
         showNavigationDots
       },
-      welcomeText,
-      subtitle,
-      textColor,
-      primaryButton {
-        text,
-        url
-      },
-      secondaryButton {
-        text,
-        url
-      }
+      conferenceTitle,
+      conferenceSubject,
+      conferenceTheme,
+      conferenceDate,
+      conferenceVenue,
+      abstractSubmissionInfo,
+      registrationInfo,
+      showRegisterButton,
+      registerButtonText,
+      registerButtonUrl,
+      textColor
     }`;
 
     const data = await optimizedFetch<HeroSectionType>(query, {}, {
@@ -76,7 +76,7 @@ export async function getHeroSection(): Promise<HeroSectionType | null> {
       if (!data.slideshowSettings) {
         data.slideshowSettings = {
           enableSlideshow: true,
-          overlayColor: '#000000',
+          overlayColor: '#2563eb',
           overlayOpacity: 50,
           transitionDuration: 5,
           enableZoomEffect: true,
@@ -85,14 +85,52 @@ export async function getHeroSection(): Promise<HeroSectionType | null> {
         };
       }
 
-      // Default welcome text
-      if (!data.welcomeText) {
-        data.welcomeText = 'Welcome to Intelli Global Conferences';
+      // Default conference title
+      if (!data.conferenceTitle) {
+        data.conferenceTitle = 'INTERNATIONAL CONFERENCE ON';
       }
 
-      // Default subtitle
-      if (!data.subtitle) {
-        data.subtitle = 'A NEVER-ENDING JOURNEY OF SEEKING KNOWLEDGE - WITH PEOPLE AND THEIR THOUGHTS THAT ENABLE A BETTER LIVING';
+      // Default conference subject
+      if (!data.conferenceSubject) {
+        data.conferenceSubject = 'MATERIAL CHEMISTRY & NANO MATERIALS';
+      }
+
+      // Default conference theme
+      if (!data.conferenceTheme) {
+        data.conferenceTheme = 'Theme: Innovative Frontiers in Material Chemistry and Nanotechnology for Sustainable Future';
+      }
+
+      // Default conference date
+      if (!data.conferenceDate) {
+        data.conferenceDate = 'June 23-24, 2025';
+      }
+
+      // Default conference venue
+      if (!data.conferenceVenue) {
+        data.conferenceVenue = 'Hotel Indigo Kuala Lumpur On The Park, Kuala Lumpur, Malaysia';
+      }
+
+      // Default abstract submission info
+      if (!data.abstractSubmissionInfo) {
+        data.abstractSubmissionInfo = 'Abstract Submission Opens: March 20, 2024';
+      }
+
+      // Default registration info
+      if (!data.registrationInfo) {
+        data.registrationInfo = 'Early Bird Registration Start: April 15, 2024';
+      }
+
+      // Default register button settings
+      if (data.showRegisterButton === undefined) {
+        data.showRegisterButton = true;
+      }
+
+      if (!data.registerButtonText) {
+        data.registerButtonText = 'Register Now';
+      }
+
+      if (!data.registerButtonUrl) {
+        data.registerButtonUrl = '/registration';
       }
 
       // Default text color
@@ -100,21 +138,6 @@ export async function getHeroSection(): Promise<HeroSectionType | null> {
         data.textColor = {
           hex: '#ffffff',
           alpha: 1
-        };
-      }
-
-      // Default buttons
-      if (!data.primaryButton) {
-        data.primaryButton = {
-          text: 'View All Conferences',
-          url: '/conferences'
-        };
-      }
-
-      if (!data.secondaryButton) {
-        data.secondaryButton = {
-          text: 'Contact Us',
-          url: '/contact'
         };
       }
     }

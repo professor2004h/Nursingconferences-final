@@ -95,70 +95,51 @@ export default function AbstractSubmissionPage() {
     )
   }
 
-  const backgroundStyle = settings?.backgroundImage?.asset?.url 
-    ? {
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${settings.backgroundImage.asset.url})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }
-    : {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-      }
-
   return (
-    <div className="min-h-screen" style={backgroundStyle}>
-      {/* Header Section */}
-      <div className="pt-20 pb-8 text-center text-white">
+    <div className="min-h-screen bg-gray-100">
+      {/* Main Content - Compact Layout */}
+      <div className="py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            {settings?.title || 'ABSTRACT SUBMISSION'}
-          </h1>
-          <nav className="text-sm">
-            <span>Home</span>
-            <span className="mx-2">»</span>
-            <span>Abstract Submission</span>
-          </nav>
-        </div>
-      </div>
+          <div className="max-w-6xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="flex flex-col lg:flex-row">
+                {/* Form Section */}
+                <div className="lg:w-3/5 p-8">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                    Submit Your Abstract
+                  </h2>
+                  <AbstractSubmissionForm settings={settings} />
+                </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 pb-20">
-        <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
-          {/* Form Section */}
-          <div className="lg:w-2/3">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                {settings?.subtitle || 'Submit Your Abstract'}
-              </h2>
-              <AbstractSubmissionForm settings={settings} />
-            </div>
-          </div>
-
-          {/* Template Download Section */}
-          <div className="lg:w-1/3">
-            <div className="bg-blue-900 rounded-lg p-8 text-white text-center">
-              <div className="mb-6">
-                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-10 h-10 text-blue-900" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
+                {/* Template Download Section */}
+                <div className="lg:w-2/5 bg-gradient-to-br from-blue-800 to-blue-900 p-8 text-white flex flex-col justify-center">
+                  <div className="text-center">
+                    <div className="mb-6">
+                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-bold mb-4">
+                      Download Abstract template here
+                    </h3>
+                    {settings?.abstractTemplate?.asset?.url ? (
+                      <a
+                        href={settings.abstractTemplate.asset.url}
+                        download
+                        className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300"
+                      >
+                        📥 Download Here
+                      </a>
+                    ) : (
+                      <button className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300">
+                        📥 Download Here
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold mb-4">
-                {settings?.templateDownloadText || 'Download Abstract Template Here'}
-              </h3>
-              {settings?.abstractTemplate?.asset?.url ? (
-                <a
-                  href={settings.abstractTemplate.asset.url}
-                  download
-                  className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300"
-                >
-                  Download Now
-                </a>
-              ) : (
-                <p className="text-blue-200">Template not available</p>
-              )}
             </div>
           </div>
         </div>

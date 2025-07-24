@@ -56,7 +56,7 @@ export default function Header() {
   }
 
   // Helper function to render social media icons conditionally (mobile)
-  const renderSocialIcon = (platform: string, url: string | undefined, title: string, iconPath: string) => {
+  const renderSocialIcon = (url: string | undefined, title: string, iconPath: string) => {
     if (!url) return null;
 
     return (
@@ -75,7 +75,7 @@ export default function Header() {
   };
 
   // Helper function to render desktop social media icons
-  const renderDesktopSocialIcon = (platform: string, url: string | undefined, title: string, iconPath: string) => {
+  const renderDesktopSocialIcon = (url: string | undefined, title: string, iconPath: string) => {
     if (!url) return null;
 
     return (
@@ -148,10 +148,10 @@ export default function Header() {
               {/* Right side - Social Links (only show if any social media URLs are provided) */}
               {(siteSettings?.socialMedia?.linkedin || siteSettings?.socialMedia?.facebook || siteSettings?.socialMedia?.twitter || siteSettings?.socialMedia?.instagram) && (
                 <div className="flex items-center flex-shrink-0 social-icons-tight ml-auto">
-                  {renderSocialIcon('linkedin', siteSettings?.socialMedia?.linkedin, 'LinkedIn', socialIcons.linkedin)}
-                  {renderSocialIcon('facebook', siteSettings?.socialMedia?.facebook, 'Facebook', socialIcons.facebook)}
-                  {renderSocialIcon('twitter', siteSettings?.socialMedia?.twitter, 'X (Twitter)', socialIcons.twitter)}
-                  {renderSocialIcon('instagram', siteSettings?.socialMedia?.instagram, 'Instagram', socialIcons.instagram)}
+                  {renderSocialIcon(siteSettings?.socialMedia?.linkedin, 'LinkedIn', socialIcons.linkedin)}
+                  {renderSocialIcon(siteSettings?.socialMedia?.facebook, 'Facebook', socialIcons.facebook)}
+                  {renderSocialIcon(siteSettings?.socialMedia?.twitter, 'X (Twitter)', socialIcons.twitter)}
+                  {renderSocialIcon(siteSettings?.socialMedia?.instagram, 'Instagram', socialIcons.instagram)}
                 </div>
               )}
             </div>
@@ -193,10 +193,10 @@ export default function Header() {
             {(siteSettings?.socialMedia?.linkedin || siteSettings?.socialMedia?.facebook || siteSettings?.socialMedia?.twitter || siteSettings?.socialMedia?.instagram) && (
               <div className="flex items-center space-x-4 desktop-social">
                 <span className="text-blue-200">Follow Us:</span>
-                {renderDesktopSocialIcon('linkedin', siteSettings?.socialMedia?.linkedin, 'LinkedIn', socialIcons.linkedin)}
-                {renderDesktopSocialIcon('facebook', siteSettings?.socialMedia?.facebook, 'Facebook', socialIcons.facebook)}
-                {renderDesktopSocialIcon('twitter', siteSettings?.socialMedia?.twitter, 'X (Twitter)', socialIcons.twitter)}
-                {renderDesktopSocialIcon('instagram', siteSettings?.socialMedia?.instagram, 'Instagram', socialIcons.instagram)}
+                {renderDesktopSocialIcon(siteSettings?.socialMedia?.linkedin, 'LinkedIn', socialIcons.linkedin)}
+                {renderDesktopSocialIcon(siteSettings?.socialMedia?.facebook, 'Facebook', socialIcons.facebook)}
+                {renderDesktopSocialIcon(siteSettings?.socialMedia?.twitter, 'X (Twitter)', socialIcons.twitter)}
+                {renderDesktopSocialIcon(siteSettings?.socialMedia?.instagram, 'Instagram', socialIcons.instagram)}
               </div>
             )}
           </div>
@@ -229,15 +229,12 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Home
             </Link>
             <Link href="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               About Us
-            </Link>
-            <Link href="/conferences" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              All Conferences
             </Link>
             <Link href="/past-conferences" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Past Conferences
@@ -249,7 +246,7 @@ export default function Header() {
               Speakers
             </Link>
             <Link href="/brochure" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              Download Brochure
+              Brochure Download
             </Link>
             <Link href="/sponsorship" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Sponsorship
@@ -259,14 +256,11 @@ export default function Header() {
                 Journal
               </Link>
             )}
-            <Link href="/cancellation-policy" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              Cancellation Policy
-            </Link>
             <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Contact Us
             </Link>
             <Link
-              href="/register"
+              href="/registration"
               className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-full font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Register Now
@@ -307,13 +301,6 @@ export default function Header() {
                 About Us
               </Link>
               <Link
-                href="/conferences"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                All Conferences
-              </Link>
-              <Link
                 href="/past-conferences"
                 className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
@@ -339,7 +326,7 @@ export default function Header() {
                 className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Download Brochure
+                Brochure Download
               </Link>
               <Link
                 href="/sponsorship"
@@ -358,13 +345,6 @@ export default function Header() {
                 </Link>
               )}
               <Link
-                href="/cancellation-policy"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Cancellation Policy
-              </Link>
-              <Link
                 href="/contact"
                 className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
@@ -372,7 +352,7 @@ export default function Header() {
                 Contact Us
               </Link>
               <Link
-                href="/register"
+                href="/registration"
                 className="block mx-3 mt-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-full font-medium text-center hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg"
                 onClick={() => setIsMenuOpen(false)}
               >

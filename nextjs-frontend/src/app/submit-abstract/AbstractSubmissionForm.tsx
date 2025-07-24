@@ -106,24 +106,37 @@ export default function AbstractSubmissionForm({ settings }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* Status Message */}
       {submitStatus.type && (
-        <div className={`p-4 rounded-lg ${
-          submitStatus.type === 'success' 
-            ? 'bg-green-100 border border-green-400 text-green-700' 
-            : 'bg-red-100 border border-red-400 text-red-700'
+        <div className={`p-3 rounded-lg border text-sm ${
+          submitStatus.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800'
+            : 'bg-red-50 border-red-200 text-red-800'
         }`}>
           {submitStatus.message}
         </div>
       )}
 
-      {/* Personal Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Row 1: Select Any, First Name, Last Name */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-            First Name *
-          </label>
+          <select
+            id="abstractType"
+            name="abstractTitle"
+            value={formData.abstractTitle}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm"
+          >
+            <option value="">Select Any</option>
+            <option value="oral">Oral Presentation</option>
+            <option value="poster">Poster Presentation</option>
+            <option value="workshop">Workshop</option>
+          </select>
+        </div>
+
+        <div>
           <input
             type="text"
             id="firstName"
@@ -131,15 +144,12 @@ export default function AbstractSubmissionForm({ settings }: Props) {
             value={formData.firstName}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
             placeholder="First Name"
           />
         </div>
 
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-            Last Name *
-          </label>
           <input
             type="text"
             id="lastName"
@@ -147,33 +157,15 @@ export default function AbstractSubmissionForm({ settings }: Props) {
             value={formData.lastName}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
             placeholder="Last Name"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Row 2: Phone Number, Email, Country */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email *
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Email"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number *
-          </label>
           <input
             type="tel"
             id="phoneNumber"
@@ -181,45 +173,58 @@ export default function AbstractSubmissionForm({ settings }: Props) {
             value={formData.phoneNumber}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
             placeholder="Phone Number"
           />
         </div>
+
+        <div>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+            placeholder="Email"
+          />
+        </div>
+
+        <div className="relative">
+          <select
+            id="country"
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm appearance-none"
+          >
+            <option value="">🇺🇸 United States</option>
+            {countries.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
-          Country *
-        </label>
-        <select
-          id="country"
-          name="country"
-          value={formData.country}
-          onChange={handleInputChange}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Select Country</option>
-          {countries.map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
-          ))}
-        </select>
-      </div>
-
+      {/* Row 3: Category, Track */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="interestedIn" className="block text-sm font-medium text-gray-700 mb-1">
-            Interested In *
-          </label>
           <select
-            id="interestedIn"
+            id="interestedInCategory"
             name="interestedIn"
             value={formData.interestedIn}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm"
           >
             <option value="">Select Category</option>
             {settings?.interestedInOptions?.map((option) => (
@@ -231,16 +236,13 @@ export default function AbstractSubmissionForm({ settings }: Props) {
         </div>
 
         <div>
-          <label htmlFor="trackName" className="block text-sm font-medium text-gray-700 mb-1">
-            Track Name *
-          </label>
           <select
             id="trackName"
             name="trackName"
             value={formData.trackName}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm"
           >
             <option value="">Select Track Name</option>
             {settings?.trackNames?.map((track) => (
@@ -252,61 +254,51 @@ export default function AbstractSubmissionForm({ settings }: Props) {
         </div>
       </div>
 
+      {/* Row 4: Address */}
       <div>
-        <label htmlFor="abstractTitle" className="block text-sm font-medium text-gray-700 mb-1">
-          Abstract Title *
-        </label>
-        <input
-          type="text"
-          id="abstractTitle"
-          name="abstractTitle"
-          value={formData.abstractTitle}
-          onChange={handleInputChange}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter your abstract title"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="abstractContent" className="block text-sm font-medium text-gray-700 mb-1">
-          Abstract Content *
-        </label>
         <textarea
           id="abstractContent"
           name="abstractContent"
           value={formData.abstractContent}
           onChange={handleInputChange}
           required
-          rows={6}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter your abstract content..."
+          rows={3}
+          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-vertical text-sm"
+          placeholder="Address"
         />
       </div>
 
+      {/* Row 5: File Upload */}
       <div>
-        <label htmlFor="abstractFile" className="block text-sm font-medium text-gray-700 mb-1">
-          Attach your file (Doc or Pdf) *
-        </label>
-        <input
-          type="file"
-          id="abstractFile"
-          name="abstractFile"
-          onChange={handleFileChange}
-          accept=".pdf,.doc,.docx"
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <p className="text-sm text-gray-500 mt-1">
-          File size should not exceed 5MB. Accepted formats: PDF, DOC, DOCX
-        </p>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-600 font-medium">Attach your File (Doc or Pdf)</span>
+          <input
+            type="file"
+            id="abstractFile"
+            name="abstractFile"
+            onChange={handleFileChange}
+            accept=".pdf,.doc,.docx"
+            required
+            className="hidden"
+          />
+          <label
+            htmlFor="abstractFile"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            Choose File
+          </label>
+          <span className="text-sm text-gray-500">
+            {formData.abstractFile ? formData.abstractFile.name : 'No file chosen'}
+          </span>
+        </div>
       </div>
 
-      <div className="text-center">
+      {/* Submit Button */}
+      <div className="text-center pt-2">
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`px-8 py-3 rounded-full font-bold text-white transition-colors duration-300 ${
+          className={`px-8 py-2.5 rounded-full font-semibold text-white transition-all duration-300 text-sm ${
             isSubmitting
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-orange-500 hover:bg-orange-600'

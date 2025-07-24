@@ -58,12 +58,19 @@ export default function BrochureDownloadForm() {
     setErrors({});
 
     try {
+      // Prepare form data with defaults for optional fields
+      const submitData = {
+        ...formData,
+        country: formData.country || 'Not specified',
+        professionalTitle: formData.professionalTitle || '',
+      };
+
       const response = await fetch('/api/brochure/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       const result: BrochureSubmitResponse = await response.json();
@@ -115,193 +122,119 @@ export default function BrochureDownloadForm() {
     <div>
       {/* Success Message with Download */}
       {showDownload && submitStatus === 'success' && (
-        <div className="mb-8 p-6 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" />
-              </svg>
-            </div>
-            <div className="ml-3 flex-1">
-              <h3 className="text-lg font-semibold text-green-900 mb-2">
-                Form Submitted Successfully!
-              </h3>
-              <p className="text-green-700 mb-4">
-                Thank you for your interest in our conferences. Your brochure is ready for download.
-              </p>
-              <button
-                onClick={handleDownload}
-                className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-md hover:shadow-lg"
-              >
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                </svg>
-                Download Brochure
-              </button>
-            </div>
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" />
+            </svg>
+            <p className="text-green-700 text-sm">Form submitted successfully! Your brochure is ready for download.</p>
           </div>
         </div>
       )}
 
       {/* Error Message */}
       {errors.general && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded">
           <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
               <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
             </svg>
-            <p className="text-red-700">{errors.general}</p>
+            <p className="text-red-700 text-sm">{errors.general}</p>
           </div>
         </div>
       )}
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Full Name */}
+      {/* Compact Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Name */}
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-            Full Name *
-          </label>
           <input
             type="text"
             id="fullName"
             name="fullName"
             value={formData.fullName}
             onChange={handleInputChange}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+            className={`w-full px-4 py-3 border rounded focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb] transition-colors ${
               errors.fullName ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="Enter your full name"
+            placeholder="Name*"
             disabled={isSubmitting}
           />
           {errors.fullName && (
-            <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+            <p className="mt-1 text-xs text-red-600">{errors.fullName}</p>
           )}
         </div>
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address *
-          </label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+            className={`w-full px-4 py-3 border rounded focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb] transition-colors ${
               errors.email ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="Enter your email address"
+            placeholder="Email*"
             disabled={isSubmitting}
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            <p className="mt-1 text-xs text-red-600">{errors.email}</p>
           )}
         </div>
 
-        {/* Phone */}
+        {/* Mobile Number */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-            Phone Number *
-          </label>
           <input
             type="tel"
             id="phone"
             name="phone"
             value={formData.phone}
             onChange={handleInputChange}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+            className={`w-full px-4 py-3 border rounded focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb] transition-colors ${
               errors.phone ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="Enter your phone number"
+            placeholder="Mobile Number*"
             disabled={isSubmitting}
           />
           {errors.phone && (
-            <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
           )}
         </div>
 
         {/* Organization */}
         <div>
-          <label htmlFor="organization" className="block text-sm font-medium text-gray-700 mb-2">
-            Organization/Institution
-          </label>
           <input
             type="text"
             id="organization"
             name="organization"
             value={formData.organization}
             onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            placeholder="Enter your organization name (optional)"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        {/* Country */}
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
-            Country *
-          </label>
-          <select
-            id="country"
-            name="country"
-            value={formData.country}
-            onChange={handleInputChange}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-              errors.country ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-4 py-3 border rounded focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb] transition-colors ${
+              errors.organization ? 'border-red-500' : 'border-gray-300'
             }`}
-            disabled={isSubmitting}
-          >
-            <option value="">Select your country</option>
-            {COUNTRY_OPTIONS.map((country) => (
-              <option key={country.value} value={country.value}>
-                {country.label}
-              </option>
-            ))}
-          </select>
-          {errors.country && (
-            <p className="mt-1 text-sm text-red-600">{errors.country}</p>
-          )}
-        </div>
-
-        {/* Professional Title */}
-        <div>
-          <label htmlFor="professionalTitle" className="block text-sm font-medium text-gray-700 mb-2">
-            Professional Title/Role
-          </label>
-          <input
-            type="text"
-            id="professionalTitle"
-            name="professionalTitle"
-            value={formData.professionalTitle}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            placeholder="Enter your professional title (optional)"
+            placeholder="Organization/Institution*"
             disabled={isSubmitting}
           />
+          {errors.organization && (
+            <p className="mt-1 text-xs text-red-600">{errors.organization}</p>
+          )}
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 hover:shadow-lg"
+          className="w-full bg-[#2563eb] text-white font-semibold py-3 px-6 rounded hover:bg-[#1d4ed8] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               <span>Submitting...</span>
             </div>
           ) : (
-            <div className="flex items-center justify-center space-x-2">
-              <span>Submit & Download Brochure</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
+            'Submit to Download'
           )}
         </button>
       </form>
