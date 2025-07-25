@@ -230,33 +230,33 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Home
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/about" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               About Us
             </Link>
-            <Link href="/past-conferences" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/past-conferences" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Past Conferences
             </Link>
-            <Link href="/organizing-committee" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/organizing-committee" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Committee
             </Link>
-            <Link href="/speakers" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/speakers" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Speakers
             </Link>
-            <Link href="/brochure" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/brochure" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Brochure Download
             </Link>
-            <Link href="/sponsorship" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/sponsorship" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Sponsorship
             </Link>
             {siteSettings?.journal?.showJournal && (
-              <Link href="/journal" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              <Link href="/journal" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
                 Journal
               </Link>
             )}
-            <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/contact" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Contact Us
             </Link>
             <Link
@@ -270,7 +270,7 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-orange-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMenuOpen ? (
@@ -288,49 +288,49 @@ export default function Header() {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2 shadow-lg">
               <Link
                 href="/"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
               <Link
                 href="/about"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About Us
               </Link>
               <Link
                 href="/past-conferences"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Past Conferences
               </Link>
               <Link
                 href="/organizing-committee"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Committee
               </Link>
               <Link
                 href="/speakers"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Speakers
               </Link>
               <Link
                 href="/brochure"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Brochure Download
               </Link>
               <Link
                 href="/sponsorship"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sponsorship
@@ -338,7 +338,7 @@ export default function Header() {
               {siteSettings?.journal?.showJournal && (
                 <Link
                   href="/journal"
-                  className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Journal
@@ -346,7 +346,7 @@ export default function Header() {
               )}
               <Link
                 href="/contact"
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact Us

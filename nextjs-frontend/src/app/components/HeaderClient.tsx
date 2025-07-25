@@ -32,43 +32,43 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
         <div className="flex items-center space-x-3 md:space-x-4 lg:space-x-5 xl:space-x-6 overflow-visible flex-wrap">
           <Link
             href="/"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
             Home
           </Link>
           <Link
             href="/about"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
             About Us
           </Link>
           <Link
             href="/past-conferences"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
             Past Conferences
           </Link>
           <Link
             href="/organizing-committee"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
             Committee
           </Link>
           <Link
             href="/speakers"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
             Speakers
           </Link>
           <Link
             href="/brochure"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
             Brochure Download
           </Link>
           <Link
             href="/sponsorship"
-            className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
             Sponsorship
           </Link>
@@ -77,7 +77,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               href={siteSettings.journal.journalUrl || "/journal"}
               target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
               rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+              className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
             >
               Journal
             </Link>
@@ -94,7 +94,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
         <div className="ml-3 lg:ml-4 xl:ml-6">
           <Link
             href="/contact"
-            className="bg-blue-600 text-white px-4 lg:px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
+            className="bg-orange-600 text-white px-4 lg:px-5 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
           >
             Contact Us
           </Link>
@@ -139,49 +139,49 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2 mx-2 shadow-lg">
             <Link
               href="/"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               Home
             </Link>
             <Link
               href="/about"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               About Us
             </Link>
             <Link
               href="/past-conferences"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               Past Conferences
             </Link>
             <Link
               href="/organizing-committee"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               Committee
             </Link>
             <Link
               href="/speakers"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               Speakers
             </Link>
             <Link
               href="/brochure"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               Brochure Download
             </Link>
             <Link
               href="/sponsorship"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               Sponsorship
@@ -191,7 +191,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                 href={siteSettings.journal.journalUrl || "/journal"}
                 target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
                 rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
-                className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={closeMenu}
               >
                 Journal
@@ -199,7 +199,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
             )}
             <Link
               href="/contact"
-              className="block px-3 py-3 text-gray-700 hover:text-blue-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
             >
               Contact Us
