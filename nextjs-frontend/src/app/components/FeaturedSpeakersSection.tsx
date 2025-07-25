@@ -83,6 +83,8 @@ const FeaturedSpeakersSection: React.FC = () => {
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  console.log('🎤 FeaturedSpeakersSection component rendered');
+
   useEffect(() => {
     fetchSpeakers();
   }, []);
@@ -97,7 +99,8 @@ const FeaturedSpeakersSection: React.FC = () => {
 
       if (result.success) {
         setSpeakers(result.data);
-        console.log(`✅ Loaded ${result.data.length} speakers`);
+        const featuredCount = result.data.filter(speaker => speaker.isFeatured === true).length;
+        console.log(`✅ Loaded ${result.data.length} speakers (${featuredCount} featured for homepage)`);
       } else {
         setError(result.error || 'Failed to fetch speakers');
         console.error('❌ API error:', result.error);
@@ -121,8 +124,11 @@ const FeaturedSpeakersSection: React.FC = () => {
     setSelectedSpeaker(null);
   };
 
-  // Group speakers by category
-  const speakersByCategory = speakers.reduce((acc, speaker) => {
+  // Filter only featured speakers and group by category
+  const featuredSpeakers = speakers.filter(speaker => speaker.isFeatured === true);
+  console.log(`🎤 Featured Speakers Filter: ${featuredSpeakers.length} out of ${speakers.length} speakers are featured`);
+
+  const speakersByCategory = featuredSpeakers.reduce((acc, speaker) => {
     if (!acc[speaker.speakerCategory]) {
       acc[speaker.speakerCategory] = [];
     }
@@ -159,6 +165,12 @@ const FeaturedSpeakersSection: React.FC = () => {
         </div>
       </section>
     );
+  }
+
+  // Don't render the section if there are no featured speakers
+  if (featuredSpeakers.length === 0) {
+    console.log('ℹ️ No featured speakers found, hiding Featured Speakers section');
+    return null;
   }
 
   return (
