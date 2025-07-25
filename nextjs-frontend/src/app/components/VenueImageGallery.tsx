@@ -118,8 +118,8 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
                   
                   {/* Caption Overlay */}
                   {image.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/70 to-transparent text-white p-3">
-                      <p className="text-sm font-medium overflow-hidden text-ellipsis">{image.caption}</p>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/70 to-transparent p-3">
+                      <p className="text-sm font-medium overflow-hidden text-ellipsis text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>{image.caption}</p>
                     </div>
                   )}
                 </>
@@ -193,9 +193,9 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
             />
             
             {/* Image Info */}
-            <div className="mt-4 text-center text-white max-w-2xl">
+            <div className="mt-4 text-center max-w-2xl">
               {images[selectedImage].caption && (
-                <p className="text-lg font-medium mb-2">{images[selectedImage].caption}</p>
+                <p className="text-lg font-medium mb-2 text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>{images[selectedImage].caption}</p>
               )}
               <p className="text-sm text-gray-300">
                 Image {selectedImage + 1} of {images.length}

@@ -33,6 +33,15 @@ import abstractSettings from './abstractSettings';
 // Organizing committee schema
 import organizingCommittee from './organizingCommittee';
 
+// Poster presenters schema
+import posterPresenters from './posterPresenters';
+
+// Past conference gallery schema
+import pastConferenceGallery from './pastConferenceGallery';
+
+// Media partners schema
+import mediaPartners from './mediaPartners';
+
 // Speakers schema
 import speakers from './speakers';
 
@@ -76,6 +85,12 @@ export const schemaTypes = [
   abstractSettings,
   // Organizing committee schema
   organizingCommittee,
+  // Poster presenters schema
+  posterPresenters,
+  // Past conference gallery schema
+  pastConferenceGallery,
+  // Media partners schema
+  mediaPartners,
   // Speakers schema
   speakers,
   // Speaker guidelines schema

@@ -148,6 +148,39 @@ export default (S) =>
             .title('Organizing Committee Members')
             .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
         ),
+      // Add Poster Presenters
+      S.listItem()
+        .title('Poster Presenters')
+        .id('posterPresenters')
+        .icon(() => '📋')
+        .schemaType('posterPresenters')
+        .child(
+          S.documentTypeList('posterPresenters')
+            .title('Poster Presenters')
+            .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
+        ),
+      // Add Past Conference Gallery
+      S.listItem()
+        .title('Conference Gallery')
+        .id('pastConferenceGallery')
+        .icon(() => '📸')
+        .schemaType('pastConferenceGallery')
+        .child(
+          S.documentTypeList('pastConferenceGallery')
+            .title('Past Conference Gallery')
+            .defaultOrdering([{field: 'conferenceDate', direction: 'desc'}])
+        ),
+      // Add Media Partners
+      S.listItem()
+        .title('Media Partners')
+        .id('mediaPartners')
+        .icon(() => '🤝')
+        .schemaType('mediaPartners')
+        .child(
+          S.documentTypeList('mediaPartners')
+            .title('Media Partners')
+            .defaultOrdering([{field: 'companyName', direction: 'asc'}])
+        ),
       // Add Speakers
       S.listItem()
         .title('Conference Speakers')

@@ -61,6 +61,24 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
             Speakers
           </Link>
           <Link
+            href="/poster-presenters"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Poster Presenters
+          </Link>
+          <Link
+            href="/past-conference-gallery"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Gallery
+          </Link>
+          <Link
+            href="/media-partners"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Partners
+          </Link>
+          <Link
             href="/brochure"
             className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
           >
@@ -171,6 +189,27 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               onClick={closeMenu}
             >
               Speakers
+            </Link>
+            <Link
+              href="/poster-presenters"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={closeMenu}
+            >
+              Poster Presenters
+            </Link>
+            <Link
+              href="/past-conference-gallery"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={closeMenu}
+            >
+              Conference Gallery
+            </Link>
+            <Link
+              href="/media-partners"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={closeMenu}
+            >
+              Media Partners
             </Link>
             <Link
               href="/brochure"

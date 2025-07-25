@@ -9,6 +9,7 @@ import { PortableText } from "@portabletext/react";
 import { getHeroSection } from "./getHeroSection";
 import { getStatisticsContent, getDefaultStatistics } from "./getStatistics";
 import { getSiteSettingsSSR } from "./getSiteSettings";
+import { getVenueSettings } from "./getVenueSettings";
 import {
   getPastConferencesSectionStyling,
   type PastConferencesSectionStyling,
@@ -31,6 +32,7 @@ import FeaturedCommitteeMembers from '@/app/components/FeaturedCommitteeMembers'
 import FeaturedSpeakersSection from '@/app/components/FeaturedSpeakersSection';
 import ConferenceTracksSection from '@/app/components/ConferenceTracksSection';
 import NavigationBlocks from '@/app/components/NavigationBlocks';
+import VenueImageGallery from '@/app/components/VenueImageGallery';
 
 // Direct imports to avoid SSR bailout
 import ContactForm from "./components/ContactForm";
@@ -58,7 +60,8 @@ export default async function HomePage() {
       siteSettings,
       pastConferencesStyling,
       journalStyling,
-      customContentData
+      customContentData,
+      venueSettings
     ] = await Promise.allSettled([
       getConferenceEvents(12),
       getFeaturedPastConferences(4),
@@ -69,7 +72,8 @@ export default async function HomePage() {
       getSiteSettingsSSR(),
       getPastConferencesSectionStyling(),
       getJournalSectionStyling(),
-      getCustomContentSectionData()
+      getCustomContentSectionData(),
+      getVenueSettings()
     ]);
 
     // Only log detailed results in development
@@ -105,7 +109,8 @@ export default async function HomePage() {
       siteSettings: siteSettings.status === 'fulfilled' ? siteSettings.value : null,
       pastConferencesStyling: pastConferencesStyling.status === 'fulfilled' ? pastConferencesStyling.value : null,
       journalStyling: journalStyling.status === 'fulfilled' ? journalStyling.value : null,
-      customContentData: customContentData.status === 'fulfilled' ? customContentData.value : null
+      customContentData: customContentData.status === 'fulfilled' ? customContentData.value : null,
+      venueSettings: venueSettings.status === 'fulfilled' ? venueSettings.value : null
     };
 
 
@@ -125,6 +130,7 @@ export default async function HomePage() {
       pastConferencesStyling={null}
       journalStyling={null}
       customContentData={null}
+      venueSettings={null}
     />;
   }
 }
@@ -140,7 +146,8 @@ function HomePageContent({
   siteSettings,
   pastConferencesStyling,
   journalStyling,
-  customContentData
+  customContentData,
+  venueSettings
 }: {
   events: ConferenceEventType[];
   pastConferences: PastConferenceType[];
@@ -152,6 +159,7 @@ function HomePageContent({
   pastConferencesStyling: PastConferencesSectionStyling | null;
   journalStyling: JournalSectionStyling | null;
   customContentData: CustomContentSectionData | null;
+  venueSettings: any;
 }) {
   // Use fallback data if needed
   const safeStatistics = statistics || getDefaultStatistics();
@@ -785,6 +793,27 @@ function HomePageContent({
                 </Link>
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Venue Images Section */}
+      {venueSettings?.venueImages && venueSettings.venueImages.length > 0 && (
+        <section className="py-12 md:py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                VENUE GALLERY
+              </h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                Explore our stunning venue and discover the perfect setting for your conference experience.
+              </p>
+            </div>
+
+            <VenueImageGallery
+              images={venueSettings.venueImages}
+              title="Conference Venue"
+            />
           </div>
         </section>
       )}
