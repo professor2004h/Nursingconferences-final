@@ -84,7 +84,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           )}
           <Link
             href="/registration"
-            className="bg-green-600 text-white px-3 lg:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
+            className="bg-green-600 text-white hover:text-gray-200 px-3 lg:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
           >
             Register Now
           </Link>
@@ -94,7 +94,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
         <div className="ml-3 lg:ml-4 xl:ml-6">
           <Link
             href="/contact"
-            className="bg-orange-600 text-white px-4 lg:px-5 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
+            className="bg-orange-600 text-white hover:text-gray-200 px-4 lg:px-5 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
           >
             Contact Us
           </Link>
@@ -206,7 +206,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
             </Link>
             <Link
               href="/registration"
-              className="block mx-3 mt-4 bg-green-600 text-white px-4 py-3 rounded-lg font-medium text-center hover:bg-green-700 transition-all duration-300 shadow-lg"
+              className="block mx-3 mt-4 bg-green-600 text-white hover:text-gray-200 px-4 py-3 rounded-lg font-medium text-center hover:bg-green-700 transition-all duration-300 shadow-lg"
               onClick={closeMenu}
             >
               Register Now

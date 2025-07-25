@@ -261,7 +261,7 @@ export default function Header() {
             </Link>
             <Link
               href="/registration"
-              className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-full font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:text-gray-200 px-6 py-2 rounded-full font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Register Now
             </Link>
@@ -353,7 +353,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/registration"
-                className="block mx-3 mt-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-full font-medium text-center hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg"
+                className="block mx-3 mt-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:text-gray-200 px-4 py-3 rounded-full font-medium text-center hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Register Now
