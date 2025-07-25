@@ -28,6 +28,7 @@ import {
   type CustomContentSectionData
 } from "./getCustomContentSectionStyling";
 import FeaturedCommitteeMembers from '@/app/components/FeaturedCommitteeMembers';
+import FeaturedSpeakersSection from '@/app/components/FeaturedSpeakersSection';
 import ConferenceTracksSection from '@/app/components/ConferenceTracksSection';
 import NavigationBlocks from '@/app/components/NavigationBlocks';
 
@@ -441,6 +442,9 @@ function HomePageContent({
 
       {/* Featured Committee Members Section */}
       <FeaturedCommitteeMembers />
+
+      {/* Featured Speakers Section */}
+      <FeaturedSpeakersSection />
 
       {/* Past Conferences Section */}
       {pastConferences && pastConferences.length > 0 && (
