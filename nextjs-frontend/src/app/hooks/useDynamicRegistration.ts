@@ -141,13 +141,8 @@ export const useDynamicRegistration = (): UseDynamicRegistrationReturn => {
         to: newPeriod?.title || 'None',
       });
 
-      // Update the data with the new active period
-      if (data) {
-        setData(prev => prev ? {
-          ...prev,
-          activePeriod: newPeriod,
-        } : null);
-      }
+      // Note: Removed setData call here to prevent infinite loop
+      // The period detection is already handled by the hook itself
     },
     onTransitionWarning: (timeRemaining, currentPeriod) => {
       console.log('⚠️ Pricing period transition warning:', {

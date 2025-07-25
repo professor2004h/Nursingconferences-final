@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalPaymentSection from '@/app/components/PayPalPaymentSection';
-import NavigationTest from '@/app/components/NavigationTest';
+
 
 // Form data interface
 interface FormData {
@@ -532,18 +532,22 @@ export default function RegistrationPage() {
     }
   };
 
-  // Debug logging
-  console.log('🔍 Registration Page Debug:', {
-    dynamicLoading,
-    dynamicError,
-    dynamicData: !!dynamicData,
-    registrationTypes: dynamicData?.registrationTypes?.length || 0,
-    registrationTypeNames: dynamicData?.registrationTypes?.map(t => ({ name: t.name, category: t.category })) || [],
-    sponsorshipTiers: dynamicData?.sponsorshipTiers?.length || 0,
-    accommodationOptions: dynamicData?.accommodationOptions?.length || 0,
-    activePeriod: dynamicData?.activePeriod?.periodId || 'None',
-    pricingPeriods: dynamicData?.pricingPeriods?.length || 0
-  });
+  // Debug logging (only on mount and when data changes)
+  useEffect(() => {
+    if (dynamicData) {
+      console.log('🔍 Registration Page Debug:', {
+        dynamicLoading,
+        dynamicError,
+        dynamicData: !!dynamicData,
+        registrationTypes: dynamicData?.registrationTypes?.length || 0,
+        registrationTypeNames: dynamicData?.registrationTypes?.map(t => ({ name: t.name, category: t.category })) || [],
+        sponsorshipTiers: dynamicData?.sponsorshipTiers?.length || 0,
+        accommodationOptions: dynamicData?.accommodationOptions?.length || 0,
+        activePeriod: dynamicData?.activePeriod?.periodId || 'None',
+        pricingPeriods: dynamicData?.pricingPeriods?.length || 0
+      });
+    }
+  }, [dynamicData, dynamicLoading, dynamicError]);
 
   // Early return for loading state
   if (dynamicLoading) {
@@ -602,9 +606,6 @@ export default function RegistrationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Test Component */}
-      <NavigationTest />
-
 
       {/* Header with hero background - matching reference site */}
       <div

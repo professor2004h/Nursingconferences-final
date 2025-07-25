@@ -126,14 +126,16 @@ export const useRealTimePeriodDetection = (
         clearInterval(countdownRef.current);
       }
     };
-  }, [updatePeriodDetection, updateInterval]);
+  }, [updateInterval]);
 
   /**
-   * Update when periods change
+   * Update when periods change (but not when updatePeriodDetection changes to avoid infinite loop)
    */
   useEffect(() => {
-    updatePeriodDetection();
-  }, [periods, updatePeriodDetection]);
+    if (periods && periods.length > 0) {
+      updatePeriodDetection();
+    }
+  }, [periods]); // Removed updatePeriodDetection from dependencies to prevent infinite loop
 
   // Generate status message
   const statusMessage = getPeriodStatusMessage(periodDetection);
