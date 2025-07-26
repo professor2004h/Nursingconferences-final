@@ -67,7 +67,33 @@ export const conferenceEvent = defineType({
         scheme: ['http', 'https']
       }).error('Must be a valid URL (http:// or https://)'),
     }),
+    defineField({
+      name: 'isActive',
+      title: 'Show on Website',
+      type: 'boolean',
+      description: 'Toggle this ON to display this conference event on the website. Toggle OFF to hide it from all public pages.',
+      initialValue: true,
+    }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+      date: 'date',
+      location: 'location',
+      isActive: 'isActive',
+      media: 'image',
+    },
+    prepare({ title, date, location, isActive, media }: any) {
+      const formattedDate = date ? new Date(date).toLocaleDateString() : 'No date';
+      const status = isActive ? '✅' : '❌';
+
+      return {
+        title: `${status} ${title}`,
+        subtitle: `${formattedDate} • ${location}`,
+        media,
+      };
+    },
+  },
 })
 
 export default conferenceEvent;

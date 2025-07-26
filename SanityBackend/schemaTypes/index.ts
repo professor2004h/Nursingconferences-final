@@ -3,6 +3,7 @@ import pastConference from "./pastConference";
 import about from './about';
 import heroSection from './heroSection';
 import conferences from "./conferences";
+import conferencesSectionSettings from "./conferencesSectionSettings";
 import siteSettings from './siteSettings';
 import statistics from './statistics';
 import sponsorshipTiers from './sponsorshipTiers';
@@ -60,6 +61,7 @@ export const schemaTypes = [
   about,
   heroSection,
   conferences,
+  conferencesSectionSettings,
   siteSettings,
   statistics,
   sponsorshipTiers,

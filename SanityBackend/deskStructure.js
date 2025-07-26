@@ -9,11 +9,47 @@ export default (S) =>
     .title('Content')
     .items([
       // Main Content
-      S.listItem().title('Conference Event').schemaType('conferenceEvent').child(S.documentTypeList('conferenceEvent')),
+      // Unified Conferences Management Section
+      S.listItem()
+        .title('🎯 Conferences')
+        .id('conferencesManagement')
+        .icon(() => '🎯')
+        .child(
+          S.list()
+            .title('Conferences Management')
+            .items([
+              // Master Conference Settings (Singleton)
+              S.listItem()
+                .title('⚙️ Conference Section Settings')
+                .id('conferencesSectionSettings')
+                .child(
+                  S.document()
+                    .schemaType('conferencesSectionSettings')
+                    .documentId('conferencesSectionSettings')
+                    .title('Conference Section Settings')
+                ),
+              // Individual Conference Events
+              S.listItem()
+                .title('📅 Conference Events')
+                .id('conferenceEvents')
+                .child(
+                  S.documentTypeList('conferenceEvent')
+                    .title('Conference Events')
+                    .defaultOrdering([{field: 'date', direction: 'desc'}])
+                ),
+              // Legacy Conferences Section (for backward compatibility)
+              S.listItem()
+                .title('📝 Legacy Conference Content')
+                .id('legacyConferences')
+                .child(
+                  S.documentTypeList('conferences')
+                    .title('Legacy Conference Section Content')
+                ),
+            ])
+        ),
       S.listItem().title('Past Conference').schemaType('pastConference').child(S.documentTypeList('pastConference')),
       S.listItem().title('About Us').schemaType('about').child(S.documentTypeList('about')),
       S.listItem().title('Hero Section').schemaType('heroSection').child(S.documentTypeList('heroSection')),
-      S.listItem().title('Conferences Section').schemaType('conferences').child(S.documentTypeList('conferences')),
       S.listItem().title('Site Settings').schemaType('siteSettings').child(S.documentTypeList('siteSettings')),
 
       // Registration System

@@ -17,6 +17,21 @@ export interface ConferenceEventType {
   email?: string;
   registerNowUrl?: string;
   submitAbstractUrl?: string;
+  isActive?: boolean;
+}
+
+export interface ConferencesSectionSettings {
+  _id: string;
+  masterControl: {
+    showOnHomepage: boolean;
+    title: string;
+    description?: any[];
+  };
+  displaySettings: {
+    maxEventsToShow: number;
+    showOnlyActiveEvents: boolean;
+    sortOrder: string;
+  };
 }
 
 // Get conferences section content (title and description)
@@ -50,6 +65,36 @@ export async function getConferences(): Promise<ConferenceType | null> {
   }
 }
 
+// Get conferences section settings (unified management)
+export async function getConferencesSectionSettings(): Promise<ConferencesSectionSettings | null> {
+  try {
+    const query = `*[_type == "conferencesSectionSettings" && _id == "conferencesSectionSettings"][0]{
+      _id,
+      masterControl {
+        showOnHomepage,
+        title,
+        description
+      },
+      displaySettings {
+        maxEventsToShow,
+        showOnlyActiveEvents,
+        sortOrder
+      }
+    }`;
+
+    const data = await optimizedFetch<ConferencesSectionSettings>(query, {}, {
+      ttl: 60000, // 60 seconds cache (corrected from 60ms)
+      tags: ['conferences-section-settings'],
+      useCache: true
+    });
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching conferences section settings:', error);
+    return null;
+  }
+}
+
 // Get conference events for display
 export async function getConferenceEvents(limit: number = 12): Promise<ConferenceEventType[]> {
   try {
@@ -64,27 +109,30 @@ export async function getConferenceEvents(limit: number = 12): Promise<Conferenc
       email,
       registerNowUrl,
       submitAbstractUrl,
+      isActive,
       "imageUrl": image.asset->url
     }`;
 
     const data = await optimizedFetch<ConferenceEventType[]>(query, {}, {
-      ttl: 0, // Disable cache temporarily for debugging
+      ttl: 60000, // 60 seconds cache (corrected from 60ms)
       tags: ['conference-events'],
-      useCache: false
+      useCache: true
     });
 
-    // Debug logging
-    console.log('🔍 getConferenceEvents: Raw data from Sanity:', data?.length || 0);
-    data?.forEach((event, index) => {
-      console.log(`📋 getConferenceEvents Event ${index + 1}: ${event.title}`);
-      console.log('  Register URL:', event.registerNowUrl || 'NOT SET');
-      console.log('  Submit URL:', event.submitAbstractUrl || 'NOT SET');
-    });
+    // Debug logging (development only)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 getConferenceEvents: Raw data from Sanity:', data?.length || 0);
+    }
 
     // Validate and filter the data
-    const validEvents = (data || []).filter((event: ConferenceEventType) =>
-      event && event._id && event.title && event.slug?.current
-    );
+    const validEvents = (data || [])
+      .filter((event: ConferenceEventType) =>
+        event && event._id && event.title && event.slug?.current
+      )
+      .filter((event: ConferenceEventType) => {
+        // Only show events that are explicitly active (true) or don't have the field set (backward compatibility)
+        return event.isActive !== false;
+      });
 
     return validEvents;
   } catch (error) {

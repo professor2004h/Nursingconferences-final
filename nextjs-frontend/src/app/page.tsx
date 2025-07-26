@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getAboutUsContent } from "./getAboutUs";
-import { getConferences, getConferenceEvents, type ConferenceEventType } from "./getconferences";
+import { getConferences, getConferenceEvents, getConferencesSectionSettings, type ConferenceEventType, type ConferencesSectionSettings } from "./getconferences";
 import { getFeaturedPastConferences, type PastConferenceType } from "./getPastConferences";
 import { PortableText } from "@portabletext/react";
 import { getHeroSection } from "./getHeroSection";
@@ -61,9 +61,10 @@ export default async function HomePage() {
       pastConferencesStyling,
       journalStyling,
       customContentData,
-      venueSettings
+      venueSettings,
+      conferencesSectionSettings
     ] = await Promise.allSettled([
-      getConferenceEvents(12),
+      getConferenceEvents(12), // Will be filtered later based on settings
       getFeaturedPastConferences(4),
       getAboutUsContent(),
       getHeroSection(),
@@ -73,7 +74,8 @@ export default async function HomePage() {
       getPastConferencesSectionStyling(),
       getJournalSectionStyling(),
       getCustomContentSectionData(),
-      getVenueSettings()
+      getVenueSettings(),
+      getConferencesSectionSettings()
     ]);
 
     // Only log detailed results in development
@@ -110,10 +112,27 @@ export default async function HomePage() {
       pastConferencesStyling: pastConferencesStyling.status === 'fulfilled' ? pastConferencesStyling.value : null,
       journalStyling: journalStyling.status === 'fulfilled' ? journalStyling.value : null,
       customContentData: customContentData.status === 'fulfilled' ? customContentData.value : null,
-      venueSettings: venueSettings.status === 'fulfilled' ? venueSettings.value : null
+      venueSettings: venueSettings.status === 'fulfilled' ? venueSettings.value : null,
+      conferencesSectionSettings: conferencesSectionSettings.status === 'fulfilled' ? conferencesSectionSettings.value : null
     };
 
+      // Filter events based on unified conferences section settings
+    if (pageData.conferencesSectionSettings?.displaySettings) {
+      const settings = pageData.conferencesSectionSettings.displaySettings;
+      let filteredEvents = pageData.events;
 
+      // Apply max events limit
+      if (settings.maxEventsToShow && filteredEvents.length > settings.maxEventsToShow) {
+        filteredEvents = filteredEvents.slice(0, settings.maxEventsToShow);
+      }
+
+      // Apply active status filter if enabled
+      if (settings.showOnlyActiveEvents) {
+        filteredEvents = filteredEvents.filter(event => event.isActive === true);
+      }
+
+      pageData.events = filteredEvents;
+    }
 
     return <HomePageContent {...pageData} />;
   } catch (error) {
@@ -131,6 +150,7 @@ export default async function HomePage() {
       journalStyling={null}
       customContentData={null}
       venueSettings={null}
+      conferencesSectionSettings={null}
     />;
   }
 }
@@ -147,7 +167,8 @@ function HomePageContent({
   pastConferencesStyling,
   journalStyling,
   customContentData,
-  venueSettings
+  venueSettings,
+  conferencesSectionSettings
 }: {
   events: ConferenceEventType[];
   pastConferences: PastConferenceType[];
@@ -160,6 +181,7 @@ function HomePageContent({
   journalStyling: JournalSectionStyling | null;
   customContentData: CustomContentSectionData | null;
   venueSettings: any;
+  conferencesSectionSettings: ConferencesSectionSettings | null;
 }) {
   // Use fallback data if needed
   const safeStatistics = statistics || getDefaultStatistics();
@@ -262,14 +284,15 @@ function HomePageContent({
         </div>
       </section>
 
-      {/* Conferences Section */}
+      {/* Conferences Section - Only show if master toggle is explicitly enabled */}
+      {(conferencesSectionSettings?.masterControl?.showOnHomepage === true) && (
       <section className="py-12 md:py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-12">
             <span className="text-orange-500 font-semibold text-lg tracking-wide uppercase mb-4 block">Our Events</span>
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-              {conference?.title ? (
-                conference.title
+              {conferencesSectionSettings?.masterControl?.title || conference?.title ? (
+                conferencesSectionSettings?.masterControl?.title || conference.title
               ) : (
                 <>
                   Featured
@@ -279,7 +302,11 @@ function HomePageContent({
                 </>
               )}
             </h2>
-            {conference?.description && Array.isArray(conference.description) ? (
+            {conferencesSectionSettings?.masterControl?.description && Array.isArray(conferencesSectionSettings.masterControl.description) ? (
+              <div className="text-lg md:text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                <PortableText value={conferencesSectionSettings.masterControl.description} />
+              </div>
+            ) : conference?.description && Array.isArray(conference.description) ? (
               <div className="text-lg md:text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
                 <PortableText value={conference.description} />
               </div>
@@ -394,59 +421,8 @@ function HomePageContent({
           </div>
         </div>
       </section>
+      )}
 
-      {/* Why Choose Us Section */}
-      <section className="py-12 md:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 md:mb-12">
-            <span className="text-orange-500 font-semibold text-lg tracking-wide uppercase mb-4 block">Why Choose Us</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-              Why
-              <span className="block bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                Intelli Global Conferences
-              </span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-            <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-100 hover:border-orange-200">
-              <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-orange-600 transition-colors">Build Stronger Relationships</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Core to our business are People, a pack of extraordinary associates, who passionately express themselves by providing an ecosystem that brings best minds together in the quest to solve complex Global concerns.
-              </p>
-            </div>
-
-            <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-100 hover:border-orange-200">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-orange-600 transition-colors">Knowledge Sharing</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Enable a Better World with knowledge sharing among Global Citizens by establishing an ecosystem that sustains today&apos;s agile demands, promoting collaboration & constructive sharing.
-              </p>
-            </div>
-
-            <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-100 hover:border-orange-200">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-orange-600 transition-colors">Global Innovation</h3>
-              <p className="text-slate-600 leading-relaxed">
-                We are pioneers in connecting people – bringing the best minds to the table to resolve complex global human concerns and deliver simple, usable solutions that bring scientific innovations to the masses.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Featured Committee Members Section */}
       <FeaturedCommitteeMembers />
