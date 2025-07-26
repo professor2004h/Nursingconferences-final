@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { getSiteSettings } from "../getSiteSettings";
 
 export const metadata = {
   title: "Journal - Intelli Global Conferences",
   description: "Explore cutting-edge research, academic insights, and scholarly publications from our global network of experts and researchers.",
 };
 
-export default function JournalPage() {
+export default async function JournalPage() {
+  const siteSettings = await getSiteSettings();
+  const journalMatter = siteSettings?.journal?.matterDescription;
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -24,15 +28,23 @@ export default function JournalPage() {
       {/* Content Section */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-              Coming Soon
-            </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Our journal section is currently under development. We're working to bring you 
-              the latest research papers, academic articles, and scholarly publications from 
-              conferences around the world.
-            </p>
+          <div className="mb-12">
+            {journalMatter ? (
+                <div className="text-2xl text-black max-w-3xl mx-auto leading-relaxed whitespace-pre-line">
+                    {journalMatter}
+                </div>
+            ) : (
+              <div className="text-center">
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+                  Coming Soon
+                </h2>
+                <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                  Our journal section is currently under development. We're working to bring you 
+                  the latest research papers, academic articles, and scholarly publications from 
+                  conferences around the world.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">

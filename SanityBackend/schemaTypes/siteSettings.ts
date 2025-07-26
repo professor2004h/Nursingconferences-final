@@ -231,7 +231,7 @@ const siteSettings = defineType({
       name: 'journal',
       title: 'Journal Settings',
       type: 'object',
-      description: 'Configure the Journal button and external link',
+      description: 'Configure the Journal page',
       group: 'journal',
       options: {
         collapsible: true,
@@ -246,23 +246,10 @@ const siteSettings = defineType({
           initialValue: false,
         }),
         defineField({
-          name: 'journalUrl',
-          title: 'Journal Website URL',
-          type: 'url',
-          description: 'Enter the external website URL where users will be redirected when they click the Journal button (e.g., https://journal.example.com)',
-          placeholder: 'https://journal.example.com',
-          validation: (Rule) => Rule.uri({
-            scheme: ['http', 'https']
-          }).error('Please enter a valid URL starting with http:// or https://'),
-          hidden: ({ parent }) => !parent?.showJournal,
-        }),
-        defineField({
-          name: 'openInNewTab',
-          title: 'Open in New Tab',
-          type: 'boolean',
-          description: 'Toggle ON to open the Journal website in a new tab/window. Toggle OFF to open in the same tab.',
-          initialValue: true,
-          hidden: ({ parent }) => !parent?.showJournal,
+          name: 'matterDescription',
+          title: 'Journal Matter Description',
+          type: 'text',
+          description: 'Enter the description for the Journal page matter.',
         }),
       ],
     }),
@@ -299,8 +286,15 @@ const siteSettings = defineType({
           type: 'text',
           rows: 6,
           description: 'Email template for invoice delivery. Use {{companyName}}, {{contactName}}, {{conferenceName}}, {{amount}} as placeholders',
-          placeholder: 'Dear {{contactName}},\n\nThank you for your sponsorship of {{conferenceName}}...',
-          initialValue: 'Dear {{contactName}},\n\nThank you for your sponsorship of {{conferenceName}}. Please find your invoice attached.\n\nBest regards,\nThe Conference Team',
+          placeholder: `Dear {{contactName}},
+
+Thank you for your sponsorship of {{conferenceName}}...`,
+          initialValue: `Dear {{contactName}},
+
+Thank you for your sponsorship of {{conferenceName}}. Please find your invoice attached.
+
+Best regards,
+The Conference Team`,
         }),
         defineField({
           name: 'paymentConfirmationTemplate',
@@ -308,7 +302,11 @@ const siteSettings = defineType({
           type: 'text',
           rows: 4,
           description: 'Email template for payment confirmation',
-          initialValue: 'Dear {{contactName}},\n\nYour payment of ${{amount}} for {{conferenceName}} sponsorship has been confirmed.\n\nThank you for your support!',
+          initialValue: `Dear {{contactName}},
+
+Your payment of \${{amount}} for {{conferenceName}} sponsorship has been confirmed.
+
+Thank you for your support!`,
         }),
       ],
     }),

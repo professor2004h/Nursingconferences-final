@@ -14,7 +14,12 @@ export const journalSection = defineType({
       initialValue: 'Journal Section Styling',
       validation: (Rule) => Rule.required(),
     }),
-
+    defineField({
+      name: 'matterDescription',
+      title: 'Matter Description',
+      type: 'text',
+      description: 'Enter the description for the Journal section.',
+    }),
     // Background Image Upload
     defineField({
       name: 'backgroundImage',
