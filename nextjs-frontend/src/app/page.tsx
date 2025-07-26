@@ -188,16 +188,13 @@ function HomePageContent({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section with Proper Slideshow */}
+      {/* 1. Hero Section with Proper Slideshow */}
       <HeroSlideshow hero={hero} />
 
-      {/* Navigation Blocks Section */}
+      {/* 2. Navigation Blocks Section */}
       <NavigationBlocks />
 
-      {/* Conference Tracks Section */}
-      <ConferenceTracksSection />
-
-      {/* About Section */}
+      {/* 3. About Us and Statistics Section */}
       <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -283,6 +280,88 @@ function HomePageContent({
           </div>
         </div>
       </section>
+
+      {/* 4. Organizing Committee Section */}
+      <FeaturedCommitteeMembers />
+
+      {/* 5. Speakers Section */}
+      <FeaturedSpeakersSection />
+
+      {/* 6. Conference Sessions and Tracks Section */}
+      <ConferenceTracksSection />
+
+      {/* 7. Venue Section */}
+      {venueSettings?.venueImages && venueSettings.venueImages.length > 0 && (
+        <section className="py-12 md:py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                VENUE GALLERY
+              </h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                Explore our stunning venue and discover the perfect setting for your conference experience.
+              </p>
+            </div>
+
+            <VenueImageGallery
+              images={venueSettings.venueImages}
+              title="Conference Venue"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* 8. Journal Section */}
+      {siteSettings?.journal?.showJournal && (
+        <section
+          className={`py-12 md:py-16 relative overflow-hidden ${
+            journalStyling?.isActive && journalStyling.backgroundImage?.url
+              ? ''
+              : 'bg-gradient-to-br from-slate-800 via-blue-900 to-slate-900'
+          }`}
+          style={generateJournalBackgroundStyles(journalStyling || undefined)}
+        >
+          {/* Custom Color Overlay (only when background image is active) */}
+          {journalStyling?.isActive && journalStyling.backgroundImage?.url && journalStyling.overlayColor && (
+            <div
+              className="absolute inset-0 z-15"
+              style={generateJournalOverlayStyles(journalStyling || undefined)}
+            />
+          )}
+
+          {/* Default Background Pattern (only when no custom background) */}
+          {(!journalStyling?.isActive || !journalStyling.backgroundImage?.url) && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+            </div>
+          )}
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30">
+            <div className="text-center">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                JOURNAL
+              </h2>
+              <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Explore cutting-edge research, academic insights, and scholarly publications from our global network of experts and researchers.
+              </p>
+
+              <div className="flex justify-center">
+                <Link
+                  href={siteSettings.journal?.journalUrl || "/journal"}
+                  target={siteSettings.journal?.openInNewTab ? "_blank" : "_self"}
+                  rel={siteSettings.journal?.openInNewTab ? "noopener noreferrer" : undefined}
+                  className="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 group"
+                >
+                  CLICK HERE
+                  <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Conferences Section - Only show if master toggle is explicitly enabled */}
       {(conferencesSectionSettings?.masterControl?.showOnHomepage === true) && (
@@ -422,13 +501,6 @@ function HomePageContent({
         </div>
       </section>
       )}
-
-
-      {/* Featured Committee Members Section */}
-      <FeaturedCommitteeMembers />
-
-      {/* Featured Speakers Section */}
-      <FeaturedSpeakersSection />
 
       {/* Past Conferences Section */}
       {pastConferences && pastConferences.length > 0 && (
@@ -721,78 +793,7 @@ function HomePageContent({
         </div>
       </section>
 
-      {/* Journal Section */}
-      {siteSettings?.journal?.showJournal && (
-        <section
-          className={`py-12 md:py-16 relative overflow-hidden ${
-            journalStyling?.isActive && journalStyling.backgroundImage?.url
-              ? ''
-              : 'bg-gradient-to-br from-slate-800 via-blue-900 to-slate-900'
-          }`}
-          style={generateJournalBackgroundStyles(journalStyling || undefined)}
-        >
-          {/* Custom Color Overlay (only when background image is active) */}
-          {journalStyling?.isActive && journalStyling.backgroundImage?.url && journalStyling.overlayColor && (
-            <div
-              className="absolute inset-0 z-15"
-              style={generateJournalOverlayStyles(journalStyling || undefined)}
-            />
-          )}
 
-          {/* Default Background Pattern (only when no custom background) */}
-          {(!journalStyling?.isActive || !journalStyling.backgroundImage?.url) && (
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
-            </div>
-          )}
-
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30">
-            <div className="text-center">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                JOURNAL
-              </h2>
-              <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-                Explore cutting-edge research, academic insights, and scholarly publications from our global network of experts and researchers.
-              </p>
-
-              <div className="flex justify-center">
-                <Link
-                  href={siteSettings.journal?.journalUrl || "/journal"}
-                  target={siteSettings.journal?.openInNewTab ? "_blank" : "_self"}
-                  rel={siteSettings.journal?.openInNewTab ? "noopener noreferrer" : undefined}
-                  className="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 group"
-                >
-                  CLICK HERE
-                  <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Venue Images Section */}
-      {venueSettings?.venueImages && venueSettings.venueImages.length > 0 && (
-        <section className="py-12 md:py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-                VENUE GALLERY
-              </h2>
-              <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                Explore our stunning venue and discover the perfect setting for your conference experience.
-              </p>
-            </div>
-
-            <VenueImageGallery
-              images={venueSettings.venueImages}
-              title="Conference Venue"
-            />
-          </div>
-        </section>
-      )}
 
       {/* Conference Locations Map Section - OpenStreetMap with Leaflet */}
       <LeafletMapLocations />
