@@ -73,7 +73,16 @@ export default (S) =>
       S.listItem().title('Payment Transaction').schemaType('paymentTransaction').child(S.documentTypeList('paymentTransaction')),
       S.listItem().title('Past Conferences Section Styling').schemaType('pastConferencesSection').child(S.documentTypeList('pastConferencesSection')),
       S.listItem().title('Journal Section Styling').schemaType('journalSection').child(S.documentTypeList('journalSection')),
-      S.listItem().title('Custom Content Section').schemaType('customContentSection').child(S.documentTypeList('customContentSection')),
+      // Custom Content Section Settings (Singleton)
+      S.listItem()
+        .title('⚙️ Custom Content Section')
+        .id('customContentSection')
+        .child(
+          S.document()
+            .schemaType('customContentSection')
+            .documentId('customContentSection')
+            .title('Custom Content Section Settings')
+        ),
       // Add Brochure Settings
       S.listItem()
         .title('Brochure Settings')

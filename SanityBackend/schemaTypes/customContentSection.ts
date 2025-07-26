@@ -15,6 +15,16 @@ export const customContentSection = defineType({
       validation: (Rule) => Rule.required(),
     }),
 
+    // Toggle to show/hide section
+    defineField({
+      name: 'showOnHomepage',
+      title: 'Show on Homepage',
+      type: 'boolean',
+      description: 'Toggle to show or hide this section on the homepage',
+      initialValue: true,
+      validation: (Rule) => Rule.required(),
+    }),
+
     // Primary Text Field
     defineField({
       name: 'primaryText',
@@ -54,21 +64,23 @@ export const customContentSection = defineType({
       primaryText: 'primaryText',
       insights: 'insights',
       targets: 'targets',
+      showOnHomepage: 'showOnHomepage',
     },
-    prepare({ title, primaryText, insights, targets }) {
+    prepare({ title, primaryText, insights, targets, showOnHomepage }) {
+      const status = showOnHomepage ? '✅ Section Visible' : '❌ Section Hidden';
       const contentPreview = primaryText ? `"${primaryText}"` : 'No primary text';
-      const insightsPreview = insights ? `Insights: ${insights.substring(0, 30)}...` : 'No insights content';
-      const targetsPreview = targets ? `Targets: ${targets.substring(0, 30)}...` : 'No targets content';
+      const insightsPreview = insights ? `Insights: ${insights.substring(0, 20)}...` : 'No insights';
+      const targetsPreview = targets ? `Targets: ${targets.substring(0, 20)}...` : 'No targets';
 
       return {
         title: title || 'Custom Content Section',
-        subtitle: `${contentPreview} • ${insightsPreview} • ${targetsPreview}`,
+        subtitle: `${status} • ${contentPreview} • ${insightsPreview} • ${targetsPreview}`,
       };
     },
   },
-  
+
   // Singleton - only one document of this type should exist
-  // __experimental_singleton: true,
+  __experimental_singleton: true,
 });
 
 export default customContentSection;

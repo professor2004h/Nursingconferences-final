@@ -658,7 +658,8 @@ function HomePageContent({
         </section>
       )}
 
-      {/* Custom Content Section */}
+      {/* Custom Content Section - Only show if toggle is enabled */}
+      {customContentData?.showOnHomepage && (
       <section className="custom-content-section bg-white py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Primary Text (Main Heading) */}
@@ -706,6 +707,7 @@ function HomePageContent({
           </div>
         </div>
       </section>
+      )}
 
       {/* Contact Section */}
       <section className="py-12 sm:py-14 md:py-16 bg-white">

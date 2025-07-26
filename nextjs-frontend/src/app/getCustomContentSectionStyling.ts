@@ -7,6 +7,7 @@ export interface CustomContentSectionData {
   primaryText: string;
   insights: string;
   targets: string;
+  showOnHomepage: boolean;
 }
 
 // Default content configuration
@@ -16,6 +17,7 @@ const getDefaultContent = (): CustomContentSectionData => ({
   primaryText: 'INSIGHTS',
   insights: 'Being part of a Scientific Seminar is a professionally very rewarding and enriching experience. Apart from socializing with the greatest kinds from across the Globe, we get the insights to the realm of new global trends, the talking shapes in the Global research laboratories. These sessions inspire many a practitioner minds for new beginnings that have the potential to transform the way we live today. As individuals we constantly seeking to advance our careers, these knowledge sharing sessions function as gateways to a new realm of opportunities unseen before.',
   targets: 'We are the pioneers in connecting people – bringing in the best minds to the table to resolve complex global human concerns to deliver simple usable solutions. We are in the critical path of bringing scientific innovations to the masses by enabling an ecosystem to key stake holders to express themselves their research findings. These research findings are the Critical links to shaping our future living – seen or unseen.',
+  showOnHomepage: true,
 });
 
 // Get Custom Content Section data from Sanity CMS
@@ -28,7 +30,8 @@ export async function getCustomContentSectionData(): Promise<CustomContentSectio
       title,
       primaryText,
       insights,
-      targets
+      targets,
+      showOnHomepage
     }`;
 
     console.log('🔍 Custom Content Data Query:', query);
@@ -55,6 +58,7 @@ export async function getCustomContentSectionData(): Promise<CustomContentSectio
       primaryText: data.primaryText || 'INSIGHTS',
       insights: data.insights || 'Being part of a Scientific Seminar is a professionally very rewarding and enriching experience. Apart from socializing with the greatest kinds from across the Globe, we get the insights to the realm of new global trends, the talking shapes in the Global research laboratories. These sessions inspire many a practitioner minds for new beginnings that have the potential to transform the way we live today. As individuals we constantly seeking to advance our careers, these knowledge sharing sessions function as gateways to a new realm of opportunities unseen before.',
       targets: data.targets || 'We are the pioneers in connecting people – bringing in the best minds to the table to resolve complex global human concerns to deliver simple usable solutions. We are in the critical path of bringing scientific innovations to the masses by enabling an ecosystem to key stake holders to express themselves their research findings. These research findings are the Critical links to shaping our future living – seen or unseen.',
+      showOnHomepage: data.showOnHomepage !== undefined ? data.showOnHomepage : true,
     };
 
     console.log('✅ Custom Content Section Data Processed:', JSON.stringify(processedData, null, 2));
