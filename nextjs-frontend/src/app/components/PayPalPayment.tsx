@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { getClientPayPalConfig } from '@/app/utils/clientPaypalConfig';
 
 interface PayPalPaymentProps {
   amount: number;
@@ -33,14 +34,49 @@ const PayPalPayment: React.FC<PayPalPaymentProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [paypalConfig, setPaypalConfig] = useState<any>(null);
+  const [configLoading, setConfigLoading] = useState(true);
   const paypalRef = useRef<HTMLDivElement>(null);
 
-  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+  // Load PayPal configuration
+  useEffect(() => {
+    async function loadConfig() {
+      try {
+        setConfigLoading(true);
+        console.log('🔍 Loading PayPal configuration...');
+
+        const config = await getClientPayPalConfig();
+        setPaypalConfig(config);
+
+        console.log('✅ PayPal configuration loaded:', {
+          clientIdLength: config.clientId?.length,
+          environment: config.environment,
+          isConfigured: config.isConfigured
+        });
+      } catch (error) {
+        console.error('❌ Failed to load PayPal configuration:', error);
+        setError('PayPal configuration error. Please contact support.');
+      } finally {
+        setConfigLoading(false);
+      }
+    }
+
+    loadConfig();
+  }, []);
+
+  // Show loading state while configuration is loading
+  if (configLoading) {
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-blue-600 text-sm">Loading PayPal configuration...</p>
+      </div>
+    );
+  }
 
   // Enhanced error handling with more detailed information
-  if (!paypalClientId) {
+  if (!paypalConfig || !paypalConfig.clientId) {
     console.error('❌ PayPal Client Configuration Error:', {
-      NEXT_PUBLIC_PAYPAL_CLIENT_ID: paypalClientId,
+      paypalConfig,
       environment: process.env.NODE_ENV,
       timestamp: new Date().toISOString()
     });
@@ -57,7 +93,7 @@ const PayPalPayment: React.FC<PayPalPaymentProps> = ({
           PayPal payment system is currently unavailable. Please contact support or try again later.
         </p>
         <p className="text-red-500 text-xs">
-          Error: Missing PayPal client configuration (NEXT_PUBLIC_PAYPAL_CLIENT_ID)
+          Error: Missing PayPal client configuration
         </p>
       </div>
     );
@@ -65,13 +101,17 @@ const PayPalPayment: React.FC<PayPalPaymentProps> = ({
 
   // Load PayPal SDK
   useEffect(() => {
+    if (configLoading || !paypalConfig) {
+      return;
+    }
+
     if (window.paypal) {
       setScriptLoaded(true);
       return;
     }
 
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalClientId}&currency=${currency}&intent=capture&components=buttons`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons`;
     script.async = true;
 
     script.onload = () => {
@@ -90,11 +130,11 @@ const PayPalPayment: React.FC<PayPalPaymentProps> = ({
         document.body.removeChild(script);
       }
     };
-  }, [paypalClientId, currency]);
+  }, [paypalConfig, currency, configLoading]);
 
   // Initialize PayPal buttons when script is loaded
   useEffect(() => {
-    if (!scriptLoaded || !window.paypal || !paypalRef.current || disabled) {
+    if (!scriptLoaded || !window.paypal || !paypalRef.current || disabled || !paypalConfig) {
       return;
     }
 
@@ -217,7 +257,7 @@ const PayPalPayment: React.FC<PayPalPaymentProps> = ({
 
     }).render(paypalRef.current);
 
-  }, [scriptLoaded, disabled, amount, currency, registrationId, registrationData, onSuccess, onError, onCancel]);
+  }, [scriptLoaded, disabled, amount, currency, registrationId, registrationData, onSuccess, onError, onCancel, paypalConfig]);
 
   return (
     <div className="paypal-payment-container">

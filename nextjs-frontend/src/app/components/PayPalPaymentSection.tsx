@@ -312,15 +312,8 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
 
 
 
-  if (!paypalClientId) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600 text-sm">
-          PayPal configuration error. Please contact support.
-        </p>
-      </div>
-    );
-  }
+  // This check is already handled above in the configuration loading logic
+  // The component will show loading state or error state appropriately
 
   return (
     <div className="paypal-payment-section bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative z-10 max-w-full overflow-hidden">
