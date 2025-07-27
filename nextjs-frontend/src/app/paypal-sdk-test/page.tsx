@@ -46,7 +46,7 @@ export default function PayPalSDKTestPage() {
     }
 
     const script = document.createElement('script');
-    script.src = 'https://www.paypal.com/sdk/js?client-id=AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc&currency=USD&intent=capture&components=buttons';
+    script.src = 'https://www.paypal.com/sdk/js?client-id=AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc&currency=USD&intent=capture&components=buttons&enable-funding=venmo,paylater,card&disable-funding=credit&env=production';
     script.async = true;
 
     script.onload = () => {

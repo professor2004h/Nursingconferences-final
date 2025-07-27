@@ -98,8 +98,8 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
     }
 
     const script = document.createElement('script');
-    // PayPal SDK with proper funding sources enabled for card payments
-    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons&enable-funding=venmo,paylater,card&disable-funding=credit`;
+    // PayPal SDK with proper funding sources enabled for card payments and explicit production environment
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons&enable-funding=venmo,paylater,card&disable-funding=credit&env=production`;
     script.async = true;
 
     script.onload = () => {
