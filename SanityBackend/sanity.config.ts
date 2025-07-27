@@ -27,6 +27,8 @@ export default defineConfig({
       'https://localhost:3000',
       'http://127.0.0.1:3000',
       'https://127.0.0.1:3000',
+      'http://localhost:3001',
+      'https://localhost:3001',
       'http://localhost:3333',
       'https://localhost:3333',
       'http://127.0.0.1:3333',
@@ -34,7 +36,9 @@ export default defineConfig({
       'http://localhost:3334',
       'https://localhost:3334',
       'http://127.0.0.1:3334',
-      'https://127.0.0.1:3334'
+      'https://127.0.0.1:3334',
+      'https://nursingeducationconferences.org',
+      'https://nursing-conferences-cms.sanity.studio'
     ],
     credentials: true,
   },
