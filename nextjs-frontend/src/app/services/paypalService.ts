@@ -168,9 +168,9 @@ export class PayPalService {
           brand_name: 'Intelli Global Conferences',
           landing_page: 'NO_PREFERENCE',
           user_action: 'PAY_NOW',
-          return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/paypal/return`,
-          cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/paypal/cancel`,
           shipping_preference: 'NO_SHIPPING',
+          // Note: return_url and cancel_url removed for SDK integration
+          // The PayPal SDK handles callbacks via onApprove/onCancel functions
         },
       };
 
