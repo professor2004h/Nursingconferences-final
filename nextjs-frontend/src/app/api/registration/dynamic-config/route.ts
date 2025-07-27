@@ -6,16 +6,17 @@ export async function GET() {
     console.log('🚀 Fetching registration configuration...');
 
     // Fetch all required data for registration
-    const [pricingPeriods, registrationTypes, sponsorshipTiers, accommodationOptions] = await Promise.all([
-      // Pricing Periods - simplified query
-      client.fetch(`*[_type == "pricingPeriods" && isActive == true] | order(displayOrder asc) {
+    const [registrationSettings, registrationTypes, sponsorshipTiers, accommodationOptions] = await Promise.all([
+      // Registration Settings - get the actual dates from here
+      client.fetch(`*[_type == "registrationSettings"][0] {
         _id,
-        periodId,
-        title,
-        startDate,
-        endDate,
-        isActive,
-        displayOrder
+        pricingDates {
+          earlyBirdEnd,
+          nextRoundStart,
+          nextRoundEnd,
+          spotRegistrationStart,
+          registrationCloseDate
+        }
       }`),
 
       // Registration Types - simplified query
@@ -78,6 +79,45 @@ export async function GET() {
         images
       }`),
     ]);
+
+    // Create pricing periods from registration settings
+    const pricingDates = registrationSettings?.pricingDates;
+    const pricingPeriods = [];
+
+    if (pricingDates) {
+      // Early Bird Period
+      pricingPeriods.push({
+        _id: 'earlyBird',
+        periodId: 'earlyBird',
+        title: 'Early Bird Registration',
+        startDate: '2025-01-01T00:00:00Z', // Start of year
+        endDate: pricingDates.earlyBirdEnd,
+        isActive: true,
+        displayOrder: 1
+      });
+
+      // Mid Term Period
+      pricingPeriods.push({
+        _id: 'nextRound',
+        periodId: 'nextRound',
+        title: 'Mid Term Registration',
+        startDate: pricingDates.nextRoundStart,
+        endDate: pricingDates.nextRoundEnd,
+        isActive: true,
+        displayOrder: 2
+      });
+
+      // Onspot Period
+      pricingPeriods.push({
+        _id: 'spotRegistration',
+        periodId: 'spotRegistration',
+        title: 'Onspot Registration',
+        startDate: pricingDates.spotRegistrationStart,
+        endDate: pricingDates.registrationCloseDate,
+        isActive: true,
+        displayOrder: 3
+      });
+    }
 
     console.log(`✅ Found ${registrationTypes.length} registration types, ${pricingPeriods.length} pricing periods, ${sponsorshipTiers.length} sponsorship tiers, ${accommodationOptions.length} accommodation options`);
 
