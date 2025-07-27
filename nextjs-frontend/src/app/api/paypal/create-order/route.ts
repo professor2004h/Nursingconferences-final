@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const PAYPAL_ENVIRONMENT = process.env.PAYPAL_ENVIRONMENT || 'sandbox';
-
-const PAYPAL_BASE_URL = PAYPAL_ENVIRONMENT === 'sandbox' 
-  ? 'https://api-m.sandbox.paypal.com'
-  : 'https://api-m.paypal.com';
+import { getPayPalConfig, logPayPalConfigStatus } from '@/app/utils/paypalConfig';
 
 // Get PayPal access token
-async function getPayPalAccessToken() {
+async function getPayPalAccessToken(config: any) {
   try {
-    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
+    const auth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
 
-    const response = await fetch(`${PAYPAL_BASE_URL}/v1/oauth2/token`, {
+    console.log('🔐 Requesting PayPal access token...');
+    const response = await fetch(`${config.baseUrl}/v1/oauth2/token`, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${auth}`,
@@ -23,10 +17,17 @@ async function getPayPalAccessToken() {
     });
 
     if (!response.ok) {
-      throw new Error(`PayPal auth failed: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ PayPal auth failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+      throw new Error(`PayPal auth failed: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('✅ PayPal access token obtained successfully');
     return data.access_token;
   } catch (error) {
     console.error('❌ PayPal auth error:', error);
@@ -38,11 +39,20 @@ export async function POST(request: NextRequest) {
   try {
     console.log('🎯 Creating PayPal order...');
 
-    // Validate environment variables
-    if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-      console.error('❌ PayPal credentials missing');
+    // Log configuration status for debugging
+    logPayPalConfigStatus();
+
+    // Get and validate PayPal configuration
+    let paypalConfig;
+    try {
+      paypalConfig = getPayPalConfig();
+    } catch (configError) {
+      console.error('❌ PayPal configuration error:', configError);
       return NextResponse.json(
-        { error: 'PayPal configuration error' },
+        {
+          error: 'PayPal configuration error. Please contact support.',
+          details: configError instanceof Error ? configError.message : 'Unknown configuration error'
+        },
         { status: 500 }
       );
     }
@@ -61,7 +71,7 @@ export async function POST(request: NextRequest) {
     console.log('📝 Order details:', { amount, currency, registrationId });
 
     // Get PayPal access token
-    const accessToken = await getPayPalAccessToken();
+    const accessToken = await getPayPalAccessToken(paypalConfig);
 
     // Create PayPal order
     const orderData = {
@@ -89,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     console.log('🔄 Sending order to PayPal...');
 
-    const response = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders`, {
+    const response = await fetch(`${paypalConfig.baseUrl}/v2/checkout/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
