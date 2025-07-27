@@ -166,7 +166,7 @@ export class PayPalService {
         ],
         application_context: {
           brand_name: 'Intelli Global Conferences',
-          landing_page: 'NO_PREFERENCE',
+          landing_page: 'BILLING',
           user_action: 'PAY_NOW',
           shipping_preference: 'NO_SHIPPING',
           // No return_url/cancel_url for JavaScript SDK integration
