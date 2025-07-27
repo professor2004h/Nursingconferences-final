@@ -137,6 +137,14 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
     paypalButtonContainer.innerHTML = '';
 
     try {
+      console.log('🔧 Initializing PayPal buttons with config:', {
+        registrationId,
+        amount,
+        currency,
+        paypalConfigured: !!paypalConfig,
+        timestamp: new Date().toISOString()
+      });
+
       window.paypal.Buttons({
         style: {
           layout: 'vertical',
@@ -192,6 +200,13 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
             setLoading(true);
             setError(null);
 
+            console.log('🎉 PayPal onApprove triggered! Payment approved by user:', {
+              orderID: data.orderID,
+              payerID: data.payerID,
+              registrationId,
+              timestamp: new Date().toISOString()
+            });
+
             console.log('💰 Capturing PayPal payment for order:', data.orderID);
 
             const response = await fetch('/api/paypal/capture-order', {
@@ -205,13 +220,26 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
               }),
             });
 
+            console.log('📡 Capture API response status:', response.status);
+
             const captureData = await response.json();
+            console.log('📋 Capture API response data:', captureData);
 
             if (!response.ok || !captureData.success) {
+              console.error('❌ Capture API failed:', {
+                status: response.status,
+                captureData,
+                error: captureData.error
+              });
               throw new Error(captureData.error || 'Failed to capture PayPal payment');
             }
 
-            console.log('✅ PayPal payment captured successfully:', captureData.paymentId);
+            console.log('✅ PayPal payment captured successfully:', {
+              paymentId: captureData.paymentId,
+              amount: captureData.amount,
+              currency: captureData.currency,
+              status: captureData.status
+            });
 
             onSuccess({
               paymentId: captureData.paymentId,
@@ -235,14 +263,22 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
         },
 
         onError: (error: any) => {
-          console.error('❌ PayPal payment error:', error);
+          console.error('❌ PayPal payment error:', {
+            error,
+            errorType: typeof error,
+            errorMessage: error?.message || 'Unknown error',
+            timestamp: new Date().toISOString()
+          });
           setError('Payment failed. Please try again.');
           setLoading(false);
           onError(error);
         },
 
         onCancel: () => {
-          console.log('⚠️ PayPal payment cancelled by user');
+          console.log('⚠️ PayPal payment cancelled by user:', {
+            timestamp: new Date().toISOString(),
+            registrationId
+          });
           setError(null);
           setLoading(false);
         }
