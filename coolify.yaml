@@ -22,6 +22,7 @@ services:
       - PAYPAL_CLIENT_SECRET=EMzGihvUsifDMxblEl3j9CGXLbOACaFsC8ykdBwMv3gK8f_a5S7NulJ9sSqe4atrt2d_2bCo7TBZ6x01
       - PAYPAL_ENVIRONMENT=production
       - NEXT_PUBLIC_PAYPAL_CLIENT_ID=AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc
+      - NEXT_PUBLIC_PAYPAL_ENVIRONMENT=production
       - NEXT_PUBLIC_BASE_URL=https://nursingeducationconferences.org
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]

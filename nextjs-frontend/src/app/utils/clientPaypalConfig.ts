@@ -19,7 +19,7 @@ export interface ClientPayPalConfig {
 export async function getClientPayPalConfig(): Promise<ClientPayPalConfig> {
   // First, try to get from environment variables (build-time)
   const envClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-  const envEnvironment = process.env.PAYPAL_ENVIRONMENT || 'sandbox';
+  const envEnvironment = process.env.PAYPAL_ENVIRONMENT || process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || 'production';
   const envBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   console.log('🔍 Client PayPal Config - Environment Variables:', {
@@ -56,7 +56,7 @@ export async function getClientPayPalConfig(): Promise<ClientPayPalConfig> {
       console.log('✅ Fetched PayPal config from API');
       return {
         clientId: data.clientId,
-        environment: data.environment || 'sandbox',
+        environment: data.environment || 'production',
         baseUrl: data.baseUrl || 'https://nursingeducationconferences.org',
         isConfigured: true
       };
