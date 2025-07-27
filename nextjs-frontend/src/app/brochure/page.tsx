@@ -58,14 +58,17 @@ export default function BrochurePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold mb-4">
-                  Download Abstract template here
+                  Download Conference Brochure
                 </h3>
-                <button className="inline-flex items-center px-6 py-3 bg-[#f97316] text-white font-semibold rounded-lg hover:bg-[#ea580c] transition-colors duration-200">
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
-                  </svg>
-                  Download Here
-                </button>
+                <p className="text-blue-100 text-sm mb-6">
+                  Submit the form on the left to get instant access to our comprehensive conference brochure with all details about speakers, schedule, and registration information.
+                </p>
+                <div className="text-sm text-blue-200">
+                  <p>✓ Complete conference schedule</p>
+                  <p>✓ Speaker profiles and abstracts</p>
+                  <p>✓ Registration information</p>
+                  <p>✓ Venue and accommodation details</p>
+                </div>
               </div>
             </div>
           </div>

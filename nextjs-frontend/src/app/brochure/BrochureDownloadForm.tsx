@@ -122,12 +122,28 @@ export default function BrochureDownloadForm() {
     <div>
       {/* Success Message with Download */}
       {showDownload && submitStatus === 'success' && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" />
-            </svg>
-            <p className="text-green-700 text-sm">Form submitted successfully! Your brochure is ready for download.</p>
+        <div className="mb-6 p-6 bg-green-50 border border-green-200 rounded-lg">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" />
+              </svg>
+              <h3 className="text-lg font-semibold text-green-800">Success!</h3>
+            </div>
+            <p className="text-green-700 text-sm mb-4">
+              Form submitted successfully! Your brochure is ready for download.
+            </p>
+            {downloadUrl && (
+              <button
+                onClick={handleDownload}
+                className="inline-flex items-center px-6 py-3 bg-[#f97316] text-white font-semibold rounded-lg hover:bg-[#ea580c] transition-colors duration-200"
+              >
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                </svg>
+                Download Brochure PDF
+              </button>
+            )}
           </div>
         </div>
       )}
