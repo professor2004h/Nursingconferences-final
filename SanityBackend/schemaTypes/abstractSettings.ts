@@ -29,12 +29,12 @@ export default defineType({
     }),
     defineField({
       name: 'abstractTemplate',
-      title: 'Abstract Template PDF',
+      title: 'Abstract Template File',
       type: 'file',
       options: {
-        accept: '.pdf'
+        accept: '.pdf,.doc,.docx'
       },
-      description: 'PDF template for abstract submission that users can download'
+      description: 'Template file for abstract submission that users can download (PDF, DOC, or DOCX format)'
     }),
     defineField({
       name: 'templateDownloadText',
