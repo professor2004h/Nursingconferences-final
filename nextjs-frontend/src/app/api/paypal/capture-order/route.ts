@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { client } from '@/app/sanity/client';
 import { getPayPalConfig, logPayPalConfigStatus } from '@/app/utils/paypalConfig';
+import { paypalService } from '@/app/services/paypalService';
 
 // Get PayPal access token
 async function getPayPalAccessToken(config: any) {
@@ -70,29 +71,10 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('📝 Capture details:', { orderId, registrationId });
+    console.log(`🔒 Capturing payment in ${paypalConfig.environment.toUpperCase()} mode`);
 
-    // Get PayPal access token
-    const accessToken = await getPayPalAccessToken(paypalConfig);
-
-    // Capture the PayPal order
-    const response = await fetch(`${paypalConfig.baseUrl}/v2/checkout/orders/${orderId}/capture`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-        'PayPal-Request-Id': `${registrationId}_capture_${Date.now()}`,
-      },
-    });
-
-    const captureData = await response.json();
-
-    if (!response.ok) {
-      console.error('❌ PayPal capture failed:', captureData);
-      return NextResponse.json(
-        { error: 'Failed to capture PayPal payment', details: captureData },
-        { status: 500 }
-      );
-    }
+    // Use production PayPal service
+    const captureData = await paypalService.capturePayment(orderId);
 
     // Extract payment details
     const capture = captureData.purchase_units[0].payments.captures[0];

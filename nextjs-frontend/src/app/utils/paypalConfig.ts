@@ -144,6 +144,19 @@ export function validatePayPalConfig(): {
     if (!baseUrl || baseUrl.includes('localhost')) {
       warnings.push('Production environment detected but base URL appears to be localhost');
     }
+
+    // Production-specific validations
+    if (clientId && clientId.length < 50) {
+      warnings.push('Production Client ID appears to be too short');
+    }
+
+    if (clientSecret && clientSecret.length < 50) {
+      warnings.push('Production Client Secret appears to be too short');
+    }
+
+    console.log('🔒 PRODUCTION PayPal environment detected - real money transactions enabled!');
+  } else {
+    console.log('🧪 Sandbox PayPal environment detected - test transactions only');
   }
 
   const isValid = errors.length === 0;

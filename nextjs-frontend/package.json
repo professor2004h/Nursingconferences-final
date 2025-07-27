@@ -13,8 +13,9 @@
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
     "@next/bundle-analyzer": "^15.3.5",
-    "@paypal/react-paypal-js": "^8.8.3",
     "@paypal/paypal-js": "^8.2.0",
+    "@paypal/paypal-server-sdk": "^1.1.0",
+    "@paypal/react-paypal-js": "^8.8.3",
     "@paypal/sdk-constants": "^1.0.155",
     "@portabletext/react": "^3.2.1",
     "@portabletext/types": "^2.0.13",

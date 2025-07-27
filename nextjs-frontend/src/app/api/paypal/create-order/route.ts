@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayPalConfig, logPayPalConfigStatus } from '@/app/utils/paypalConfig';
+import { paypalService } from '@/app/services/paypalService';
 
 // Get PayPal access token
 async function getPayPalAccessToken(config: any) {
@@ -96,66 +97,25 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('📝 Order details:', { amount: numericAmount, currency, registrationId });
+    console.log(`🔒 Processing in ${paypalConfig.environment.toUpperCase()} mode`);
 
-    // Get PayPal access token
-    const accessToken = await getPayPalAccessToken(paypalConfig);
-
-    // Create PayPal order
-    const orderData = {
-      intent: 'CAPTURE',
-      purchase_units: [
-        {
-          reference_id: registrationId,
-          amount: {
-            currency_code: currency,
-            value: numericAmount.toFixed(2), // Ensure 2 decimal places
-          },
-          description: `Conference Registration - ${registrationData.firstName} ${registrationData.lastName}`,
-          custom_id: registrationId,
-          invoice_id: `REG_${registrationId}_${Date.now()}`,
-        },
-      ],
-      application_context: {
-        brand_name: 'Intelli Global Conferences',
-        landing_page: 'NO_PREFERENCE',
-        user_action: 'PAY_NOW',
-        return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/paypal/return`,
-        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/paypal/cancel`,
-      },
-    };
-
-    console.log('🔄 Sending order to PayPal...');
-
-    const response = await fetch(`${paypalConfig.baseUrl}/v2/checkout/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-        'PayPal-Request-Id': `${registrationId}_${Date.now()}`,
-      },
-      body: JSON.stringify(orderData),
+    // Use production PayPal service
+    const order = await paypalService.createOrder({
+      amount: numericAmount,
+      currency,
+      registrationId,
+      registrationData,
+      description: `Conference Registration - ${registrationData.firstName} ${registrationData.lastName}`
     });
-
-    const order = await response.json();
-
-    if (!response.ok) {
-      console.error('❌ PayPal order creation failed:', order);
-      return NextResponse.json(
-        {
-          error: 'Failed to create PayPal order',
-          details: order,
-          status: response.status
-        },
-        { status: 500 }
-      );
-    }
 
     console.log('✅ PayPal order created successfully:', order.id);
 
     return NextResponse.json({
       success: true,
       orderId: order.id,
-      order: order,
+      registrationId,
+      approvalUrl: order.links?.find((link: any) => link.rel === 'approve')?.href,
+      environment: paypalConfig.environment
     });
 
   } catch (error) {
