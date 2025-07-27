@@ -47,7 +47,12 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
   // Load PayPal SDK
   useEffect(() => {
     if (!paypalClientId) {
-      setError('PayPal configuration error');
+      console.error('❌ PayPal Client ID missing:', {
+        NEXT_PUBLIC_PAYPAL_CLIENT_ID: paypalClientId,
+        environment: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+      });
+      setError('PayPal configuration error. Please contact support.');
       return;
     }
 
