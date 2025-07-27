@@ -19,17 +19,31 @@ export function getPayPalConfig(): PayPalConfig {
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
   const environment = (process.env.PAYPAL_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
-  const baseUrl = environment === 'sandbox' 
+  const baseUrl = environment === 'sandbox'
     ? 'https://api-m.sandbox.paypal.com'
     : 'https://api-m.paypal.com';
 
+  // During build time, allow missing environment variables
+  const isBuildTime = process.env.NODE_ENV === 'production' && !clientId && !clientSecret;
+
+  if (isBuildTime) {
+    console.log('⚠️ PayPal configuration created for build time (credentials will be validated at runtime)');
+    return {
+      clientId: '',
+      clientSecret: '',
+      environment,
+      baseUrl,
+      isConfigured: false
+    };
+  }
+
   // Validate required environment variables
   const missingVars: string[] = [];
-  
+
   if (!clientId) {
     missingVars.push('PAYPAL_CLIENT_ID');
   }
-  
+
   if (!clientSecret) {
     missingVars.push('PAYPAL_CLIENT_SECRET');
   }
@@ -110,6 +124,24 @@ export function validatePayPalConfig(): {
   const publicClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
   const environment = process.env.PAYPAL_ENVIRONMENT || 'sandbox';
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+  // During build time, environment variables might not be available
+  const isBuildTime = process.env.NODE_ENV === 'production' && !clientId && !clientSecret;
+
+  if (isBuildTime) {
+    console.log('⚠️ PayPal configuration validation skipped during build time');
+    return {
+      isValid: false,
+      errors: ['Build time - environment variables not available'],
+      warnings: ['PayPal configuration will be validated at runtime'],
+      config: {
+        clientId: '',
+        clientSecret: '',
+        environment: environment as 'sandbox' | 'production',
+        baseUrl: environment === 'production' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com'
+      }
+    };
+  }
 
   // Check required server-side variables
   if (!clientId) {

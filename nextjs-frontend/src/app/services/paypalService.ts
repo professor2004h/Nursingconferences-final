@@ -48,17 +48,41 @@ interface PayPalCaptureResponse {
 export class PayPalService {
   private config: any;
   private baseUrl: string;
+  private isConfigured: boolean;
 
   constructor() {
-    this.config = getPayPalConfig();
-    this.baseUrl = this.config.environment === 'production' 
-      ? 'https://api-m.paypal.com'
-      : 'https://api-m.sandbox.paypal.com';
-    
-    // Log environment for security awareness
-    console.log(`🔒 PayPal Service initialized in ${this.config.environment.toUpperCase()} mode`);
-    if (this.config.environment === 'production') {
-      console.log('⚠️ PRODUCTION MODE: Real money transactions enabled!');
+    try {
+      this.config = getPayPalConfig();
+      this.baseUrl = this.config.environment === 'production'
+        ? 'https://api-m.paypal.com'
+        : 'https://api-m.sandbox.paypal.com';
+
+      // Check if properly configured
+      this.isConfigured = !!(this.config.clientId && this.config.clientSecret);
+
+      if (this.isConfigured) {
+        // Log environment for security awareness
+        console.log(`🔒 PayPal Service initialized in ${this.config.environment.toUpperCase()} mode`);
+        if (this.config.environment === 'production') {
+          console.log('⚠️ PRODUCTION MODE: Real money transactions enabled!');
+        }
+      } else {
+        console.log('⚠️ PayPal Service initialized without credentials (build time)');
+      }
+    } catch (error) {
+      console.log('⚠️ PayPal Service initialization failed (likely build time):', error.message);
+      this.isConfigured = false;
+      this.config = { environment: 'sandbox' };
+      this.baseUrl = 'https://api-m.sandbox.paypal.com';
+    }
+  }
+
+  /**
+   * Check if PayPal is properly configured
+   */
+  private checkConfiguration(): void {
+    if (!this.isConfigured) {
+      throw new Error('PayPal service is not properly configured. Missing credentials.');
     }
   }
 
@@ -66,6 +90,8 @@ export class PayPalService {
    * Get PayPal access token with enhanced error handling
    */
   private async getAccessToken(): Promise<string> {
+    this.checkConfiguration();
+
     try {
       const auth = Buffer.from(`${this.config.clientId}:${this.config.clientSecret}`).toString('base64');
 
@@ -113,6 +139,8 @@ export class PayPalService {
     registrationData: any;
     description?: string;
   }): Promise<PayPalOrder> {
+    this.checkConfiguration();
+
     try {
       // Enhanced validation for production
       if (orderData.amount <= 0) {
@@ -200,6 +228,8 @@ export class PayPalService {
    * Capture PayPal payment with enhanced validation
    */
   async capturePayment(orderId: string): Promise<PayPalCaptureResponse> {
+    this.checkConfiguration();
+
     try {
       const accessToken = await this.getAccessToken();
 
