@@ -74,7 +74,23 @@ export async function POST(request: NextRequest) {
     console.log(`🔒 Capturing payment in ${paypalConfig.environment.toUpperCase()} mode`);
 
     // Use production PayPal service
+    console.log('🔄 Attempting to capture PayPal payment...');
     const captureData = await paypalService.capturePayment(orderId);
+
+    console.log('📋 PayPal capture response:', {
+      status: captureData.status,
+      id: captureData.id,
+      purchase_units: captureData.purchase_units?.length || 0,
+      hasCaptures: !!captureData.purchase_units?.[0]?.payments?.captures?.length
+    });
+
+    // Validate capture response structure
+    if (!captureData.purchase_units || !captureData.purchase_units[0] ||
+        !captureData.purchase_units[0].payments || !captureData.purchase_units[0].payments.captures ||
+        !captureData.purchase_units[0].payments.captures[0]) {
+      console.error('❌ Invalid capture response structure:', captureData);
+      throw new Error('Invalid PayPal capture response structure');
+    }
 
     // Extract payment details
     const capture = captureData.purchase_units[0].payments.captures[0];

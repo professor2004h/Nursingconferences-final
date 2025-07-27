@@ -98,7 +98,8 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
     }
 
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons`;
+    // PayPal SDK with proper funding sources enabled for card payments
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons&enable-funding=venmo,paylater,card&disable-funding=credit`;
     script.async = true;
 
     script.onload = () => {
@@ -281,6 +282,45 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
           });
           setError(null);
           setLoading(false);
+        },
+
+        // Add debugging callbacks
+        onInit: (data: any, actions: any) => {
+          console.log('🔧 PayPal buttons initialized:', {
+            data,
+            actions,
+            amount,
+            currency,
+            registrationId,
+            timestamp: new Date().toISOString()
+          });
+        },
+
+        onClick: (data: any, actions: any) => {
+          console.log('👆 PayPal button clicked:', {
+            data,
+            actions,
+            amount,
+            currency,
+            registrationId,
+            timestamp: new Date().toISOString()
+          });
+
+          // Validate before proceeding
+          if (amount <= 0) {
+            console.error('❌ Invalid amount:', amount);
+            setError('Invalid payment amount. Please refresh and try again.');
+            return actions.reject();
+          }
+
+          if (!registrationId) {
+            console.error('❌ Missing registration ID');
+            setError('Registration ID missing. Please refresh and try again.');
+            return actions.reject();
+          }
+
+          console.log('✅ Validation passed, proceeding with payment');
+          return actions.resolve();
         }
 
       }).render('#paypal-button-container');
