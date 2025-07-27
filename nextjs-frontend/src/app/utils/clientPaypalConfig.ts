@@ -40,41 +40,21 @@ export async function getClientPayPalConfig(): Promise<ClientPayPalConfig> {
     };
   }
 
+  // IMMEDIATE FALLBACK: Use known working production values
+  console.log('⚠️ Environment variables not available, using production fallback immediately');
+  return {
+    clientId: 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc',
+    environment: 'production',
+    baseUrl: 'https://nursingeducationconferences.org',
+    isConfigured: true
+  };
+
+  // NOTE: Removed API fallback as it's causing delays and the hardcoded values work
   // Fallback: Fetch configuration from API
-  console.log('⚠️ Environment variables not available, fetching from API...');
-  
-  try {
-    const response = await fetch('/api/paypal/client-config');
-    
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    if (data.success && data.clientId) {
-      console.log('✅ Fetched PayPal config from API');
-      return {
-        clientId: data.clientId,
-        environment: data.environment || 'production',
-        baseUrl: data.baseUrl || 'https://nursingeducationconferences.org',
-        isConfigured: true
-      };
-    } else {
-      throw new Error('Invalid API response');
-    }
-  } catch (error) {
-    console.error('❌ Failed to fetch PayPal config from API:', error);
-    
-    // Last resort: Use hardcoded production values
-    console.log('⚠️ Using hardcoded production fallback');
-    return {
-      clientId: 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc',
-      environment: 'production',
-      baseUrl: 'https://nursingeducationconferences.org',
-      isConfigured: true
-    };
-  }
+  // console.log('⚠️ Environment variables not available, fetching from API...');
+
+  // NOTE: API fallback code removed since we're using immediate hardcoded fallback above
+  // This ensures faster loading and eliminates the "NOT_SET" client ID issue
 }
 
 /**
