@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getClientPayPalConfig, type ClientPayPalConfig } from '@/app/utils/clientPaypalConfig';
 
 interface PayPalPaymentSectionProps {
   amount: number;
@@ -32,8 +33,36 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [paypalButtonsRendered, setPaypalButtonsRendered] = useState(false);
+  const [paypalConfig, setPaypalConfig] = useState<ClientPayPalConfig | null>(null);
+  const [configLoading, setConfigLoading] = useState(true);
 
-  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+  // Load PayPal configuration
+  useEffect(() => {
+    async function loadPayPalConfig() {
+      try {
+        setConfigLoading(true);
+        setError(null);
+
+        console.log('🔧 Loading PayPal configuration...');
+        const config = await getClientPayPalConfig();
+
+        console.log('✅ PayPal configuration loaded:', {
+          hasClientId: !!config.clientId,
+          environment: config.environment,
+          isConfigured: config.isConfigured
+        });
+
+        setPaypalConfig(config);
+      } catch (error) {
+        console.error('❌ Failed to load PayPal configuration:', error);
+        setError('PayPal configuration error. Please contact support.');
+      } finally {
+        setConfigLoading(false);
+      }
+    }
+
+    loadPayPalConfig();
+  }, []);
 
   // Validate amount before proceeding
   useEffect(() => {
@@ -41,17 +70,19 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
       setError('Invalid payment amount. Please ensure a registration type is selected.');
       return;
     }
-    setError(null);
-  }, [amount]);
+    if (!configLoading && paypalConfig) {
+      setError(null);
+    }
+  }, [amount, configLoading, paypalConfig]);
 
   // Load PayPal SDK
   useEffect(() => {
-    if (!paypalClientId) {
-      console.error('❌ PayPal Client ID missing:', {
-        NEXT_PUBLIC_PAYPAL_CLIENT_ID: paypalClientId,
-        environment: process.env.NODE_ENV,
-        timestamp: new Date().toISOString()
-      });
+    if (configLoading || !paypalConfig) {
+      return;
+    }
+
+    if (!paypalConfig.clientId) {
+      console.error('❌ PayPal Client ID missing from configuration');
       setError('PayPal configuration error. Please contact support.');
       return;
     }
@@ -67,7 +98,7 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
     }
 
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalClientId}&currency=${currency}&intent=capture&components=buttons`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons`;
     script.async = true;
 
     script.onload = () => {
@@ -85,7 +116,7 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
         document.body.removeChild(script);
       }
     };
-  }, [paypalClientId, currency]);
+  }, [paypalConfig, currency, configLoading]);
 
   // Render PayPal buttons when script is loaded
   useEffect(() => {
@@ -337,10 +368,12 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
       )}
 
       {/* PayPal Buttons Container */}
-      {!scriptLoaded && (
+      {(configLoading || !scriptLoaded) && (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-sm text-gray-600">Loading PayPal...</span>
+          <span className="ml-2 text-sm text-gray-600">
+            {configLoading ? 'Loading PayPal configuration...' : 'Loading PayPal...'}
+          </span>
         </div>
       )}
 

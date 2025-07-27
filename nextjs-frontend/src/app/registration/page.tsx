@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalPaymentSection from '@/app/components/PayPalPaymentSection';
+import PayPalDebugInfo from '@/app/components/PayPalDebugInfo';
 
 
 // Form data interface
@@ -1484,6 +1485,9 @@ export default function RegistrationPage() {
           </div>
         )}
       </div>
+
+      {/* Debug component for PayPal troubleshooting */}
+      <PayPalDebugInfo />
     </div>
   );
 }
