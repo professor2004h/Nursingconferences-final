@@ -35,10 +35,24 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
 
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
+  // Validate amount before proceeding
+  useEffect(() => {
+    if (amount <= 0) {
+      setError('Invalid payment amount. Please ensure a registration type is selected.');
+      return;
+    }
+    setError(null);
+  }, [amount]);
+
   // Load PayPal SDK
   useEffect(() => {
     if (!paypalClientId) {
       setError('PayPal configuration error');
+      return;
+    }
+
+    if (amount <= 0) {
+      setError('Invalid payment amount. Please ensure a registration type is selected.');
       return;
     }
 
@@ -71,6 +85,12 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
   // Render PayPal buttons when script is loaded
   useEffect(() => {
     if (!scriptLoaded || !window.paypal || paypalButtonsRendered || disabled || !registrationId) {
+      return;
+    }
+
+    // Don't render buttons if amount is invalid
+    if (amount <= 0) {
+      setError('Invalid payment amount. Please ensure a registration type is selected.');
       return;
     }
 
@@ -282,20 +302,34 @@ const PayPalPaymentSection: React.FC<PayPalPaymentSectionProps> = ({
       )}
 
       {/* Payment Amount Display */}
-      <div className="bg-blue-50 rounded-lg p-4 mb-6">
-        <div className="flex justify-between items-center">
-          <span className="text-sm font-medium text-blue-700">Total Amount:</span>
-          <span className="text-2xl font-bold text-blue-900">
-            {currency} {amount.toFixed(2)}
-          </span>
-        </div>
-        {registrationId && (
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-sm font-medium text-blue-700">Registration ID:</span>
-            <span className="text-sm font-mono text-blue-600">{registrationId}</span>
+      {amount > 0 ? (
+        <div className="bg-blue-50 rounded-lg p-4 mb-6">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-blue-700">Total Amount:</span>
+            <span className="text-2xl font-bold text-blue-900">
+              {currency} {amount.toFixed(2)}
+            </span>
           </div>
-        )}
-      </div>
+          {registrationId && (
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-sm font-medium text-blue-700">Registration ID:</span>
+              <span className="text-sm font-mono text-blue-600">{registrationId}</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center">
+            <span className="text-yellow-500 text-lg mr-2">⚠️</span>
+            <div>
+              <p className="text-yellow-800 font-medium">Payment Amount Not Available</p>
+              <p className="text-yellow-700 text-sm mt-1">
+                Please ensure you have selected a registration type or sponsorship option above.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* PayPal Buttons Container */}
       {!scriptLoaded && (

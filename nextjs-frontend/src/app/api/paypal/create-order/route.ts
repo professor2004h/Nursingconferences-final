@@ -68,7 +68,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('📝 Order details:', { amount, currency, registrationId });
+    // Validate amount is greater than 0
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      console.error('❌ Invalid payment amount:', amount);
+      return NextResponse.json(
+        {
+          error: 'Invalid payment amount. Amount must be greater than 0.',
+          details: `Received amount: ${amount}`,
+          registrationId
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate amount is reasonable (between $1 and $50,000)
+    if (numericAmount < 1 || numericAmount > 50000) {
+      console.error('❌ Payment amount out of range:', amount);
+      return NextResponse.json(
+        {
+          error: 'Payment amount out of acceptable range ($1 - $50,000).',
+          details: `Received amount: $${numericAmount}`,
+          registrationId
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log('📝 Order details:', { amount: numericAmount, currency, registrationId });
 
     // Get PayPal access token
     const accessToken = await getPayPalAccessToken(paypalConfig);
@@ -81,7 +108,7 @@ export async function POST(request: NextRequest) {
           reference_id: registrationId,
           amount: {
             currency_code: currency,
-            value: amount.toString(),
+            value: numericAmount.toFixed(2), // Ensure 2 decimal places
           },
           description: `Conference Registration - ${registrationData.firstName} ${registrationData.lastName}`,
           custom_id: registrationId,

@@ -67,6 +67,16 @@ export function determineActivePeriod(
   // If no active period found, check if we're past all periods
   if (!activePeriod && !nextPeriod && sortedPeriods.length > 0) {
     previousPeriod = sortedPeriods[sortedPeriods.length - 1];
+
+    // If we're past all periods, use the last period as active (on-spot registration)
+    console.log('⚠️ No active period found, using last period as fallback for on-spot registration');
+    activePeriod = sortedPeriods[sortedPeriods.length - 1];
+  }
+
+  // If still no active period and we have periods, use the first available period
+  if (!activePeriod && sortedPeriods.length > 0) {
+    console.log('⚠️ No active period detected, using first available period as fallback');
+    activePeriod = sortedPeriods[0];
   }
 
   // Calculate time until next period starts

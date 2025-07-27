@@ -205,6 +205,17 @@ export default function RegistrationPage() {
         tier.slug?.current === selectedSponsorType.toLowerCase()
       );
       registrationPrice = sponsorTier?.price || 0;
+
+      // Fallback to hardcoded sponsor pricing if not found in dynamic data
+      if (registrationPrice === 0) {
+        const fallbackPricing: { [key: string]: number } = {
+          'platinum': 7500,
+          'gold': 6000,
+          'silver': 5000,
+          'exhibitor': 3000,
+        };
+        registrationPrice = fallbackPricing[selectedSponsorType.toLowerCase()] || 0;
+      }
     } else if (selectedRegistrationType) {
       // Parse the registration type selection (format: typeId-periodId)
       const parts = selectedRegistrationType.split('-');
@@ -219,6 +230,13 @@ export default function RegistrationPage() {
           const periodPricing = regType.pricingByPeriod[periodId];
           if (periodPricing) {
             registrationPrice = periodPricing.price || 0;
+          }
+
+          // Fallback pricing if no period pricing found or if active period is null
+          if (registrationPrice === 0 || !dynamicData.activePeriod) {
+            console.log('⚠️ No active period pricing found, using fallback pricing');
+            // Use on-spot pricing as fallback
+            registrationPrice = regType.onSpotPrice || regType.nextRoundPrice || regType.earlyBirdPrice || 0;
           }
         }
       }
@@ -243,6 +261,20 @@ export default function RegistrationPage() {
 
     const totalRegistrationPrice = registrationPrice * formData.numberOfParticipants;
     const totalPrice = totalRegistrationPrice + accommodationPrice;
+
+    // Debug logging for pricing issues
+    if (totalPrice === 0) {
+      console.log('⚠️ Total price is 0, debugging pricing calculation:', {
+        selectedSponsorType,
+        selectedRegistrationType,
+        registrationPrice,
+        accommodationPrice,
+        numberOfParticipants: formData.numberOfParticipants,
+        activePeriod: dynamicData.activePeriod,
+        registrationTypes: dynamicData.registrationTypes?.length,
+        sponsorshipTiers: dynamicData.sponsorshipTiers?.length
+      });
+    }
 
     return {
       registrationPrice,
@@ -520,6 +552,17 @@ export default function RegistrationPage() {
 
       // Show PayPal payment section for payment processing
       console.log('💳 Proceeding to payment for registration:', result.registrationId);
+
+      // Validate payment amount before showing PayPal section
+      const currentPrice = calculateTotalPrice();
+      if (currentPrice.totalPrice <= 0) {
+        console.error('❌ Cannot proceed to payment: Invalid amount', currentPrice);
+        alert('Payment amount calculation error. Please ensure you have selected a registration type or sponsorship option.');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('✅ Payment amount validated:', currentPrice.totalPrice);
       setCurrentRegistrationId(result.registrationId);
       setShowPayPalSection(true);
       setIsLoading(false);
@@ -1319,7 +1362,7 @@ export default function RegistrationPage() {
         </form>
 
         {/* PayPal Payment Section */}
-        {showPayPalSection && currentRegistrationId && (
+        {showPayPalSection && currentRegistrationId && priceCalculation.totalPrice > 0 && (
           <div className="mt-8 mb-8 w-full max-w-4xl mx-auto relative z-10">
             <div className="bg-gray-50 p-4 rounded-lg mb-4">
               <h2 className="text-xl font-bold text-gray-900 mb-2">Complete Your Payment</h2>
@@ -1336,6 +1379,44 @@ export default function RegistrationPage() {
               onError={handlePaymentError}
               disabled={isLoading}
             />
+          </div>
+        )}
+
+        {/* Error message when PayPal section should show but amount is 0 */}
+        {showPayPalSection && currentRegistrationId && priceCalculation.totalPrice <= 0 && (
+          <div className="mt-8 mb-8 w-full max-w-4xl mx-auto relative z-10">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <span className="text-yellow-500 text-2xl mr-3">⚠️</span>
+                <h2 className="text-xl font-bold text-yellow-800">Payment Amount Issue</h2>
+              </div>
+              <p className="text-yellow-700 mb-4">
+                Your registration has been saved, but there's an issue with the payment amount calculation.
+              </p>
+              <div className="bg-white rounded-lg p-4 mb-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Registration Details:</h3>
+                <p className="text-sm text-gray-600">Registration ID: <span className="font-mono">{currentRegistrationId}</span></p>
+                <p className="text-sm text-gray-600">Selected Type: {getSelection('registrationType') || getSelection('sponsorshipType') || 'None'}</p>
+                <p className="text-sm text-gray-600">Calculated Amount: ${priceCalculation.totalPrice}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => {
+                    setShowPayPalSection(false);
+                    setCurrentRegistrationId(null);
+                  }}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Go Back to Form
+                </button>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Refresh Page
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
