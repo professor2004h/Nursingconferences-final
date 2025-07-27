@@ -66,21 +66,66 @@ export default function PayPalTestPage() {
                 API Endpoints Test
               </h2>
               <div className="space-y-3">
-                <a 
-                  href="/api/debug/env" 
+                <a
+                  href="/api/debug/env"
                   target="_blank"
                   className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Test Environment Debug API
                 </a>
-                
-                <a 
-                  href="/api/paypal/client-config" 
+
+                <a
+                  href="/api/paypal/client-config"
                   target="_blank"
                   className="inline-block bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors ml-3"
                 >
                   Test PayPal Client Config API
                 </a>
+              </div>
+            </div>
+
+            {/* PayPal Order Test */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                PayPal Order Creation Test
+              </h2>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-800 text-sm mb-3">
+                  Test PayPal order creation with a $1.00 test order:
+                </p>
+                <button
+                  onClick={async () => {
+                    try {
+                      console.log('🧪 Testing PayPal order creation...');
+                      const response = await fetch('/api/paypal/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          amount: 1.00,
+                          currency: 'USD',
+                          registrationId: 'TEST_' + Date.now(),
+                          registrationData: {
+                            firstName: 'Test',
+                            lastName: 'User',
+                            email: 'test@example.com'
+                          }
+                        })
+                      });
+                      const data = await response.json();
+                      console.log('📋 Order creation result:', data);
+                      alert(data.success ?
+                        `✅ Order created successfully! ID: ${data.orderId}` :
+                        `❌ Order creation failed: ${data.error}`
+                      );
+                    } catch (error) {
+                      console.error('❌ Order creation test failed:', error);
+                      alert('❌ Order creation test failed. Check console for details.');
+                    }
+                  }}
+                  className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Test Order Creation ($1.00)
+                </button>
               </div>
             </div>
             
