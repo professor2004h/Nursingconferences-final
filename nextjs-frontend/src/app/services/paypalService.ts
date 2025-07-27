@@ -1,6 +1,6 @@
 /**
  * Production PayPal Service
- * Handles live PayPal payment processing using official PayPal SDK
+ * Handles live PayPal payment processing using direct HTTP calls (like working example)
  * ⚠️ WARNING: This processes REAL MONEY transactions!
  */
 
@@ -78,6 +78,42 @@ export class PayPalService {
   }
 
   /**
+   * Generate PayPal access token using HTTP calls (like working example)
+   * This method follows the same pattern as the working PayPal code
+   */
+  private async generateAccessToken(): Promise<string> {
+    if (!this.isConfigured) {
+      throw new Error('PayPal service not properly configured');
+    }
+
+    try {
+      console.log('🔑 Generating PayPal access token...');
+
+      const response = await fetch(`${this.baseUrl}/v1/oauth2/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${Buffer.from(`${this.config.clientId}:${this.config.clientSecret}`).toString('base64')}`
+        },
+        body: 'grant_type=client_credentials'
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ PayPal token generation failed:', response.status, errorText);
+        throw new Error(`PayPal authentication failed: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ PayPal access token generated successfully');
+      return data.access_token;
+    } catch (error) {
+      console.error('❌ Error generating PayPal access token:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Check if PayPal is properly configured
    */
   private checkConfiguration(): void {
@@ -86,48 +122,7 @@ export class PayPalService {
     }
   }
 
-  /**
-   * Get PayPal access token with enhanced error handling
-   */
-  private async getAccessToken(): Promise<string> {
-    this.checkConfiguration();
 
-    try {
-      const auth = Buffer.from(`${this.config.clientId}:${this.config.clientSecret}`).toString('base64');
-
-      console.log(`🔐 Requesting PayPal access token (${this.config.environment})...`);
-      
-      const response = await fetch(`${this.baseUrl}/v1/oauth2/token`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json',
-          'Accept-Language': 'en_US',
-        },
-        body: 'grant_type=client_credentials',
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ PayPal auth failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorText,
-          environment: this.config.environment
-        });
-        throw new Error(`PayPal authentication failed: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log(`✅ PayPal access token obtained (${this.config.environment})`);
-      
-      return data.access_token;
-    } catch (error) {
-      console.error('❌ PayPal authentication error:', error);
-      throw error;
-    }
-  }
 
   /**
    * Create PayPal order with production-grade validation
@@ -151,7 +146,7 @@ export class PayPalService {
         throw new Error('Amount exceeds maximum limit ($50,000)');
       }
 
-      const accessToken = await this.getAccessToken();
+      const accessToken = await this.generateAccessToken();
       
       // Production-grade order structure
       const paypalOrderData = {
@@ -231,7 +226,7 @@ export class PayPalService {
     this.checkConfiguration();
 
     try {
-      const accessToken = await this.getAccessToken();
+      const accessToken = await this.generateAccessToken();
 
       console.log(`💰 Capturing PayPal payment (${this.config.environment}):`, {
         orderId,
@@ -284,7 +279,7 @@ export class PayPalService {
     webhookId: string
   ): Promise<boolean> {
     try {
-      const accessToken = await this.getAccessToken();
+      const accessToken = await this.generateAccessToken();
 
       const verificationData = {
         auth_algo: headers['paypal-auth-algo'],
