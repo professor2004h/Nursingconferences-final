@@ -148,7 +148,7 @@ export class PayPalService {
 
       const accessToken = await this.generateAccessToken();
       
-      // Production-grade order structure
+      // PayPal order structure optimized for JavaScript SDK integration
       const paypalOrderData = {
         intent: 'CAPTURE',
         purchase_units: [
@@ -169,8 +169,8 @@ export class PayPalService {
           landing_page: 'NO_PREFERENCE',
           user_action: 'PAY_NOW',
           shipping_preference: 'NO_SHIPPING',
-          // Note: return_url and cancel_url removed for SDK integration
-          // The PayPal SDK handles callbacks via onApprove/onCancel functions
+          // No return_url/cancel_url for JavaScript SDK integration
+          // SDK uses onApprove/onCancel callbacks instead
         },
       };
 
