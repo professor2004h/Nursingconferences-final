@@ -1359,8 +1359,7 @@ export default function RegistrationPage() {
         )}
       </div>
 
-      {/* Debug component for PayPal troubleshooting */}
-      <PayPalDebugInfo />
+      {/* PayPal integration now uses simple, clean implementation */}
     </div>
   );
 }
