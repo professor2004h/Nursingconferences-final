@@ -31,23 +31,45 @@ export async function getClientPayPalConfig(): Promise<ClientPayPalConfig> {
 
   // If environment variables are available, use them
   if (envClientId) {
-    console.log('✅ Using environment variables for PayPal config');
+    // For localhost development, force sandbox mode for better compatibility
+    const isLocalhost = (envBaseUrl || '').includes('localhost') || (envBaseUrl || '').includes('127.0.0.1');
+    const effectiveEnvironment = isLocalhost ? 'sandbox' : envEnvironment;
+
+    console.log('✅ Using environment variables for PayPal config', {
+      isLocalhost,
+      originalEnvironment: envEnvironment,
+      effectiveEnvironment
+    });
+
     return {
       clientId: envClientId,
-      environment: envEnvironment as 'sandbox' | 'production',
+      environment: effectiveEnvironment as 'sandbox' | 'production',
       baseUrl: envBaseUrl || 'https://nursingeducationconferences.org',
       isConfigured: true
     };
   }
 
-  // IMMEDIATE FALLBACK: Use known working production values
-  console.log('⚠️ Environment variables not available, using production fallback immediately');
-  return {
-    clientId: 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc',
-    environment: 'production',
-    baseUrl: 'https://nursingeducationconferences.org',
-    isConfigured: true
-  };
+  // IMMEDIATE FALLBACK: Use sandbox for localhost, production for live
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const isLocalhost = currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1');
+
+  if (isLocalhost) {
+    console.log('⚠️ Environment variables not available, using sandbox fallback for localhost');
+    return {
+      clientId: 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc', // We'll use the same ID but force sandbox
+      environment: 'sandbox',
+      baseUrl: 'http://localhost:3001',
+      isConfigured: true
+    };
+  } else {
+    console.log('⚠️ Environment variables not available, using production fallback');
+    return {
+      clientId: 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc',
+      environment: 'production',
+      baseUrl: 'https://nursingeducationconferences.org',
+      isConfigured: true
+    };
+  }
 
   // NOTE: Removed API fallback as it's causing delays and the hardcoded values work
   // Fallback: Fetch configuration from API
