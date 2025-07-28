@@ -288,7 +288,7 @@ export default function RegistrationPage() {
   const priceCalculation = calculateTotalPrice();
 
   // Handle payment success
-  const handlePaymentSuccess = (paymentData: any) => {
+  const handlePaymentSuccess = useCallback((paymentData: any) => {
     console.log('✅ Payment successful:', paymentData);
     setPaymentSuccess(true);
     setShowPayPalSection(false);
@@ -305,15 +305,15 @@ export default function RegistrationPage() {
       `test_mode=true`;
 
     router.push(successUrl);
-  };
+  }, [router]);
 
   // Handle payment error
-  const handlePaymentError = (error: any) => {
+  const handlePaymentError = useCallback((error: any) => {
     console.error('❌ Payment failed:', error);
     const errorMessage = error instanceof Error ? error.message : 'Payment failed';
     alert(`Payment failed: ${errorMessage}\nYour registration is saved and you can complete payment later.`);
     setIsLoading(false);
-  };
+  }, []);
 
 
 

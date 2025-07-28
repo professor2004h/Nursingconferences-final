@@ -112,10 +112,14 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     // Clean up any existing scripts safely
     cleanupPayPalScripts();
 
-    // Load PayPal SDK with comprehensive parameters for production
+    // Load PayPal SDK with minimal parameters for better compatibility
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&enable-funding=card&disable-funding=credit,bancontact,blik,eps,giropay,ideal,mercadopago,mybank,p24,sepa,sofort,venmo&components=buttons`;
+    const environment = process.env.PAYPAL_ENVIRONMENT || 'production';
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons`;
     script.async = true;
+
+    console.log('🔧 PayPal Environment:', environment);
+    console.log('🔧 PayPal SDK URL:', script.src);
 
     // Store reference to the script
     scriptRef.current = script;
