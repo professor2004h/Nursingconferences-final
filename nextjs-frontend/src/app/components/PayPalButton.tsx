@@ -122,10 +122,19 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     // Clean up any existing scripts safely
     cleanupPayPalScripts();
 
-    // Load PayPal SDK with minimal parameters for better compatibility
+    // Load PayPal SDK with guest checkout enabled
     const script = document.createElement('script');
     const environment = process.env.PAYPAL_ENVIRONMENT || 'production';
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons`;
+
+    // Build SDK URL with guest checkout parameters
+    let sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons&enable-funding=card&disable-funding=credit,paylater,venmo`;
+
+    // Add buyer-country for sandbox testing (not used in production)
+    if (environment === 'sandbox') {
+      sdkUrl += '&buyer-country=US';
+    }
+
+    script.src = sdkUrl;
     script.async = true;
 
     console.log('🔧 PayPal Environment:', environment);
@@ -223,7 +232,6 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
             layout: 'vertical',
             color: 'blue',
             shape: 'rect',
-            label: 'paypal',
             height: 50,
           },
           createOrder: async function(_data, _actions) {
@@ -311,9 +319,15 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                   paymentID: captureData.paymentId,
                   details: captureData,
                 });
-                // Redirect to return page
+                // Redirect to return page with proper URL encoding
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://nursingeducationconferences.org';
-                window.location.href = `${baseUrl}/paypal/return?orderID=${data.orderID}&paymentID=${captureData.paymentId}&amount=${captureData.amount}&currency=${captureData.currency}&registrationId=${registrationId}`;
+                const returnUrl = `${baseUrl}/paypal/return` +
+                  `?orderID=${encodeURIComponent(data.orderID)}` +
+                  `&paymentID=${encodeURIComponent(captureData.paymentId)}` +
+                  `&amount=${encodeURIComponent(captureData.amount)}` +
+                  `&currency=${encodeURIComponent(captureData.currency)}` +
+                  `&registrationId=${encodeURIComponent(registrationId)}`;
+                window.location.href = returnUrl;
               } else {
                 let msg = captureData.error || 'Failed to capture payment';
                 if (errorDetail) {
