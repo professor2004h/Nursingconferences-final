@@ -112,9 +112,9 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     // Clean up any existing scripts safely
     cleanupPayPalScripts();
 
-    // Load PayPal SDK with simplified parameters
+    // Load PayPal SDK with comprehensive parameters for production
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&enable-funding=card&disable-funding=credit,bancontact,blik,eps,giropay,ideal,mercadopago,mybank,p24,sepa,sofort,venmo&components=buttons`;
     script.async = true;
 
     // Store reference to the script
@@ -164,6 +164,15 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
     console.log('🔄 Rendering PayPal button for amount:', amount);
 
+    // Add timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (isLoading) {
+        console.warn('⚠️ PayPal button loading timeout - forcing completion');
+        setIsLoading(false);
+        setError('PayPal button took too long to load. Please refresh the page.');
+      }
+    }, 15000); // 15 second timeout
+
     const renderButton = async () => {
       try {
         // Check if already rendered
@@ -172,6 +181,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           return;
         }
 
+        // Validate prerequisites
+        if (!window.paypal) {
+          throw new Error('PayPal SDK not available');
+        }
+
+        if (!containerRef.current) {
+          throw new Error('PayPal container not available');
+        }
+
+        console.log('🎯 Starting PayPal button render process...');
         renderedRef.current = true;
 
         // Close existing button if any
@@ -193,7 +212,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
             label: 'paypal',
             height: 50,
           },
-          createOrder: async function(data, actions) {
+          createOrder: async function(_data, _actions) {
             try {
               console.log('🔄 Creating server-side PayPal order for amount:', amount);
 
@@ -309,13 +328,27 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
         // Render the button
         if (containerRef.current && buttonsRef.current) {
+          console.log('🎯 Rendering PayPal button to container...');
           await buttonsRef.current.render(containerRef.current);
           console.log('✅ PayPal button rendered successfully');
+          clearTimeout(loadingTimeout);
           setIsLoading(false);
+        } else {
+          throw new Error('Container or buttons instance not available for rendering');
         }
       } catch (renderError) {
         console.error('❌ PayPal button render error:', renderError);
-        setError('Failed to display PayPal button');
+        console.error('❌ Error details:', {
+          hasWindow: typeof window !== 'undefined',
+          hasPayPal: !!window.paypal,
+          hasContainer: !!containerRef.current,
+          isSDKLoaded,
+          amount,
+          currency,
+          registrationId
+        });
+        clearTimeout(loadingTimeout);
+        setError(`Failed to display PayPal button: ${renderError instanceof Error ? renderError.message : 'Unknown error'}`);
         setIsLoading(false);
         renderedRef.current = false;
       }
@@ -324,6 +357,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     renderButton();
 
     return () => {
+      clearTimeout(loadingTimeout);
       renderedRef.current = false;
       if (buttonsRef.current) {
         const btn = buttonsRef.current;
