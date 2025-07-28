@@ -23,105 +23,133 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isSDKLoaded, setIsSDKLoaded] = useState(false);
 
+  // Load PayPal SDK
   useEffect(() => {
-    // Simple script loading without complex state management
-    const loadPayPalAndRender = () => {
-      const clientId = 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
 
-      console.log('🔧 Loading PayPal for registration:', registrationId);
+    console.log('🔧 Loading PayPal SDK for registration:', registrationId);
+    console.log('🔧 Using PayPal Client ID:', clientId.substring(0, 10) + '...');
 
-      // If PayPal is already loaded, render immediately
-      if (window.paypal) {
-        console.log('✅ PayPal already loaded, rendering button...');
-        renderButton();
-        return;
+    // Check if PayPal is already loaded
+    if (window.paypal) {
+      console.log('✅ PayPal SDK already loaded');
+      setIsSDKLoaded(true);
+      return;
+    }
+
+    // Remove any existing PayPal scripts to prevent conflicts
+    const existingScripts = document.querySelectorAll('script[src*="paypal.com/sdk/js"]');
+    existingScripts.forEach(script => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
       }
+    });
 
-      // Load PayPal SDK
-      const script = document.createElement('script');
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture`;
-      script.onload = () => {
-        console.log('✅ PayPal SDK loaded, rendering button...');
-        renderButton();
-      };
-      script.onerror = () => {
-        console.error('❌ Failed to load PayPal SDK');
-        setError('Failed to load PayPal. Please refresh the page.');
-        setIsLoading(false);
-      };
-      document.head.appendChild(script);
+    // Load PayPal SDK with simplified parameters
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}`;
+    script.async = true;
+
+    script.onload = () => {
+      console.log('✅ PayPal SDK loaded successfully');
+      setIsSDKLoaded(true);
     };
 
-    const renderButton = () => {
-      if (!window.paypal) {
-        console.error('❌ PayPal not available');
-        setError('PayPal not loaded');
-        setIsLoading(false);
-        return;
+    script.onerror = (error) => {
+      console.error('❌ Failed to load PayPal SDK:', error);
+      console.error('❌ Script src:', script.src);
+      setError('Failed to load PayPal. Please check your internet connection and refresh the page.');
+      setIsLoading(false);
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script if component unmounts
+      if (script.parentNode === document.head) {
+        document.head.removeChild(script);
       }
+    };
+  }, [currency, registrationId]);
 
-      const container = document.getElementById(`paypal-container-${registrationId}`);
-      if (!container) {
-        console.error('❌ PayPal container not found');
-        setError('PayPal container not found');
-        setIsLoading(false);
-        return;
-      }
+  // Render PayPal button when SDK is loaded and container is ready
+  useEffect(() => {
+    if (!isSDKLoaded || !window.paypal || !containerRef.current) {
+      return;
+    }
 
-      console.log('🔄 Rendering PayPal button for amount:', amount);
+    console.log('🔄 Rendering PayPal button for amount:', amount);
 
-      window.paypal.Buttons({
-        createOrder: function(data: any, actions: any) {
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: amount.toFixed(2)
-              }
-            }]
-          });
-        },
-        onApprove: function(data: any, actions: any) {
-          return actions.order.capture().then(function(details: any) {
-            console.log('✅ Payment successful:', details);
-            onSuccess({
-              orderID: data.orderID,
-              paymentID: details.id,
-              details: details
-            });
-            // Redirect to return page
-            window.location.href = `https://nursingeducationconferences.org/paypal/return?orderID=${data.orderID}&paymentID=${details.id}&amount=${amount}&currency=${currency}&registrationId=${registrationId}`;
-          });
-        },
-        onCancel: function(data: any) {
-          console.log('⚠️ Payment cancelled');
-          if (onCancel) onCancel();
-        },
-        onError: function(err: any) {
-          console.error('❌ PayPal error:', err);
-          onError(err);
+    // Clear any existing content
+    if (containerRef.current) {
+      containerRef.current.innerHTML = '';
+    }
+
+    const renderButton = async () => {
+      try {
+        if (!containerRef.current) {
+          console.error('❌ Container ref not available');
+          setError('PayPal container not found');
+          setIsLoading(false);
+          return;
         }
-      }).render(container).then(() => {
+
+        await window.paypal!.Buttons({
+          style: {
+            layout: 'vertical',
+            color: 'blue',
+            shape: 'rect',
+            label: 'paypal',
+            height: 50,
+          },
+          createOrder: function(_data: any, actions: any) {
+            console.log('🔄 Creating PayPal order for amount:', amount);
+            return actions.order.create({
+              purchase_units: [{
+                amount: {
+                  value: amount.toFixed(2),
+                  currency_code: currency
+                }
+              }]
+            });
+          },
+          onApprove: function(data: any, actions: any) {
+            console.log('✅ Payment approved, capturing...');
+            return actions.order.capture().then(function(details: any) {
+              console.log('✅ Payment successful:', details);
+              onSuccess({
+                orderID: data.orderID,
+                paymentID: details.id,
+                details: details
+              });
+              // Redirect to return page
+              window.location.href = `https://nursingeducationconferences.org/paypal/return?orderID=${data.orderID}&paymentID=${details.id}&amount=${amount}&currency=${currency}&registrationId=${registrationId}`;
+            });
+          },
+          onCancel: function(_data: any) {
+            console.log('⚠️ Payment cancelled');
+            if (onCancel) onCancel();
+          },
+          onError: function(err: any) {
+            console.error('❌ PayPal error:', err);
+            onError(err);
+          }
+        }).render(containerRef.current);
+
         console.log('✅ PayPal button rendered successfully');
         setIsLoading(false);
-      }).catch((err: any) => {
+      } catch (err: any) {
         console.error('❌ Failed to render PayPal button:', err);
-        setError('Failed to render PayPal button');
+        setError('Failed to render PayPal button: ' + (err.message || 'Unknown error'));
         setIsLoading(false);
-      });
+      }
     };
 
-    loadPayPalAndRender();
-  }, [amount, registrationId]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">Loading PayPal...</span>
-      </div>
-    );
-  }
+    renderButton();
+  }, [isSDKLoaded, amount, currency, registrationId, onSuccess, onError, onCancel]);
 
   if (error) {
     return (
@@ -158,10 +186,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
       </div>
       
       <div
+        ref={containerRef}
         id={`paypal-container-${registrationId}`}
-        className="min-h-[50px]"
+        className="min-h-[50px] w-full"
       >
-        {/* PayPal button will be rendered here */}
+        {isLoading && (
+          <div className="flex items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-600">Loading PayPal...</span>
+          </div>
+        )}
       </div>
       
       <div className="mt-4 text-center">

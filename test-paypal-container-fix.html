@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Container Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .paypal-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid #0070ba;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0070ba;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            background-color: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .test-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 PayPal Container Fix Test</h1>
+        
+        <div class="test-info">
+            <h3>Test Purpose:</h3>
+            <p>This test verifies that the PayPal button container issue has been resolved. The error "PayPal container not found" should no longer occur.</p>
+            <p><strong>Expected Result:</strong> PayPal button should load and render successfully without container errors.</p>
+        </div>
+
+        <div class="paypal-section">
+            <h2>💳 PayPal Payment Test</h2>
+            <p>Amount: <strong>$50.00 USD</strong></p>
+            <p>Registration ID: <strong>test-reg-123</strong></p>
+            
+            <div id="paypal-status" class="loading">
+                <div class="spinner"></div>
+                <span>Loading PayPal...</span>
+            </div>
+            
+            <div id="paypal-container-test-reg-123" style="min-height: 50px; margin-top: 20px;">
+                <!-- PayPal button will be rendered here -->
+            </div>
+        </div>
+
+        <div class="log" id="console-log">
+            <strong>Console Log:</strong><br>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced logging
+        const logElement = document.getElementById('console-log');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addToLog(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            logElement.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToLog(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToLog(args.join(' '), 'error');
+        };
+
+        // PayPal Integration Test
+        const statusElement = document.getElementById('paypal-status');
+        const registrationId = 'test-reg-123';
+        const amount = 50.00;
+        
+        function updateStatus(message, type = 'loading') {
+            if (type === 'loading') {
+                statusElement.innerHTML = `<div class="spinner"></div><span>${message}</span>`;
+                statusElement.className = 'loading';
+            } else if (type === 'error') {
+                statusElement.innerHTML = `<div style="color: red;">❌ ${message}</div>`;
+                statusElement.className = 'error';
+            } else if (type === 'success') {
+                statusElement.innerHTML = `<div style="color: green;">✅ ${message}</div>`;
+                statusElement.className = 'success';
+            }
+        }
+
+        function loadPayPalSDK() {
+            console.log('🔧 Starting PayPal SDK load test...');
+            updateStatus('Loading PayPal SDK...');
+            
+            const clientId = 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
+            
+            // Check if PayPal is already loaded
+            if (window.paypal) {
+                console.log('✅ PayPal SDK already loaded');
+                renderPayPalButton();
+                return;
+            }
+            
+            // Remove any existing PayPal scripts to prevent conflicts
+            const existingScripts = document.querySelectorAll('script[src*="paypal.com/sdk/js"]');
+            existingScripts.forEach(script => {
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+            });
+
+            // Load PayPal SDK with simplified parameters
+            const script = document.createElement('script');
+            script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=USD`;
+            script.async = true;
+            
+            script.onload = () => {
+                console.log('✅ PayPal SDK loaded successfully');
+                updateStatus('PayPal SDK loaded, rendering button...');
+                renderPayPalButton();
+            };
+            
+            script.onerror = (error) => {
+                console.error('❌ Failed to load PayPal SDK:', error);
+                console.error('❌ Script src:', script.src);
+                updateStatus('Failed to load PayPal SDK - Check console for details', 'error');
+            };
+            
+            document.head.appendChild(script);
+        }
+
+        function renderPayPalButton() {
+            console.log('🔄 Attempting to render PayPal button...');
+            updateStatus('Rendering PayPal button...');
+            
+            if (!window.paypal) {
+                console.error('❌ PayPal SDK not available');
+                updateStatus('PayPal SDK not available', 'error');
+                return;
+            }
+            
+            const container = document.getElementById(`paypal-container-${registrationId}`);
+            if (!container) {
+                console.error('❌ PayPal container not found');
+                updateStatus('PayPal container not found', 'error');
+                return;
+            }
+            
+            console.log('✅ PayPal container found:', container);
+            console.log('🔄 Rendering PayPal button for amount:', amount);
+            
+            // Clear any existing content
+            container.innerHTML = '';
+            
+            window.paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'blue',
+                    shape: 'rect',
+                    label: 'paypal',
+                    height: 50,
+                },
+                createOrder: function(data, actions) {
+                    console.log('🔄 Creating PayPal order for amount:', amount);
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: amount.toFixed(2),
+                                currency_code: 'USD'
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    console.log('✅ Payment approved, capturing...');
+                    return actions.order.capture().then(function(details) {
+                        console.log('✅ Payment successful:', details);
+                        updateStatus('Payment successful! (Test mode)', 'success');
+                        alert('✅ Test Payment Successful!\n\nThis is a test transaction. No actual payment was processed.');
+                    });
+                },
+                onCancel: function(data) {
+                    console.log('⚠️ Payment cancelled');
+                    updateStatus('Payment cancelled', 'error');
+                },
+                onError: function(err) {
+                    console.error('❌ PayPal error:', err);
+                    updateStatus('PayPal error: ' + JSON.stringify(err), 'error');
+                }
+            }).render(container).then(() => {
+                console.log('✅ PayPal button rendered successfully');
+                updateStatus('PayPal button ready for testing', 'success');
+            }).catch((err) => {
+                console.error('❌ Failed to render PayPal button:', err);
+                updateStatus('Failed to render PayPal button: ' + err.message, 'error');
+            });
+        }
+
+        // Start the test
+        console.log('🚀 Starting PayPal container fix test...');
+        loadPayPalSDK();
+    </script>
+</body>
+</html>

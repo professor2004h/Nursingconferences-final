@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Network Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid;
+        }
+        .success {
+            background-color: #efe;
+            border-color: #cfc;
+            color: #3c3;
+        }
+        .error {
+            background-color: #fee;
+            border-color: #fcc;
+            color: #c33;
+        }
+        .loading {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #0070ba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #005ea6;
+        }
+        .url-test {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 PayPal Network Connectivity Test</h1>
+        
+        <p>This test checks if PayPal SDK URLs are accessible from your network.</p>
+        
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <button onclick="clearLog()">🧹 Clear Log</button>
+        
+        <div id="test-results"></div>
+        
+        <div class="log" id="console-log">
+            <strong>Test Log:</strong><br>
+        </div>
+    </div>
+
+    <script>
+        const logElement = document.getElementById('console-log');
+        const resultsElement = document.getElementById('test-results');
+        
+        function addToLog(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            logElement.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function clearLog() {
+            logElement.innerHTML = '<strong>Test Log:</strong><br>';
+            resultsElement.innerHTML = '';
+        }
+        
+        function addTestResult(testName, status, message) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${status}`;
+            resultDiv.innerHTML = `
+                <strong>${testName}:</strong> 
+                ${status === 'success' ? '✅' : status === 'error' ? '❌' : '⏳'} 
+                ${message}
+            `;
+            resultsElement.appendChild(resultDiv);
+        }
+        
+        async function testPayPalSDKUrl(clientId, testName) {
+            const url = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=USD`;
+            
+            addToLog(`Testing ${testName}: ${url}`);
+            addTestResult(testName, 'loading', 'Testing...');
+            
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.async = true;
+                
+                const timeout = setTimeout(() => {
+                    addToLog(`❌ ${testName} timed out after 10 seconds`, 'error');
+                    addTestResult(testName, 'error', 'Timeout - URL may be blocked or slow');
+                    if (script.parentNode) {
+                        script.parentNode.removeChild(script);
+                    }
+                    resolve(false);
+                }, 10000);
+                
+                script.onload = () => {
+                    clearTimeout(timeout);
+                    addToLog(`✅ ${testName} loaded successfully`, 'success');
+                    addTestResult(testName, 'success', 'SDK loaded successfully');
+                    resolve(true);
+                };
+                
+                script.onerror = (error) => {
+                    clearTimeout(timeout);
+                    addToLog(`❌ ${testName} failed to load: ${error}`, 'error');
+                    addTestResult(testName, 'error', 'Failed to load - Check network/firewall');
+                    resolve(false);
+                };
+                
+                document.head.appendChild(script);
+            });
+        }
+        
+        async function testFetch(url, testName) {
+            addToLog(`Testing fetch to ${testName}: ${url}`);
+            addTestResult(testName, 'loading', 'Testing...');
+            
+            try {
+                const response = await fetch(url, { 
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                addToLog(`✅ ${testName} fetch successful`, 'success');
+                addTestResult(testName, 'success', 'URL is accessible');
+                return true;
+            } catch (error) {
+                addToLog(`❌ ${testName} fetch failed: ${error.message}`, 'error');
+                addTestResult(testName, 'error', `Fetch failed: ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function runAllTests() {
+            clearLog();
+            addToLog('🚀 Starting PayPal network connectivity tests...');
+            
+            const clientId = 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
+            
+            // Test 1: Basic PayPal domain accessibility
+            await testFetch('https://www.paypal.com', 'PayPal Domain');
+            
+            // Test 2: PayPal SDK base URL
+            await testFetch('https://www.paypal.com/sdk/js', 'PayPal SDK Base');
+            
+            // Test 3: Full PayPal SDK URL with our client ID
+            await testPayPalSDKUrl(clientId, 'PayPal SDK with Client ID');
+            
+            // Test 4: Alternative simplified URL
+            const simpleUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
+            await testPayPalSDKUrl(clientId.substring(0, 20) + '...', 'Simplified SDK URL');
+            
+            addToLog('🏁 All tests completed');
+        }
+        
+        // Auto-run tests on page load
+        window.onload = () => {
+            addToLog('📄 Page loaded, ready to test PayPal connectivity');
+        };
+    </script>
+</body>
+</html>

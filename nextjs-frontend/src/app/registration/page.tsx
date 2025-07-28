@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
-import PayPalButton from '@/app/components/PayPalButton';
+import PayPalButtonAlternative from '@/app/components/PayPalButtonAlternative';
 
 
 // Form data interface
