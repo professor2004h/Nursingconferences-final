@@ -315,133 +315,7 @@ export default function RegistrationPage() {
     setIsLoading(false);
   };
 
-  // Initialize Razorpay payment
-  const initializeRazorpayPayment = async (registrationId: string, amount: number, registrationData: any) => {
-    try {
-      console.log('Initializing Razorpay payment...', { registrationId, amount });
 
-      // Get Razorpay key
-      const keyResponse = await fetch('/api/get-razorpay-key');
-      const keyResult = await keyResponse.json();
-
-      if (!keyResult.success) {
-        throw new Error('Failed to get Razorpay key');
-      }
-
-      // Create payment order
-      const orderResponse = await fetch('/api/payment/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: amount,
-          currency: 'USD',
-          receipt: `reg_${registrationId}`,
-          notes: {
-            registrationId,
-            email: registrationData.email,
-            name: `${registrationData.firstName} ${registrationData.lastName}`,
-            type: 'conference_registration'
-          }
-        }),
-      });
-
-      const orderResult = await orderResponse.json();
-
-      if (!orderResult.success) {
-        throw new Error('Failed to create payment order');
-      }
-
-      // Load Razorpay script
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      document.body.appendChild(script);
-
-      script.onload = () => {
-        const options = {
-          key: keyResult.keyId,
-          amount: orderResult.order.amount,
-          currency: orderResult.order.currency,
-          name: 'International Nursing Conference 2025',
-          description: 'Conference Registration Payment',
-          order_id: orderResult.order.id,
-          handler: async (response: any) => {
-            console.log('Payment successful:', response);
-
-            // Verify payment
-            try {
-              const verifyResponse = await fetch('/api/payment/verify', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                  registrationId: registrationId,
-                }),
-              });
-
-              const verifyResult = await verifyResponse.json();
-
-              if (verifyResult.success) {
-                alert(`Payment successful! Registration ID: ${registrationId}`);
-                // Reset form
-                setFormData({
-                  title: '',
-                  firstName: '',
-                  lastName: '',
-                  email: '',
-                  phoneNumber: '',
-                  country: '',
-                  abstractCategory: '',
-                  fullPostalAddress: '',
-                  selectedRegistration: '',
-                  sponsorType: '',
-                  accommodationType: '',
-                  accommodationNights: '',
-                  numberOfParticipants: 1,
-                });
-              } else {
-                alert('Payment verification failed. Please contact support.');
-              }
-            } catch (error) {
-              console.error('Payment verification error:', error);
-              alert('Payment verification failed. Please contact support.');
-            }
-          },
-          prefill: {
-            name: `${registrationData.firstName} ${registrationData.lastName}`,
-            email: registrationData.email,
-            contact: registrationData.phoneNumber,
-          },
-          theme: {
-            color: '#1e40af',
-          },
-          modal: {
-            ondismiss: () => {
-              console.log('Payment modal dismissed');
-              alert('Payment was cancelled. Your registration is saved and you can complete payment later.');
-            },
-          },
-        };
-
-        const razorpay = new (window as any).Razorpay(options);
-        razorpay.open();
-      };
-
-      script.onerror = () => {
-        throw new Error('Failed to load Razorpay script');
-      };
-
-    } catch (error) {
-      console.error('Payment initialization error:', error);
-      alert(`Payment initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1444,7 +1318,7 @@ export default function RegistrationPage() {
               </div>
 
               <div className="p-6">
-                <PayPalOnlyPayment
+                <PayPalPaymentSection
                   amount={priceCalculation.totalPrice}
                   currency="USD"
                   registrationId={currentRegistrationId}

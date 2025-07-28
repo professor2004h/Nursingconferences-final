@@ -87,11 +87,27 @@ const PayPalPayment: React.FC<PayPalPaymentProps> = ({
       return;
     }
 
+    console.log('🔄 Loading PayPal SDK with config:', {
+      clientId: paypalConfig.clientId?.substring(0, 10) + '...',
+      environment: paypalConfig.environment,
+      currency
+    });
+
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons`;
+    // Enhanced PayPal SDK URL with all required parameters
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons&enable-funding=card&disable-funding=credit,bancontact,blik,eps,giropay,ideal,mercadopago,mybank,p24,sepa,sofort,venmo`;
     script.async = true;
-    script.onload = () => setScriptLoaded(true);
-    script.onerror = () => setError('Failed to load PayPal SDK');
+
+    script.onload = () => {
+      console.log('✅ PayPal SDK loaded successfully');
+      setScriptLoaded(true);
+    };
+
+    script.onerror = (error) => {
+      console.error('❌ Failed to load PayPal SDK:', error);
+      setError('Failed to load PayPal SDK. Please check your internet connection and try again.');
+    };
+
     document.body.appendChild(script);
 
     return () => {
