@@ -196,6 +196,10 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           createOrder: async function(data, actions) {
             try {
               console.log('🔄 Creating server-side PayPal order for amount:', amount);
+
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
               const response = await fetch('/api/paypal/create-order', {
                 method: 'POST',
                 headers: {
@@ -207,7 +211,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                   registrationId,
                   registrationData,
                 }),
+                signal: controller.signal,
               });
+
+              clearTimeout(timeoutId);
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Server error: ${response.status} - ${errorText}`);
+              }
+
               const orderData = await response.json();
               if (orderData.success && orderData.orderId) {
                 console.log('✅ Server-side order created:', orderData.orderId);
@@ -217,12 +230,19 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
               }
             } catch (error) {
               console.error('❌ Order creation error:', error);
+              if (error.name === 'AbortError') {
+                throw new Error('Order creation timeout - please try again');
+              }
               throw error;
             }
           },
           onApprove: async function(data, actions) {
             try {
               console.log('✅ Payment approved, capturing server-side...');
+
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
               const response = await fetch('/api/paypal/capture-order', {
                 method: 'POST',
                 headers: {
@@ -232,7 +252,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                   orderId: data.orderID,
                   registrationId,
                 }),
+                signal: controller.signal,
               });
+
+              clearTimeout(timeoutId);
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Server error: ${response.status} - ${errorText}`);
+              }
+
               const captureData = await response.json();
               if (captureData.success) {
                 console.log('✅ Payment captured successfully:', captureData);
@@ -249,6 +278,9 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
               }
             } catch (error) {
               console.error('❌ Payment capture error:', error);
+              if (error.name === 'AbortError') {
+                throw new Error('Payment capture timeout - please try again');
+              }
               onError(error);
               throw error;
             }
