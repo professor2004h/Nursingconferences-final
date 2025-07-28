@@ -76,7 +76,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           if (typeof buttonsRef.current.close === 'function') {
             buttonsRef.current.close();
           }
-        } catch (e) {
+        } catch (e: unknown) {
           console.warn('⚠️ PayPal buttons cleanup warning:', e);
         }
         buttonsRef.current = null;
@@ -178,14 +178,14 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
         if (buttonsRef.current) {
           try {
             await buttonsRef.current.close();
-          } catch (e) {
+          } catch (e: unknown) {
             console.warn('⚠️ Error closing previous PayPal buttons:', e);
           }
           buttonsRef.current = null;
         }
 
         // Create new buttons instance
-        buttonsRef.current = window.paypal.Buttons({
+        buttonsRef.current = window.paypal!.Buttons({
           style: {
             layout: 'vertical',
             color: 'blue',
@@ -228,9 +228,9 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
               } else {
                 throw new Error(orderData.error || 'Failed to create order');
               }
-            } catch (error) {
+            } catch (error: unknown) {
               console.error('❌ Order creation error:', error);
-              if (error.name === 'AbortError') {
+              if (error instanceof Error && error.name === 'AbortError') {
                 throw new Error('Order creation timeout - please try again');
               }
               throw error;
@@ -263,6 +263,14 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
               }
 
               const captureData = await response.json();
+
+              // Check for recoverable errors
+              const errorDetail = Array.isArray(captureData.details) ? captureData.details[0] : null;
+              if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
+                console.log('⚠️ Instrument declined - restarting payment flow');
+                return actions.restart();
+              }
+
               if (captureData.success) {
                 console.log('✅ Payment captured successfully:', captureData);
                 onSuccess({
@@ -274,11 +282,15 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://nursingeducationconferences.org';
                 window.location.href = `${baseUrl}/paypal/return?orderID=${data.orderID}&paymentID=${captureData.paymentId}&amount=${captureData.amount}&currency=${captureData.currency}&registrationId=${registrationId}`;
               } else {
-                throw new Error(captureData.error || 'Failed to capture payment');
+                const msg = captureData.error || 'Failed to capture payment';
+                if (errorDetail) {
+                  msg += `\nDetails: ${errorDetail.description || ''}`;
+                }
+                throw new Error(msg);
               }
-            } catch (error) {
+            } catch (error: unknown) {
               console.error('❌ Payment capture error:', error);
-              if (error.name === 'AbortError') {
+              if (error instanceof Error && error.name === 'AbortError') {
                 throw new Error('Payment capture timeout - please try again');
               }
               onError(error);
@@ -316,7 +328,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
       if (buttonsRef.current) {
         const btn = buttonsRef.current;
         buttonsRef.current = null;
-        return btn.close().catch((e) => {
+        return btn.close().catch((e: unknown) => {
           console.warn('⚠️ Error closing PayPal buttons:', e);
         });
       }
