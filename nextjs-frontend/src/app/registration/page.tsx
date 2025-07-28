@@ -315,6 +315,11 @@ export default function RegistrationPage() {
     setIsLoading(false);
   }, []);
 
+  // Handle payment cancellation
+  const handlePaymentCancel = useCallback(() => {
+    console.log('⚠️ Payment cancelled by user');
+  }, []);
+
 
 
   // Handle form submission
@@ -1278,7 +1283,7 @@ export default function RegistrationPage() {
                 registrationData={formData}
                 onSuccess={handlePaymentSuccess}
                 onError={handlePaymentError}
-                onCancel={() => console.log('Payment cancelled')}
+                onCancel={handlePaymentCancel}
               />
             </PayPalErrorBoundary>
           </div>
@@ -1353,7 +1358,7 @@ export default function RegistrationPage() {
                     registrationData={formData}
                     onSuccess={handlePaymentSuccess}
                     onError={handlePaymentError}
-                    onCancel={() => console.log('Payment cancelled')}
+                    onCancel={handlePaymentCancel}
                   />
                 </PayPalErrorBoundary>
               </div>

@@ -30,6 +30,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
   const scriptRef = useRef<HTMLScriptElement | null>(null); // To track the script element
   const renderedRef = useRef(false);
 
+  // Refs for callback functions to prevent stale closures
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+  const onCancelRef = useRef(onCancel);
+
+  // Update refs when props change
+  onSuccessRef.current = onSuccess;
+  onErrorRef.current = onError;
+  onCancelRef.current = onCancel;
+
   // Safe DOM element removal function
   const safeRemoveElement = (element: Element | null) => {
     if (!element) return false;
@@ -296,7 +306,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
               if (captureData.success) {
                 console.log('✅ Payment captured successfully:', captureData);
-                onSuccess({
+                onSuccessRef.current({
                   orderID: data.orderID,
                   paymentID: captureData.paymentId,
                   details: captureData,
@@ -322,11 +332,11 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           },
           onCancel: function(_data: any) {
             console.log('⚠️ Payment cancelled');
-            if (onCancel) onCancel();
+            if (onCancelRef.current) onCancelRef.current();
           },
           onError: function(err: any) {
             console.error('❌ PayPal error:', err);
-            onError(err);
+            onErrorRef.current(err);
           }
         });
 
@@ -371,7 +381,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
         });
       }
     };
-  }, [isSDKLoaded, amount, currency, registrationId, onSuccess, onError, onCancel]);
+  }, [isSDKLoaded, amount, currency, registrationId]);
 
   if (error) {
     return (
