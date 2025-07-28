@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, memo } from 'react';
+import React, { useState, memo } from 'react';
 import Link from 'next/link';
 import { type SiteSettings } from '../getSiteSettings';
 
@@ -15,14 +15,14 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   // Debug logging
   console.log('HeaderClient rendering:', { siteSettings: !!siteSettings, isMenuOpen });
 
-  // Stable toggle function to prevent re-renders
-  const toggleMenu = useCallback(() => {
+  // Simple toggle functions without useCallback to avoid React hook issues
+  const toggleMenu = () => {
     setIsMenuOpen(prev => !prev);
-  }, []);
+  };
 
-  const closeMenu = useCallback(() => {
+  const closeMenu = () => {
     setIsMenuOpen(false);
-  }, []);
+  };
 
   return (
     <>
