@@ -28,31 +28,10 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
   useEffect(() => {
     const loadPayPalScript = async () => {
-      // Check if PayPal client ID is available
-      let clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+      // Use the known working PayPal client ID directly
+      const clientId = 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
 
-      if (!clientId || clientId === 'undefined') {
-        console.warn('⚠️ PayPal Client ID not found in environment variables, fetching from API...');
-
-        try {
-          const response = await fetch('/api/paypal/client-config');
-          const config = await response.json();
-
-          if (config.success && config.clientId) {
-            clientId = config.clientId;
-            console.log('✅ PayPal Client ID fetched from API:', clientId.substring(0, 10) + '...');
-          } else {
-            throw new Error('Failed to get PayPal configuration from API');
-          }
-        } catch (error) {
-          console.error('❌ Failed to fetch PayPal configuration:', error);
-          setError('PayPal configuration error. Please contact support.');
-          setIsLoading(false);
-          return;
-        }
-      } else {
-        console.log('🔧 PayPal Client ID found in environment:', clientId.substring(0, 10) + '...');
-      }
+      console.log('🔧 Using PayPal Client ID:', clientId.substring(0, 10) + '...');
 
       // Check if PayPal script is already loaded
       if (window.paypal) {
@@ -73,9 +52,9 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
         return;
       }
 
-      // Load PayPal SDK script
+      // Load PayPal SDK script with the exact pattern from working example
       const script = document.createElement('script');
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}`;
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture`;
       script.async = true;
 
       console.log('🔄 Loading PayPal SDK:', script.src);
