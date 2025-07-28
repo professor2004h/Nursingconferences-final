@@ -56,7 +56,7 @@ export async function getClientPayPalConfig(): Promise<ClientPayPalConfig> {
   if (isLocalhost) {
     console.log('⚠️ Environment variables not available, using sandbox fallback for localhost');
     return {
-      clientId: 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc', // We'll use the same ID but force sandbox
+      clientId: 'AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R', // PayPal demo sandbox client ID
       environment: 'sandbox',
       baseUrl: 'http://localhost:3001',
       isConfigured: true
