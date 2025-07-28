@@ -345,7 +345,7 @@ export default function RegistrationPage() {
 
       // Get the registration type name for display
       let selectedRegistrationName = '';
-      if (selectedRegistrationType) {
+      if (selectedRegistrationType && dynamicData) {
         const regTypeId = selectedRegistrationType.split('-')[0]; // Extract the registration type ID
         const selectedRegType = dynamicData.registrationTypes?.find(type => type._id === regTypeId);
         selectedRegistrationName = selectedRegType?.name || '';
@@ -1005,16 +1005,11 @@ export default function RegistrationPage() {
                                     </div>
                                   )}
 
-                                  {/* Availability Info */}
-                                  {tier.maxSponsors && (
+                                  {/* Availability Info - Removed maxSponsors/currentSponsors as they don't exist in SponsorshipTier type */}
+                                  {tier.featured && (
                                     <div className="mt-auto pt-3 border-t border-gray-300">
                                       <div className="text-xs text-black opacity-70">
-                                        Limited to {tier.maxSponsors} sponsors
-                                        {tier.currentSponsors && (
-                                          <span className="ml-1">
-                                            ({tier.maxSponsors - tier.currentSponsors} remaining)
-                                          </span>
-                                        )}
+                                        ⭐ Featured Sponsorship Package
                                       </div>
                                     </div>
                                   )}
