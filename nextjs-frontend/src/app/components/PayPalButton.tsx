@@ -27,7 +27,33 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   useEffect(() => {
-    const loadPayPalScript = () => {
+    const loadPayPalScript = async () => {
+      // Check if PayPal client ID is available
+      let clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+
+      if (!clientId || clientId === 'undefined') {
+        console.warn('⚠️ PayPal Client ID not found in environment variables, fetching from API...');
+
+        try {
+          const response = await fetch('/api/paypal/client-config');
+          const config = await response.json();
+
+          if (config.success && config.clientId) {
+            clientId = config.clientId;
+            console.log('✅ PayPal Client ID fetched from API:', clientId.substring(0, 10) + '...');
+          } else {
+            throw new Error('Failed to get PayPal configuration from API');
+          }
+        } catch (error) {
+          console.error('❌ Failed to fetch PayPal configuration:', error);
+          setError('PayPal configuration error. Please contact support.');
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        console.log('🔧 PayPal Client ID found in environment:', clientId.substring(0, 10) + '...');
+      }
+
       // Check if PayPal script is already loaded
       if (window.paypal) {
         setScriptLoaded(true);
@@ -49,8 +75,10 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
       // Load PayPal SDK script
       const script = document.createElement('script');
-      script.src = `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&intent=capture&currency=${currency}`;
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}`;
       script.async = true;
+
+      console.log('🔄 Loading PayPal SDK:', script.src);
 
       script.onload = () => {
         console.log('✅ PayPal SDK loaded successfully');
@@ -141,7 +169,11 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
       }).render(paypalRef.current);
     };
 
-    loadPayPalScript();
+    loadPayPalScript().catch(error => {
+      console.error('❌ Error loading PayPal script:', error);
+      setError('Failed to load PayPal. Please refresh the page and try again.');
+      setIsLoading(false);
+    });
   }, [amount, currency, registrationId, onSuccess, onError, onCancel]);
 
   if (isLoading) {
