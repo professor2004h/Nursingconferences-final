@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getSiteSettings, type SiteSettings } from '../getSiteSettings';
 
 export default function ContactForm() {
