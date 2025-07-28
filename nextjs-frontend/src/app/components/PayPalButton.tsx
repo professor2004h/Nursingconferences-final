@@ -236,7 +236,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
               throw error;
             }
           },
-          onApprove: async function(data, actions) {
+          onApprove: async function(data, _actions) {
             try {
               console.log('✅ Payment approved, capturing server-side...');
 
@@ -267,8 +267,8 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
               // Check for recoverable errors
               const errorDetail = Array.isArray(captureData.details) ? captureData.details[0] : null;
               if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
-                console.log('⚠️ Instrument declined - restarting payment flow');
-                return actions.restart();
+                console.log('⚠️ Instrument declined - please try a different payment method');
+                throw new Error('Payment method declined. Please try a different payment method.');
               }
 
               if (captureData.success) {
@@ -282,7 +282,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://nursingeducationconferences.org';
                 window.location.href = `${baseUrl}/paypal/return?orderID=${data.orderID}&paymentID=${captureData.paymentId}&amount=${captureData.amount}&currency=${captureData.currency}&registrationId=${registrationId}`;
               } else {
-                const msg = captureData.error || 'Failed to capture payment';
+                let msg = captureData.error || 'Failed to capture payment';
                 if (errorDetail) {
                   msg += `\nDetails: ${errorDetail.description || ''}`;
                 }
