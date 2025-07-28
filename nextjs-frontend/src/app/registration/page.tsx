@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
-import PayPalPaymentSection from '@/app/components/PayPalPaymentSection';
-import PayPalDebugInfo from '@/app/components/PayPalDebugInfo';
+import PayPalButton from '@/app/components/PayPalButton';
 
 
 // Form data interface
@@ -1245,14 +1244,14 @@ export default function RegistrationPage() {
                 Your registration has been saved. Please complete your payment below to confirm your spot.
               </p>
             </div>
-            <PayPalPaymentSection
+            <PayPalButton
               amount={priceCalculation.totalPrice}
               currency="USD"
               registrationId={currentRegistrationId}
               registrationData={formData}
               onSuccess={handlePaymentSuccess}
               onError={handlePaymentError}
-              disabled={isLoading}
+              onCancel={() => console.log('Payment cancelled')}
             />
           </div>
         )}
@@ -1318,14 +1317,14 @@ export default function RegistrationPage() {
               </div>
 
               <div className="p-6">
-                <PayPalPaymentSection
+                <PayPalButton
                   amount={priceCalculation.totalPrice}
                   currency="USD"
                   registrationId={currentRegistrationId}
                   registrationData={formData}
                   onSuccess={handlePaymentSuccess}
                   onError={handlePaymentError}
-                  disabled={isLoading}
+                  onCancel={() => console.log('Payment cancelled')}
                 />
               </div>
             </div>

@@ -15,17 +15,39 @@ const PayPalReturnPage: React.FC = () => {
     const processPayPalReturn = async () => {
       try {
         // Get PayPal parameters from URL
-        const paymentId = searchParams.get('paymentId');
-        const token = searchParams.get('token');
-        const payerId = searchParams.get('PayerID');
+        const orderID = searchParams.get('orderID');
+        const paymentID = searchParams.get('paymentID');
+        const amount = searchParams.get('amount');
+        const currency = searchParams.get('currency');
+        const registrationId = searchParams.get('registrationId');
         const txnId = searchParams.get('tx'); // Classic PayPal transaction ID
-        const amount = searchParams.get('amt'); // Classic PayPal amount
-        const currency = searchParams.get('cc'); // Classic PayPal currency
+        const classicAmount = searchParams.get('amt'); // Classic PayPal amount
+        const classicCurrency = searchParams.get('cc'); // Classic PayPal currency
         const status = searchParams.get('st'); // Classic PayPal status
 
         console.log('🔄 Processing PayPal return:', {
-          paymentId, token, payerId, txnId, amount, currency, status
+          orderID, paymentID, amount, currency, registrationId, txnId, classicAmount, classicCurrency, status
         });
+
+        // Check if this is our new simple PayPal flow (has orderID and paymentID)
+        if (orderID && paymentID) {
+          console.log('✅ Simple PayPal flow detected');
+
+          setPaymentDetails({
+            orderID: orderID,
+            paymentID: paymentID,
+            registrationId: registrationId || 'N/A',
+            amount: amount || 'N/A',
+            currency: currency || 'USD',
+            status: 'Completed',
+            paymentMethod: 'PayPal',
+            timestamp: new Date().toISOString()
+          });
+
+          setPaymentConfirmed(true);
+          setProcessing(false);
+          return;
+        }
 
         // Check if this is a classic PayPal Auto Return (has tx parameter)
         if (txnId) {
@@ -35,8 +57,8 @@ const PayPalReturnPage: React.FC = () => {
           // as the payment has already been processed by PayPal
           setPaymentDetails({
             transactionId: txnId,
-            amount: amount || 'N/A',
-            currency: currency || 'USD',
+            amount: classicAmount || 'N/A',
+            currency: classicCurrency || 'USD',
             status: status || 'Completed',
             paymentMethod: 'PayPal Classic',
             timestamp: new Date().toISOString()
