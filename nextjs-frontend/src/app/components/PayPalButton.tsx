@@ -25,13 +25,36 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+  const buttonsRef = useRef<any>(null); // To store PayPal buttons instance
+  const isMounted = useRef(true); // To track component mount state
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      // Cleanup PayPal buttons if they exist
+      if (buttonsRef.current) {
+        try {
+          buttonsRef.current.close();
+        } catch (e) {
+          console.log('⚠️ Error closing PayPal buttons:', e);
+        }
+      }
+    };
+  }, []);
 
   // Load PayPal SDK
   useEffect(() => {
+    if (!isMounted.current) return;
+    
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
 
     console.log('🔧 Loading PayPal SDK for registration:', registrationId);
     console.log('🔧 Using PayPal Client ID:', clientId.substring(0, 10) + '...');
+    
+    // Reset error state
+    setError(null);
+    setIsLoading(true);
 
     // Check if PayPal is already loaded
     if (window.paypal) {
@@ -55,14 +78,18 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
     script.onload = () => {
       console.log('✅ PayPal SDK loaded successfully');
-      setIsSDKLoaded(true);
+      if (isMounted.current) {
+        setIsSDKLoaded(true);
+      }
     };
 
     script.onerror = (error) => {
       console.error('❌ Failed to load PayPal SDK:', error);
       console.error('❌ Script src:', script.src);
-      setError('Failed to load PayPal. Please check your internet connection and refresh the page.');
-      setIsLoading(false);
+      if (isMounted.current) {
+        setError('Failed to load PayPal. Please check your internet connection and refresh the page.');
+        setIsLoading(false);
+      }
     };
 
     document.head.appendChild(script);
@@ -90,14 +117,27 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
     const renderButton = async () => {
       try {
-        if (!containerRef.current) {
-          console.error('❌ Container ref not available');
-          setError('PayPal container not found');
-          setIsLoading(false);
+        // Check if component is still mounted and container exists
+        if (!isMounted.current || !containerRef.current) {
+          console.log('🛑 Component unmounted or container not available, skipping PayPal button render');
           return;
         }
+        
+        // Clear any existing buttons instance
+        if (buttonsRef.current) {
+          try {
+            buttonsRef.current.close();
+          } catch (e) {
+            console.log('⚠️ Error closing previous PayPal buttons:', e);
+          }
+          buttonsRef.current = null;
+        }
+        
+        // Clear container content
+        containerRef.current.innerHTML = '';
 
-        await window.paypal!.Buttons({
+        // Create and render PayPal buttons
+        buttonsRef.current = window.paypal!.Buttons({
           style: {
             layout: 'vertical',
             color: 'blue',
@@ -137,14 +177,22 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
             console.error('❌ PayPal error:', err);
             onError(err);
           }
-        }).render(containerRef.current);
+        });
+        
+        if (isMounted.current && containerRef.current) {
+          buttonsRef.current.render(containerRef.current);
+        }
 
-        console.log('✅ PayPal button rendered successfully');
-        setIsLoading(false);
+        if (isMounted.current) {
+          console.log('✅ PayPal button rendered successfully');
+          setIsLoading(false);
+        }
       } catch (err: any) {
         console.error('❌ Failed to render PayPal button:', err);
-        setError('Failed to render PayPal button: ' + (err.message || 'Unknown error'));
-        setIsLoading(false);
+        if (isMounted.current) {
+          setError('Failed to render PayPal button: ' + (err.message || 'Unknown error'));
+          setIsLoading(false);
+        }
       }
     };
 
