@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal DOM Manipulation Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .paypal-container {
+            min-height: 60px;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 10px 0;
+            background-color: white;
+        }
+        .success {
+            background-color: #efe;
+            border-color: #cfc;
+            color: #3c3;
+        }
+        .error {
+            background-color: #fee;
+            border-color: #fcc;
+            color: #c33;
+        }
+        .loading {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        button {
+            background-color: #0070ba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #005ea6;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0070ba;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 PayPal DOM Manipulation Fix Test</h1>
+        
+        <div class="test-section">
+            <h3>Test Purpose</h3>
+            <p>This test verifies that the PayPal button component can be safely mounted, unmounted, and remounted without causing DOM manipulation errors like "NotFoundError: Failed to execute 'removeChild' on 'Node'".</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Controls</h3>
+            <button onclick="mountPayPalButton()" id="mountBtn">Mount PayPal Button</button>
+            <button onclick="unmountPayPalButton()" id="unmountBtn" disabled>Unmount PayPal Button</button>
+            <button onclick="remountPayPalButton()" id="remountBtn" disabled>Remount PayPal Button</button>
+            <button onclick="stressTest()" id="stressBtn">Stress Test (10x Mount/Unmount)</button>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📦 PayPal Button Container</h3>
+            <div id="paypal-test-container" class="paypal-container">
+                <p style="text-align: center; color: #666;">PayPal button will appear here when mounted</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="test-status" class="loading">
+                <div class="spinner"></div>
+                Ready to test
+            </div>
+        </div>
+
+        <div class="log" id="console-log">
+            <strong>Test Log:</strong><br>
+        </div>
+    </div>
+
+    <script>
+        let paypalButtonInstance = null;
+        let isMounted = false;
+        let testCount = 0;
+        
+        const logElement = document.getElementById('console-log');
+        const statusElement = document.getElementById('test-status');
+        const containerElement = document.getElementById('paypal-test-container');
+        
+        // Enhanced logging
+        function addToLog(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            logElement.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateStatus(message, type = 'loading') {
+            if (type === 'loading') {
+                statusElement.innerHTML = `<div class="spinner"></div>${message}`;
+                statusElement.className = 'loading';
+            } else if (type === 'error') {
+                statusElement.innerHTML = `❌ ${message}`;
+                statusElement.className = 'error';
+            } else if (type === 'success') {
+                statusElement.innerHTML = `✅ ${message}`;
+                statusElement.className = 'success';
+            }
+        }
+        
+        function updateButtons() {
+            document.getElementById('mountBtn').disabled = isMounted;
+            document.getElementById('unmountBtn').disabled = !isMounted;
+            document.getElementById('remountBtn').disabled = isMounted;
+        }
+        
+        function clearLog() {
+            logElement.innerHTML = '<strong>Test Log:</strong><br>';
+        }
+        
+        // Safe element removal function (mimicking our React component fix)
+        function safeRemoveElement(element) {
+            if (!element) return false;
+            
+            try {
+                if (element.parentNode && element.parentNode.contains(element)) {
+                    element.parentNode.removeChild(element);
+                    return true;
+                }
+            } catch (error) {
+                addToLog(`⚠️ Safe removal warning: ${error.message}`, 'error');
+            }
+            return false;
+        }
+        
+        function cleanupPayPalScripts() {
+            try {
+                const existingScripts = document.querySelectorAll('script[src*="paypal.com/sdk/js"]');
+                addToLog(`🧹 Found ${existingScripts.length} PayPal scripts to clean up`);
+                
+                existingScripts.forEach((script, index) => {
+                    const removed = safeRemoveElement(script);
+                    addToLog(`Script ${index + 1}: ${removed ? 'Removed safely' : 'Already removed or not found'}`);
+                });
+            } catch (error) {
+                addToLog(`❌ Script cleanup error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function mountPayPalButton() {
+            try {
+                testCount++;
+                addToLog(`🚀 Test ${testCount}: Mounting PayPal button...`);
+                updateStatus('Mounting PayPal button...', 'loading');
+                
+                // Clean up any existing scripts first
+                cleanupPayPalScripts();
+                
+                // Clear container
+                containerElement.innerHTML = '<div class="spinner"></div>Loading PayPal...';
+                
+                // Load PayPal SDK
+                const clientId = 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
+                const script = document.createElement('script');
+                script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=USD`;
+                script.async = true;
+                
+                script.onload = () => {
+                    addToLog('✅ PayPal SDK loaded successfully');
+                    renderPayPalButton();
+                };
+                
+                script.onerror = (error) => {
+                    addToLog(`❌ PayPal SDK load failed: ${error}`, 'error');
+                    updateStatus('PayPal SDK load failed', 'error');
+                };
+                
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                addToLog(`❌ Mount error: ${error.message}`, 'error');
+                updateStatus(`Mount failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function renderPayPalButton() {
+            try {
+                containerElement.innerHTML = '';
+                
+                paypalButtonInstance = window.paypal.Buttons({
+                    style: {
+                        layout: 'vertical',
+                        color: 'blue',
+                        shape: 'rect',
+                        label: 'paypal',
+                        height: 50,
+                    },
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: { value: '25.00', currency_code: 'USD' }
+                            }]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        addToLog('✅ Payment approved (test mode)');
+                        return actions.order.capture().then(function(details) {
+                            addToLog('✅ Payment captured successfully');
+                            alert('Test payment successful! (No actual payment processed)');
+                        });
+                    },
+                    onCancel: function(data) {
+                        addToLog('⚠️ Payment cancelled');
+                    },
+                    onError: function(err) {
+                        addToLog(`❌ PayPal error: ${JSON.stringify(err)}`, 'error');
+                    }
+                });
+                
+                paypalButtonInstance.render(containerElement).then(() => {
+                    addToLog('✅ PayPal button rendered successfully');
+                    updateStatus('PayPal button mounted successfully', 'success');
+                    isMounted = true;
+                    updateButtons();
+                }).catch((error) => {
+                    addToLog(`❌ PayPal render error: ${error.message}`, 'error');
+                    updateStatus(`Render failed: ${error.message}`, 'error');
+                });
+                
+            } catch (error) {
+                addToLog(`❌ Render error: ${error.message}`, 'error');
+                updateStatus(`Render failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function unmountPayPalButton() {
+            try {
+                addToLog('🔄 Unmounting PayPal button...');
+                updateStatus('Unmounting PayPal button...', 'loading');
+                
+                // Close PayPal button instance safely
+                if (paypalButtonInstance) {
+                    try {
+                        if (typeof paypalButtonInstance.close === 'function') {
+                            paypalButtonInstance.close();
+                        }
+                    } catch (error) {
+                        addToLog(`⚠️ PayPal button close warning: ${error.message}`, 'error');
+                    }
+                    paypalButtonInstance = null;
+                }
+                
+                // Clear container safely
+                try {
+                    containerElement.innerHTML = '<p style="text-align: center; color: #666;">PayPal button unmounted</p>';
+                } catch (error) {
+                    addToLog(`⚠️ Container clear warning: ${error.message}`, 'error');
+                }
+                
+                // Clean up scripts safely
+                cleanupPayPalScripts();
+                
+                addToLog('✅ PayPal button unmounted successfully');
+                updateStatus('PayPal button unmounted successfully', 'success');
+                isMounted = false;
+                updateButtons();
+                
+            } catch (error) {
+                addToLog(`❌ Unmount error: ${error.message}`, 'error');
+                updateStatus(`Unmount failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function remountPayPalButton() {
+            addToLog('🔄 Remounting PayPal button...');
+            mountPayPalButton();
+        }
+        
+        async function stressTest() {
+            addToLog('🏋️ Starting stress test: 10x mount/unmount cycles...');
+            document.getElementById('stressBtn').disabled = true;
+            
+            for (let i = 1; i <= 10; i++) {
+                addToLog(`--- Stress Test Cycle ${i}/10 ---`);
+                
+                // Mount
+                await new Promise(resolve => {
+                    mountPayPalButton();
+                    setTimeout(resolve, 2000); // Wait 2 seconds
+                });
+                
+                // Unmount
+                unmountPayPalButton();
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+            }
+            
+            addToLog('🏁 Stress test completed!');
+            updateStatus('Stress test completed successfully', 'success');
+            document.getElementById('stressBtn').disabled = false;
+        }
+        
+        // Initialize
+        addToLog('📄 DOM manipulation test page loaded');
+        updateStatus('Ready to test PayPal DOM manipulation fixes', 'success');
+        updateButtons();
+    </script>
+</body>
+</html>

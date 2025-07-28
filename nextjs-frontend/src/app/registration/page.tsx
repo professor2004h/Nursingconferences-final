@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalButton from '@/app/components/PayPalButton';
+import PayPalErrorBoundary from '@/app/components/PayPalErrorBoundary';
 
 
 // Form data interface
@@ -456,12 +457,12 @@ export default function RegistrationPage() {
         dynamicLoading,
         dynamicError,
         dynamicData: !!dynamicData,
-        registrationTypes: dynamicData.registrationTypes?.length || 0,
-        registrationTypeNames: dynamicData.registrationTypes?.map(t => ({ name: t.name, category: t.category })) || [],
-        sponsorshipTiers: dynamicData.sponsorshipTiers?.length || 0,
-        accommodationOptions: dynamicData.accommodationOptions?.length || 0,
-        activePeriod: dynamicData.activePeriod?.periodId || 'None',
-        pricingPeriods: dynamicData.pricingPeriods?.length || 0
+        registrationTypes: dynamicData?.registrationTypes?.length || 0,
+        registrationTypeNames: dynamicData?.registrationTypes?.map(t => ({ name: t.name, category: t.category })) || [],
+        sponsorshipTiers: dynamicData?.sponsorshipTiers?.length || 0,
+        accommodationOptions: dynamicData?.accommodationOptions?.length || 0,
+        activePeriod: dynamicData?.activePeriod?.periodId || 'None',
+        pricingPeriods: dynamicData?.pricingPeriods?.length || 0
       });
     }
   }, [dynamicData, dynamicLoading, dynamicError]);
@@ -978,13 +979,13 @@ export default function RegistrationPage() {
                                   )}
 
                                   {/* Availability Info */}
-                                  {(tier as any).maxSponsors && (
+                                  {tier.maxSponsors && (
                                     <div className="mt-auto pt-3 border-t border-gray-300">
                                       <div className="text-xs text-black opacity-70">
-                                        Limited to {(tier as any).maxSponsors} sponsors
-                                        {((tier as any).currentSponsors && (tier as any).maxSponsors) && (
+                                        Limited to {tier.maxSponsors} sponsors
+                                        {tier.currentSponsors && (
                                           <span className="ml-1">
-                                            ({(tier as any).maxSponsors - (tier as any).currentSponsors} remaining)
+                                            ({tier.maxSponsors - tier.currentSponsors} remaining)
                                           </span>
                                         )}
                                       </div>
@@ -1244,15 +1245,17 @@ export default function RegistrationPage() {
                 Your registration has been saved. Please complete your payment below to confirm your spot.
               </p>
             </div>
-            <PayPalButton
-              amount={priceCalculation.totalPrice}
-              currency="USD"
-              registrationId={currentRegistrationId}
-              registrationData={formData}
-              onSuccess={handlePaymentSuccess}
-              onError={handlePaymentError}
-              onCancel={() => console.log('Payment cancelled')}
-            />
+            <PayPalErrorBoundary>
+              <PayPalButton
+                amount={priceCalculation.totalPrice}
+                currency="USD"
+                registrationId={currentRegistrationId}
+                registrationData={formData}
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentError}
+                onCancel={() => console.log('Payment cancelled')}
+              />
+            </PayPalErrorBoundary>
           </div>
         )}
 
@@ -1317,15 +1320,17 @@ export default function RegistrationPage() {
               </div>
 
               <div className="p-6">
-                <PayPalButton
-                  amount={priceCalculation.totalPrice}
-                  currency="USD"
-                  registrationId={currentRegistrationId}
-                  registrationData={formData}
-                  onSuccess={handlePaymentSuccess}
-                  onError={handlePaymentError}
-                  onCancel={() => console.log('Payment cancelled')}
-                />
+                <PayPalErrorBoundary>
+                  <PayPalButton
+                    amount={priceCalculation.totalPrice}
+                    currency="USD"
+                    registrationId={currentRegistrationId}
+                    registrationData={formData}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                    onCancel={() => console.log('Payment cancelled')}
+                  />
+                </PayPalErrorBoundary>
               </div>
             </div>
           </div>

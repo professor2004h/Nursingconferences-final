@@ -27,31 +27,74 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const buttonsRef = useRef<any>(null); // To store PayPal buttons instance
   const isMounted = useRef(true); // To track component mount state
+  const scriptRef = useRef<HTMLScriptElement | null>(null); // To track the script element
+
+  // Safe DOM element removal function
+  const safeRemoveElement = (element: Element | null) => {
+    if (!element) return false;
+
+    try {
+      // Check if element exists and has a parent
+      if (element.parentNode && element.parentNode.contains(element)) {
+        element.parentNode.removeChild(element);
+        return true;
+      }
+    } catch (error) {
+      console.warn('⚠️ Safe removal warning:', error);
+    }
+    return false;
+  };
+
+  // Safe script cleanup function
+  const cleanupPayPalScripts = () => {
+    try {
+      // Remove our tracked script first
+      if (scriptRef.current) {
+        safeRemoveElement(scriptRef.current);
+        scriptRef.current = null;
+      }
+
+      // Remove any other PayPal scripts safely
+      const existingScripts = document.querySelectorAll('script[src*="paypal.com/sdk/js"]');
+      existingScripts.forEach(script => {
+        safeRemoveElement(script);
+      });
+    } catch (error) {
+      console.warn('⚠️ Script cleanup warning:', error);
+    }
+  };
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       isMounted.current = false;
+
       // Cleanup PayPal buttons if they exist
       if (buttonsRef.current) {
         try {
-          buttonsRef.current.close();
+          if (typeof buttonsRef.current.close === 'function') {
+            buttonsRef.current.close();
+          }
         } catch (e) {
-          console.log('⚠️ Error closing PayPal buttons:', e);
+          console.warn('⚠️ PayPal buttons cleanup warning:', e);
         }
+        buttonsRef.current = null;
       }
+
+      // Cleanup scripts safely
+      cleanupPayPalScripts();
     };
   }, []);
 
   // Load PayPal SDK
   useEffect(() => {
     if (!isMounted.current) return;
-    
+
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
 
     console.log('🔧 Loading PayPal SDK for registration:', registrationId);
     console.log('🔧 Using PayPal Client ID:', clientId.substring(0, 10) + '...');
-    
+
     // Reset error state
     setError(null);
     setIsLoading(true);
@@ -59,22 +102,22 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     // Check if PayPal is already loaded
     if (window.paypal) {
       console.log('✅ PayPal SDK already loaded');
-      setIsSDKLoaded(true);
+      if (isMounted.current) {
+        setIsSDKLoaded(true);
+      }
       return;
     }
 
-    // Remove any existing PayPal scripts to prevent conflicts
-    const existingScripts = document.querySelectorAll('script[src*="paypal.com/sdk/js"]');
-    existingScripts.forEach(script => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    });
+    // Clean up any existing scripts safely
+    cleanupPayPalScripts();
 
     // Load PayPal SDK with simplified parameters
     const script = document.createElement('script');
     script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}`;
     script.async = true;
+
+    // Store reference to the script
+    scriptRef.current = script;
 
     script.onload = () => {
       console.log('✅ PayPal SDK loaded successfully');
@@ -92,12 +135,22 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
       }
     };
 
-    document.head.appendChild(script);
+    // Safely append script to head
+    try {
+      document.head.appendChild(script);
+    } catch (error) {
+      console.error('❌ Failed to append PayPal script:', error);
+      if (isMounted.current) {
+        setError('Failed to initialize PayPal. Please refresh the page.');
+        setIsLoading(false);
+      }
+    }
 
     return () => {
-      // Cleanup script if component unmounts
-      if (script.parentNode === document.head) {
-        document.head.removeChild(script);
+      // Cleanup script safely when effect cleans up
+      if (scriptRef.current) {
+        safeRemoveElement(scriptRef.current);
+        scriptRef.current = null;
       }
     };
   }, [currency, registrationId]);
@@ -110,10 +163,18 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
     console.log('🔄 Rendering PayPal button for amount:', amount);
 
-    // Clear any existing content
-    if (containerRef.current) {
-      containerRef.current.innerHTML = '';
-    }
+    // Safe container content clearing
+    const clearContainer = () => {
+      try {
+        if (containerRef.current && isMounted.current) {
+          containerRef.current.innerHTML = '';
+        }
+      } catch (error) {
+        console.warn('⚠️ Container clear warning:', error);
+      }
+    };
+
+    clearContainer();
 
     const renderButton = async () => {
       try {
@@ -122,22 +183,29 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           console.log('🛑 Component unmounted or container not available, skipping PayPal button render');
           return;
         }
-        
-        // Clear any existing buttons instance
+
+        // Clear any existing buttons instance safely
         if (buttonsRef.current) {
           try {
-            buttonsRef.current.close();
+            if (typeof buttonsRef.current.close === 'function') {
+              buttonsRef.current.close();
+            }
           } catch (e) {
-            console.log('⚠️ Error closing previous PayPal buttons:', e);
+            console.warn('⚠️ Error closing previous PayPal buttons:', e);
           }
           buttonsRef.current = null;
         }
-        
-        // Clear container content
-        containerRef.current.innerHTML = '';
+
+        // Clear container content safely
+        clearContainer();
+
+        // Verify PayPal SDK is still available
+        if (!window.paypal) {
+          throw new Error('PayPal SDK is no longer available');
+        }
 
         // Create and render PayPal buttons
-        buttonsRef.current = window.paypal!.Buttons({
+        buttonsRef.current = window.paypal.Buttons({
           style: {
             layout: 'vertical',
             color: 'blue',
@@ -145,29 +213,65 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
             label: 'paypal',
             height: 50,
           },
-          createOrder: function(_data: any, actions: any) {
-            console.log('🔄 Creating PayPal order for amount:', amount);
-            return actions.order.create({
-              purchase_units: [{
-                amount: {
-                  value: amount.toFixed(2),
-                  currency_code: currency
-                }
-              }]
-            });
-          },
-          onApprove: function(data: any, actions: any) {
-            console.log('✅ Payment approved, capturing...');
-            return actions.order.capture().then(function(details: any) {
-              console.log('✅ Payment successful:', details);
-              onSuccess({
-                orderID: data.orderID,
-                paymentID: details.id,
-                details: details
+          createOrder: async function(data, actions) {
+            try {
+              console.log('🔄 Creating server-side PayPal order for amount:', amount);
+              const response = await fetch('/api/paypal/create-order', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  amount: amount.toFixed(2),
+                  currency,
+                  registrationId,
+                  registrationData,
+                }),
               });
-              // Redirect to return page
-              window.location.href = `https://nursingeducationconferences.org/paypal/return?orderID=${data.orderID}&paymentID=${details.id}&amount=${amount}&currency=${currency}&registrationId=${registrationId}`;
-            });
+              const orderData = await response.json();
+              if (orderData.success && orderData.orderId) {
+                console.log('✅ Server-side order created:', orderData.orderId);
+                return orderData.orderId;
+              } else {
+                throw new Error(orderData.error || 'Failed to create order');
+              }
+            } catch (error) {
+              console.error('❌ Order creation error:', error);
+              throw error;
+            }
+          },
+          onApprove: async function(data, actions) {
+            try {
+              console.log('✅ Payment approved, capturing server-side...');
+              const response = await fetch('/api/paypal/capture-order', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  orderId: data.orderID,
+                  registrationId,
+                }),
+              });
+              const captureData = await response.json();
+              if (captureData.success) {
+                console.log('✅ Payment captured successfully:', captureData);
+                onSuccess({
+                  orderID: data.orderID,
+                  paymentID: captureData.paymentId,
+                  details: captureData,
+                });
+                // Redirect to return page
+                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://nursingeducationconferences.org';
+                window.location.href = `${baseUrl}/paypal/return?orderID=${data.orderID}&paymentID=${captureData.paymentId}&amount=${captureData.amount}&currency=${captureData.currency}&registrationId=${registrationId}`;
+              } else {
+                throw new Error(captureData.error || 'Failed to capture payment');
+              }
+            } catch (error) {
+              console.error('❌ Payment capture error:', error);
+              onError(error);
+              throw error;
+            }
           },
           onCancel: function(_data: any) {
             console.log('⚠️ Payment cancelled');
@@ -178,19 +282,30 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
             onError(err);
           }
         });
-        
-        if (isMounted.current && containerRef.current) {
-          buttonsRef.current.render(containerRef.current);
-        }
 
-        if (isMounted.current) {
-          console.log('✅ PayPal button rendered successfully');
-          setIsLoading(false);
+        // Safely render the buttons
+        if (isMounted.current && containerRef.current && buttonsRef.current) {
+          try {
+            await buttonsRef.current.render(containerRef.current);
+
+            if (isMounted.current) {
+              console.log('✅ PayPal button rendered successfully');
+              setIsLoading(false);
+            }
+          } catch (renderError) {
+            console.error('❌ PayPal button render error:', renderError);
+            if (isMounted.current) {
+              setError('Failed to display PayPal button: ' + (renderError instanceof Error ? renderError.message : 'Render error'));
+              setIsLoading(false);
+            }
+          }
+        } else {
+          console.warn('⚠️ Cannot render PayPal button: component unmounted or container unavailable');
         }
       } catch (err: any) {
-        console.error('❌ Failed to render PayPal button:', err);
+        console.error('❌ Failed to create PayPal button:', err);
         if (isMounted.current) {
-          setError('Failed to render PayPal button: ' + (err.message || 'Unknown error'));
+          setError('Failed to initialize PayPal button: ' + (err.message || 'Unknown error'));
           setIsLoading(false);
         }
       }
