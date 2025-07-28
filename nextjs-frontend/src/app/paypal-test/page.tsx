@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import PayPalDebug from '@/app/components/PayPalDebug';
 
 /**
  * PayPal Test Page
@@ -18,12 +17,20 @@ export default function PayPalTestPage() {
           </h1>
           
           <div className="space-y-6">
-            {/* PayPal Configuration Debug */}
+            {/* PayPal Configuration Status */}
             <div>
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
                 Configuration Status
               </h2>
-              <PayPalDebug />
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 text-sm">
+                  ✅ PayPal integration has been simplified and rebuilt from scratch.
+                  <br />
+                  🔧 Using official PayPal JavaScript SDK with direct script loading.
+                  <br />
+                  📋 Check the environment variables below for configuration status.
+                </p>
+              </div>
             </div>
             
             {/* Environment Variables Check */}
