@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Autofill Functionality Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #0070ba;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 112, 186, 0.3);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        button {
+            background-color: #0070ba;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #005ea6;
+        }
+        .test-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #efe;
+            border-color: #cfc;
+            color: #3c3;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .autocomplete-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+        .browser-support {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Browser Autofill Functionality Test</h1>
+        
+        <div class="test-info">
+            <h3>Test Purpose</h3>
+            <p>This test verifies that HTML5 autocomplete attributes work correctly for form autofill functionality. Fill out this form once, submit it, then refresh the page and start typing in the fields to see autofill suggestions.</p>
+            <p><strong>Instructions:</strong></p>
+            <ol>
+                <li>Fill out all form fields with your information</li>
+                <li>Click "Submit Test Form" to save the data</li>
+                <li>Refresh the page (F5 or Ctrl+R)</li>
+                <li>Start typing in any field - you should see autofill suggestions</li>
+                <li>Test across different browsers (Chrome, Firefox, Safari, Edge)</li>
+            </ol>
+        </div>
+
+        <form 
+            id="autofillTestForm" 
+            autoComplete="on" 
+            name="registrationTestForm"
+            onsubmit="handleSubmit(event)"
+        >
+            <div class="form-section">
+                <h3>Personal Information</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <select id="title" name="title" autoComplete="honorific-prefix">
+                            <option value="">Select Any</option>
+                            <option value="Mr">Mr</option>
+                            <option value="Ms">Ms</option>
+                            <option value="Mrs">Mrs</option>
+                            <option value="Prof">Prof</option>
+                            <option value="Dr">Dr</option>
+                        </select>
+                        <div class="autocomplete-info">autocomplete="honorific-prefix"</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            name="firstName" 
+                            autoComplete="given-name"
+                            placeholder="Enter your first name"
+                            required
+                        >
+                        <div class="autocomplete-info">autocomplete="given-name"</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            name="lastName" 
+                            autoComplete="family-name"
+                            placeholder="Enter your last name"
+                            required
+                        >
+                        <div class="autocomplete-info">autocomplete="family-name"</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            autoComplete="email"
+                            placeholder="Enter your email"
+                            required
+                        >
+                        <div class="autocomplete-info">autocomplete="email"</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number</label>
+                        <input 
+                            type="tel" 
+                            id="phoneNumber" 
+                            name="phoneNumber" 
+                            autoComplete="tel"
+                            placeholder="Enter your phone number"
+                            required
+                        >
+                        <div class="autocomplete-info">autocomplete="tel"</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="organization">Organization/Company</label>
+                        <input 
+                            type="text" 
+                            id="organization" 
+                            name="organization" 
+                            autoComplete="organization"
+                            placeholder="Enter your organization"
+                        >
+                        <div class="autocomplete-info">autocomplete="organization"</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Address Information</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select id="country" name="country" autoComplete="country">
+                            <option value="">Select country</option>
+                            <option value="United States">United States</option>
+                            <option value="Canada">Canada</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Germany">Germany</option>
+                            <option value="France">France</option>
+                            <option value="India">India</option>
+                            <option value="Japan">Japan</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="autocomplete-info">autocomplete="country"</div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="fullPostalAddress">Full Postal Address</label>
+                        <textarea 
+                            id="fullPostalAddress" 
+                            name="fullPostalAddress" 
+                            autoComplete="street-address"
+                            rows="3"
+                            placeholder="Enter your complete address"
+                        ></textarea>
+                        <div class="autocomplete-info">autocomplete="street-address"</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Additional Information</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="numberOfParticipants">Number of Participants</label>
+                        <select id="numberOfParticipants" name="numberOfParticipants" autoComplete="off">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <div class="autocomplete-info">autocomplete="off"</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <button type="submit">Submit Test Form</button>
+                <button type="button" onclick="clearForm()">Clear Form</button>
+                <button type="button" onclick="fillSampleData()">Fill Sample Data</button>
+            </div>
+        </form>
+
+        <div class="browser-support">
+            <h3>🌐 Browser Autofill Support</h3>
+            <p><strong>Expected Behavior:</strong></p>
+            <ul>
+                <li><strong>Chrome/Edge:</strong> Excellent autofill support, shows dropdown suggestions</li>
+                <li><strong>Firefox:</strong> Good support, may show suggestions in address bar style</li>
+                <li><strong>Safari:</strong> Good support, integrates with Keychain</li>
+                <li><strong>Mobile browsers:</strong> Should integrate with device autofill systems</li>
+            </ul>
+            
+            <div id="testResults" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Store in localStorage to simulate form submission
+            localStorage.setItem('autofillTestData', JSON.stringify(data));
+            
+            // Show success message
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = `
+                <div style="background-color: #efe; border: 1px solid #cfc; padding: 10px; border-radius: 5px; color: #3c3;">
+                    ✅ <strong>Form submitted successfully!</strong><br>
+                    Data saved to browser storage. Refresh the page and start typing in fields to test autofill.
+                </div>
+            `;
+            
+            console.log('Form data submitted:', data);
+        }
+        
+        function clearForm() {
+            document.getElementById('autofillTestForm').reset();
+            document.getElementById('testResults').innerHTML = '';
+        }
+        
+        function fillSampleData() {
+            document.getElementById('title').value = 'Dr';
+            document.getElementById('firstName').value = 'John';
+            document.getElementById('lastName').value = 'Smith';
+            document.getElementById('email').value = 'john.smith@example.com';
+            document.getElementById('phoneNumber').value = '+1-555-123-4567';
+            document.getElementById('organization').value = 'Medical University';
+            document.getElementById('country').value = 'United States';
+            document.getElementById('fullPostalAddress').value = '123 Main Street\nAnytown, ST 12345\nUnited States';
+            document.getElementById('numberOfParticipants').value = '2';
+        }
+        
+        // Check if browser supports autofill
+        window.onload = function() {
+            const resultsDiv = document.getElementById('testResults');
+            const userAgent = navigator.userAgent;
+            let browserInfo = '';
+            
+            if (userAgent.includes('Chrome')) {
+                browserInfo = '🟢 Chrome detected - Excellent autofill support expected';
+            } else if (userAgent.includes('Firefox')) {
+                browserInfo = '🟡 Firefox detected - Good autofill support expected';
+            } else if (userAgent.includes('Safari')) {
+                browserInfo = '🟡 Safari detected - Good autofill support with Keychain integration';
+            } else if (userAgent.includes('Edge')) {
+                browserInfo = '🟢 Edge detected - Excellent autofill support expected';
+            } else {
+                browserInfo = '🔵 Other browser detected - Autofill support may vary';
+            }
+            
+            resultsDiv.innerHTML = `
+                <div style="background-color: #e7f3ff; border: 1px solid #b3d9ff; padding: 10px; border-radius: 5px;">
+                    <strong>Browser Detection:</strong> ${browserInfo}
+                </div>
+            `;
+        };
+    </script>
+</body>
+</html>

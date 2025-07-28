@@ -544,7 +544,13 @@ export default function RegistrationPage() {
 
       {/* Main Form Container */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          autoComplete="on"
+          name="registrationForm"
+          id="registrationForm"
+        >
           {/* Personal Details Section */}
           <div className="bg-white rounded-lg shadow-sm border">
             <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
@@ -556,8 +562,11 @@ export default function RegistrationPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                   <select
+                    id="title"
+                    name="title"
                     value={formData.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
+                    autoComplete="honorific-prefix"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Any</option>
@@ -574,9 +583,12 @@ export default function RegistrationPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
                   <input
                     type="text"
+                    id="firstName"
+                    name="firstName"
                     placeholder="First Name *"
                     value={formData.firstName}
                     onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    autoComplete="given-name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -587,9 +599,12 @@ export default function RegistrationPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
                   <input
                     type="text"
+                    id="lastName"
+                    name="lastName"
                     placeholder="Last Name *"
                     value={formData.lastName}
                     onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    autoComplete="family-name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -602,9 +617,12 @@ export default function RegistrationPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input
                     type="email"
+                    id="email"
+                    name="email"
                     placeholder="Email *"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
+                    autoComplete="email"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -615,9 +633,12 @@ export default function RegistrationPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                   <input
                     type="tel"
+                    id="phoneNumber"
+                    name="phoneNumber"
                     placeholder="Phone Number *"
                     value={formData.phoneNumber}
                     onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                    autoComplete="tel"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -637,8 +658,11 @@ export default function RegistrationPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
                   <select
+                    id="country"
+                    name="country"
                     value={formData.country}
                     onChange={(e) => handleInputChange('country', e.target.value)}
+                    autoComplete="country"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select country</option>
@@ -655,8 +679,11 @@ export default function RegistrationPage() {
               <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Postal Address</label>
                 <textarea
+                  id="fullPostalAddress"
+                  name="fullPostalAddress"
                   value={formData.fullPostalAddress}
                   onChange={(e) => handleInputChange('fullPostalAddress', e.target.value)}
+                  autoComplete="street-address"
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -1108,8 +1135,11 @@ export default function RegistrationPage() {
             </div>
             <div className="p-6">
               <select
+                id="numberOfParticipants"
+                name="numberOfParticipants"
                 value={formData.numberOfParticipants}
                 onChange={(e) => handleInputChange('numberOfParticipants', parseInt(e.target.value))}
+                autoComplete="off"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
