@@ -94,8 +94,8 @@ const PayPalPayment: React.FC<PayPalPaymentProps> = ({
     });
 
     const script = document.createElement('script');
-    // Enhanced PayPal SDK URL with all required parameters
-    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons&enable-funding=card&disable-funding=credit,bancontact,blik,eps,giropay,ideal,mercadopago,mybank,p24,sepa,sofort,venmo`;
+    // Simplified PayPal SDK URL for better compatibility
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${currency}&intent=capture&components=buttons&enable-funding=card`;
     script.async = true;
 
     script.onload = () => {
