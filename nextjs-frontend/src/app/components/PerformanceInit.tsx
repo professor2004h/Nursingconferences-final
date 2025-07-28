@@ -8,9 +8,7 @@ export default function PerformanceInit() {
     // Initialize performance monitoring
     initPerformanceMonitoring();
 
-    // Preload critical resources
-    preloadResource('/fonts/inter.woff2', 'font', 'anonymous');
-    
+        
     // Prefetch likely next pages
     prefetchResource('/about');
     prefetchResource('/conferences');

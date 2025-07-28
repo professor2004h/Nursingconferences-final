@@ -28,6 +28,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
   const buttonsRef = useRef<any>(null); // To store PayPal buttons instance
   const isMounted = useRef(true); // To track component mount state
   const scriptRef = useRef<HTMLScriptElement | null>(null); // To track the script element
+  const renderedRef = useRef(false);
 
   // Safe DOM element removal function
   const safeRemoveElement = (element: Element | null) => {
@@ -163,48 +164,27 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
     console.log('🔄 Rendering PayPal button for amount:', amount);
 
-    // Safe container content clearing
-    const clearContainer = () => {
-      try {
-        if (containerRef.current && isMounted.current) {
-          containerRef.current.innerHTML = '';
-        }
-      } catch (error) {
-        console.warn('⚠️ Container clear warning:', error);
-      }
-    };
-
-    clearContainer();
-
     const renderButton = async () => {
       try {
-        // Check if component is still mounted and container exists
-        if (!isMounted.current || !containerRef.current) {
-          console.log('🛑 Component unmounted or container not available, skipping PayPal button render');
+        // Check if already rendered
+        if (renderedRef.current) {
+          console.log('🛑 Skipping render - button already rendered');
           return;
         }
 
-        // Clear any existing buttons instance safely
+        renderedRef.current = true;
+
+        // Close existing button if any
         if (buttonsRef.current) {
           try {
-            if (typeof buttonsRef.current.close === 'function') {
-              buttonsRef.current.close();
-            }
+            await buttonsRef.current.close();
           } catch (e) {
             console.warn('⚠️ Error closing previous PayPal buttons:', e);
           }
           buttonsRef.current = null;
         }
 
-        // Clear container content safely
-        clearContainer();
-
-        // Verify PayPal SDK is still available
-        if (!window.paypal) {
-          throw new Error('PayPal SDK is no longer available');
-        }
-
-        // Create and render PayPal buttons
+        // Create new buttons instance
         buttonsRef.current = window.paypal.Buttons({
           style: {
             layout: 'vertical',
@@ -283,35 +263,32 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           }
         });
 
-        // Safely render the buttons
-        if (isMounted.current && containerRef.current && buttonsRef.current) {
-          try {
-            await buttonsRef.current.render(containerRef.current);
-
-            if (isMounted.current) {
-              console.log('✅ PayPal button rendered successfully');
-              setIsLoading(false);
-            }
-          } catch (renderError) {
-            console.error('❌ PayPal button render error:', renderError);
-            if (isMounted.current) {
-              setError('Failed to display PayPal button: ' + (renderError instanceof Error ? renderError.message : 'Render error'));
-              setIsLoading(false);
-            }
-          }
-        } else {
-          console.warn('⚠️ Cannot render PayPal button: component unmounted or container unavailable');
-        }
-      } catch (err: any) {
-        console.error('❌ Failed to create PayPal button:', err);
-        if (isMounted.current) {
-          setError('Failed to initialize PayPal button: ' + (err.message || 'Unknown error'));
+        // Render the button
+        if (containerRef.current && buttonsRef.current) {
+          await buttonsRef.current.render(containerRef.current);
+          console.log('✅ PayPal button rendered successfully');
           setIsLoading(false);
         }
+      } catch (renderError) {
+        console.error('❌ PayPal button render error:', renderError);
+        setError('Failed to display PayPal button');
+        setIsLoading(false);
+        renderedRef.current = false;
       }
     };
 
     renderButton();
+
+    return () => {
+      renderedRef.current = false;
+      if (buttonsRef.current) {
+        const btn = buttonsRef.current;
+        buttonsRef.current = null;
+        return btn.close().catch((e) => {
+          console.warn('⚠️ Error closing PayPal buttons:', e);
+        });
+      }
+    };
   }, [isSDKLoaded, amount, currency, registrationId, onSuccess, onError, onCancel]);
 
   if (error) {
@@ -348,13 +325,14 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
         </div>
       </div>
       
-      <div
-        ref={containerRef}
-        id={`paypal-container-${registrationId}`}
-        className="min-h-[50px] w-full"
-      >
+      <div className="relative min-h-[50px] w-full">
+        <div
+          ref={containerRef}
+          id={`paypal-container-${registrationId}`}
+          className="w-full"
+        />
         {isLoading && (
-          <div className="flex items-center justify-center p-8">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <span className="ml-3 text-gray-600">Loading PayPal...</span>
           </div>
