@@ -21,158 +21,98 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
   onError,
   onCancel
 }) => {
-  const paypalRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
-  const [buttonRendered, setButtonRendered] = useState(false);
 
   useEffect(() => {
-    const loadPayPalScript = async () => {
-      // Use the known working PayPal client ID directly
+    // Simple script loading without complex state management
+    const loadPayPalAndRender = () => {
       const clientId = 'AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc';
 
-      console.log('🔧 Using PayPal Client ID:', clientId.substring(0, 10) + '...');
+      console.log('🔧 Loading PayPal for registration:', registrationId);
 
-      // Check if PayPal script is already loaded
+      // If PayPal is already loaded, render immediately
       if (window.paypal) {
-        setScriptLoaded(true);
-        setIsLoading(false);
-        renderPayPalButton();
+        console.log('✅ PayPal already loaded, rendering button...');
+        renderButton();
         return;
       }
 
-      // Check if script is already in DOM
-      const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
-      if (existingScript) {
-        existingScript.addEventListener('load', () => {
-          setScriptLoaded(true);
-          setIsLoading(false);
-          renderPayPalButton();
-        });
-        return;
-      }
-
-      // Load PayPal SDK script with the exact pattern from working example
+      // Load PayPal SDK
       const script = document.createElement('script');
       script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture`;
-      script.async = true;
-
-      console.log('🔄 Loading PayPal SDK:', script.src);
-
       script.onload = () => {
-        console.log('✅ PayPal SDK loaded successfully');
-        setScriptLoaded(true);
-        setIsLoading(false);
-        renderPayPalButton();
+        console.log('✅ PayPal SDK loaded, rendering button...');
+        renderButton();
       };
-
       script.onerror = () => {
         console.error('❌ Failed to load PayPal SDK');
-        setError('Failed to load PayPal. Please refresh the page and try again.');
+        setError('Failed to load PayPal. Please refresh the page.');
         setIsLoading(false);
       };
-
       document.head.appendChild(script);
     };
 
-    const renderPayPalButton = () => {
-      if (!window.paypal || !paypalRef.current || buttonRendered) return;
-
-      console.log('🔄 Rendering PayPal button...');
-
-      try {
-        window.paypal.Buttons({
-          // Set up the transaction when the buyer clicks the button
-          createOrder: function (data: any, actions: any) {
-            console.log('🔄 Creating PayPal order...', { amount, currency, registrationId });
-
-            return actions.order.create({
-              purchase_units: [{
-                amount: {
-                  value: amount.toFixed(2)
-                },
-                description: `Conference Registration - ${registrationId}`,
-                custom_id: registrationId,
-                invoice_id: `REG-${registrationId}-${Date.now()}`
-              }]
-            });
-          },
-
-          // Finalize the transaction after buyer approval
-          onApprove: function (data: any, actions: any) {
-            console.log('✅ PayPal payment approved:', data);
-
-            return actions.order.capture().then(function (details: any) {
-              console.log('✅ PayPal payment captured:', details);
-
-              // Call success callback with payment details
-              onSuccess({
-                orderID: data.orderID,
-                paymentID: details.id,
-                payerID: details.payer.payer_id,
-                amount: amount,
-                currency: currency,
-                registrationId: registrationId,
-                details: details
-              });
-
-              // Redirect to return page
-              window.location.href = `https://nursingeducationconferences.org/paypal/return?orderID=${data.orderID}&paymentID=${details.id}&amount=${amount}&currency=${currency}&registrationId=${registrationId}`;
-            });
-          },
-
-          // Handle cancellations if the buyer backs out
-          onCancel: function (data: any) {
-            console.log('⚠️ PayPal payment cancelled:', data);
-            if (onCancel) {
-              onCancel();
-            }
-            window.location.href = 'https://nursingeducationconferences.org/paypal/cancel';
-          },
-
-          // Handle any errors
-          onError: function (err: any) {
-            console.error('❌ PayPal error:', err);
-            setError('Payment failed. Please try again.');
-            onError(err);
-          },
-
-          // Button styling
-          style: {
-            layout: 'vertical',
-            color: 'blue',
-            shape: 'rect',
-            label: 'paypal',
-            height: 45
-          }
-        }).render(paypalRef.current).then(() => {
-          console.log('✅ PayPal button rendered successfully');
-          setButtonRendered(true);
-        }).catch((err: any) => {
-          console.error('❌ Failed to render PayPal button:', err);
-          setError('Failed to render PayPal button. Please refresh the page.');
-        });
-      } catch (err) {
-        console.error('❌ Error rendering PayPal button:', err);
-        setError('Failed to render PayPal button. Please refresh the page.');
+    const renderButton = () => {
+      if (!window.paypal) {
+        console.error('❌ PayPal not available');
+        setError('PayPal not loaded');
+        setIsLoading(false);
+        return;
       }
+
+      const container = document.getElementById(`paypal-container-${registrationId}`);
+      if (!container) {
+        console.error('❌ PayPal container not found');
+        setError('PayPal container not found');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('🔄 Rendering PayPal button for amount:', amount);
+
+      window.paypal.Buttons({
+        createOrder: function(data: any, actions: any) {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: amount.toFixed(2)
+              }
+            }]
+          });
+        },
+        onApprove: function(data: any, actions: any) {
+          return actions.order.capture().then(function(details: any) {
+            console.log('✅ Payment successful:', details);
+            onSuccess({
+              orderID: data.orderID,
+              paymentID: details.id,
+              details: details
+            });
+            // Redirect to return page
+            window.location.href = `https://nursingeducationconferences.org/paypal/return?orderID=${data.orderID}&paymentID=${details.id}&amount=${amount}&currency=${currency}&registrationId=${registrationId}`;
+          });
+        },
+        onCancel: function(data: any) {
+          console.log('⚠️ Payment cancelled');
+          if (onCancel) onCancel();
+        },
+        onError: function(err: any) {
+          console.error('❌ PayPal error:', err);
+          onError(err);
+        }
+      }).render(container).then(() => {
+        console.log('✅ PayPal button rendered successfully');
+        setIsLoading(false);
+      }).catch((err: any) => {
+        console.error('❌ Failed to render PayPal button:', err);
+        setError('Failed to render PayPal button');
+        setIsLoading(false);
+      });
     };
 
-    loadPayPalScript().catch(error => {
-      console.error('❌ Error loading PayPal script:', error);
-      setError('Failed to load PayPal. Please refresh the page and try again.');
-      setIsLoading(false);
-    });
-
-    // Cleanup function to prevent DOM removal errors
-    return () => {
-      if (paypalRef.current) {
-        paypalRef.current.innerHTML = '';
-      }
-      setButtonRendered(false);
-    };
-  }, [amount, currency, registrationId, onSuccess, onError, onCancel]);
+    loadPayPalAndRender();
+  }, [amount, registrationId]);
 
   if (isLoading) {
     return (
@@ -218,10 +158,8 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
       </div>
       
       <div
-        ref={paypalRef}
-        id={`paypal-button-container-${registrationId}`}
+        id={`paypal-container-${registrationId}`}
         className="min-h-[50px]"
-        key={`paypal-${registrationId}-${amount}`}
       >
         {/* PayPal button will be rendered here */}
       </div>
