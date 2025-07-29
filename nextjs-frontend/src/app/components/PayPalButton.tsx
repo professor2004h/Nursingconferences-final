@@ -126,18 +126,31 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     const script = document.createElement('script');
     const environment = process.env.PAYPAL_ENVIRONMENT || 'production';
 
-    // Validate environment is correct for production
-    if (environment === 'production' && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      console.warn('⚠️ Production PayPal environment detected on localhost - this may cause issues');
+    // CRITICAL: Ensure we're using production mode for live credentials
+    console.log('🔧 PayPal Environment from env:', environment);
+    console.log('🔧 Client ID (first 10 chars):', clientId.substring(0, 10));
+
+    // Force production mode if using live credentials (starts with 'A')
+    const isLiveCredentials = clientId.startsWith('A');
+    const actualEnvironment = isLiveCredentials ? 'production' : environment;
+
+    if (isLiveCredentials && environment !== 'production') {
+      console.warn('⚠️ Live PayPal credentials detected but environment is not production - forcing production mode');
     }
+
+    console.log('🔧 Actual PayPal Environment:', actualEnvironment);
 
     // Build SDK URL with guest checkout parameters
     // Enable card funding for guest checkout, allow other funding sources
     let sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons&enable-funding=card,paylater,venmo`;
 
-    // Add buyer-country for sandbox testing only (must not be used in production)
-    if (environment === 'sandbox') {
+    // CRITICAL: Never add buyer-country in production or with live credentials
+    // buyer-country forces sandbox test card numbers and will reject real cards
+    if (actualEnvironment === 'sandbox' && !isLiveCredentials) {
       sdkUrl += '&buyer-country=US';
+      console.log('🧪 Adding buyer-country=US for sandbox testing');
+    } else {
+      console.log('🔒 Production mode - buyer-country parameter excluded');
     }
 
     script.src = sdkUrl;

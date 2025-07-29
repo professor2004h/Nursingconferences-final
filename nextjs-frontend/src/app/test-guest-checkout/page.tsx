@@ -13,10 +13,19 @@ export default function TestGuestCheckout() {
       
       // Use the same SDK configuration as the main PayPal button
       const environment = process.env.PAYPAL_ENVIRONMENT || 'production';
-      let sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=USD&components=buttons&enable-funding=card&disable-funding=credit,paylater,venmo`;
-      
-      if (environment === 'sandbox') {
+
+      // Force production mode if using live credentials (starts with 'A')
+      const isLiveCredentials = clientId.startsWith('A');
+      const actualEnvironment = isLiveCredentials ? 'production' : environment;
+
+      let sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=USD&components=buttons&enable-funding=card,paylater,venmo`;
+
+      // CRITICAL: Never add buyer-country with live credentials
+      if (actualEnvironment === 'sandbox' && !isLiveCredentials) {
         sdkUrl += '&buyer-country=US';
+        console.log('🧪 Test page: Adding buyer-country=US for sandbox testing');
+      } else {
+        console.log('🔒 Test page: Production mode - buyer-country parameter excluded');
       }
 
       const script = document.createElement('script');
