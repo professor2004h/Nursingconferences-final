@@ -126,10 +126,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
     const script = document.createElement('script');
     const environment = process.env.PAYPAL_ENVIRONMENT || 'production';
 
-    // Build SDK URL with guest checkout parameters
-    let sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons&enable-funding=card&disable-funding=credit,paylater,venmo`;
+    // Validate environment is correct for production
+    if (environment === 'production' && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      console.warn('⚠️ Production PayPal environment detected on localhost - this may cause issues');
+    }
 
-    // Add buyer-country for sandbox testing (not used in production)
+    // Build SDK URL with guest checkout parameters
+    // Enable card funding for guest checkout, allow other funding sources
+    let sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons&enable-funding=card,paylater,venmo`;
+
+    // Add buyer-country for sandbox testing only (must not be used in production)
     if (environment === 'sandbox') {
       sdkUrl += '&buyer-country=US';
     }
