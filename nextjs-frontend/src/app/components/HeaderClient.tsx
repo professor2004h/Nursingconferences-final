@@ -15,6 +15,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownContentRef = useRef<HTMLDivElement>(null);
 
   // Debug logging
   console.log('HeaderClient rendering:', { siteSettings: !!siteSettings, isMenuOpen });
@@ -43,9 +44,19 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
     setIsMoreDropdownOpen(false);
   };
 
+  const handleDropdownLinkClick = (e: React.MouseEvent) => {
+    console.log('Dropdown link clicked:', e.currentTarget);
+    // Allow the link navigation to proceed
+    // Close dropdown after a small delay to ensure navigation happens
+    setTimeout(() => {
+      setIsMoreDropdownOpen(false);
+    }, 100);
+  };
+
   // Render dropdown content
   const renderDropdownContent = () => (
     <div
+      ref={dropdownContentRef}
       className="w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
       style={{
         position: 'fixed',
@@ -59,56 +70,56 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       <Link
         href="/conferences"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Conferences
       </Link>
       <Link
         href="/speakers"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Speakers
       </Link>
       <Link
         href="/sponsorship"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Sponsorship
       </Link>
       <Link
         href="/past-conferences"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Past Conferences
       </Link>
       <Link
         href="/media-partners"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Media Partners
       </Link>
       <Link
         href="/speaker-guidelines"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Speaker Guidelines
       </Link>
       <Link
         href="/poster-presenters"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Poster Presenters
       </Link>
       <Link
         href="/past-conference-gallery"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={closeMoreDropdown}
+        onClick={handleDropdownLinkClick}
       >
         Gallery
       </Link>
@@ -118,7 +129,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
           rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
           className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-          onClick={closeMoreDropdown}
+          onClick={handleDropdownLinkClick}
         >
           Journal
         </Link>
@@ -128,17 +139,28 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
   // Close dropdown when clicking outside
   useEffect(() => {
+    if (!isMoreDropdownOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const isOutsideDropdownTrigger = dropdownRef.current && !dropdownRef.current.contains(target);
+      const isOutsideDropdownContent = dropdownContentRef.current && !dropdownContentRef.current.contains(target);
+
+      if (isOutsideDropdownTrigger && isOutsideDropdownContent) {
         setIsMoreDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    // Add a small delay to ensure portal is rendered
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 10);
+
     return () => {
+      clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isMoreDropdownOpen]);
 
   // Close dropdown on escape key
   useEffect(() => {
