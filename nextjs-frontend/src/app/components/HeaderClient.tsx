@@ -65,7 +65,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   return (
     <>
       {/* Desktop Navigation - Reorganized with More dropdown */}
-      <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0 relative z-10">
+      <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0 relative z-[9997]">
         {/* Main navigation links - Keep visible */}
         <div className="flex items-center space-x-3 md:space-x-4 lg:space-x-5 xl:space-x-6 overflow-visible">
           <Link
@@ -106,7 +106,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           </Link>
 
           {/* More Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative z-[9998]" ref={dropdownRef}>
             <button
               onClick={toggleMoreDropdown}
               onKeyDown={(e) => {
@@ -132,7 +132,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
             {/* Dropdown Menu */}
             {isMoreDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-[99999] transform-gpu will-change-transform">
                 <Link
                   href="/conferences"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"

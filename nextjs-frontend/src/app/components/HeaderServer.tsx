@@ -15,7 +15,7 @@ export default async function HeaderServer() {
   const isHeaderSectionVisible = siteSettings?.headerVisibility?.showHeaderSection !== false;
 
   return (
-    <header className="bg-white shadow-md fixed top-0 left-0 right-0 z-[100] header-container">
+    <header className="bg-white shadow-md fixed top-0 left-0 right-0 z-[9990] header-container">
       {/* Top Contact Bar - Conditionally Rendered */}
       {isHeaderSectionVisible && siteSettings?.contactInfo?.email && (
         <div className="bg-blue-900 text-white py-1.5 px-1">
