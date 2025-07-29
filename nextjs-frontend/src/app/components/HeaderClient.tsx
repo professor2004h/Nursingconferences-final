@@ -106,7 +106,10 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           </Link>
 
           {/* More Dropdown */}
-          <div className="relative z-[9998]" ref={dropdownRef}>
+          <div
+            className="relative dropdown-container-isolation"
+            ref={dropdownRef}
+          >
             <button
               onClick={toggleMoreDropdown}
               onKeyDown={(e) => {
@@ -132,7 +135,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
             {/* Dropdown Menu */}
             {isMoreDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-[99999] transform-gpu will-change-transform">
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 dropdown-menu-overlay">
                 <Link
                   href="/conferences"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"

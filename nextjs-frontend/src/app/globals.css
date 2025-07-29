@@ -4437,3 +4437,20 @@ a.hero-register-button,
     background-position: -200% 0;
   }
 }
+
+/* ===== DROPDOWN Z-INDEX FIX ===== */
+/* Force dropdown to appear above all content including hero section */
+.dropdown-menu-overlay {
+  z-index: 999999 !important;
+  position: absolute !important;
+  isolation: isolate !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+}
+
+.dropdown-container-isolation {
+  z-index: 999998 !important;
+  position: relative !important;
+  isolation: isolate !important;
+  transform: translateZ(0) !important;
+}
