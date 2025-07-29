@@ -92,6 +92,18 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           >
             Committee
           </Link>
+          <Link
+            href="/venue"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Venue
+          </Link>
+          <Link
+            href="/submit-abstract"
+            className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm md:text-base whitespace-nowrap"
+          >
+            Submit Abstract
+          </Link>
 
           {/* More Dropdown */}
           <div className="relative" ref={dropdownRef}>
@@ -120,7 +132,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
             {/* Dropdown Menu */}
             {isMoreDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
                 <Link
                   href="/conferences"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
@@ -134,13 +146,6 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                   onClick={closeMoreDropdown}
                 >
                   Speakers
-                </Link>
-                <Link
-                  href="/venue"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Venue
                 </Link>
                 <Link
                   href="/sponsorship"
@@ -162,13 +167,6 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                   onClick={closeMoreDropdown}
                 >
                   Media Partners
-                </Link>
-                <Link
-                  href="/submit-abstract"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Submit Abstract
                 </Link>
                 <Link
                   href="/speaker-guidelines"
@@ -291,6 +289,20 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
             >
               Committee
             </Link>
+            <Link
+              href="/venue"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={closeMenu}
+            >
+              Venue
+            </Link>
+            <Link
+              href="/submit-abstract"
+              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={closeMenu}
+            >
+              Submit Abstract
+            </Link>
 
             {/* Divider */}
             <div className="border-t border-gray-300 my-2"></div>
@@ -314,13 +326,6 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               Speakers
             </Link>
             <Link
-              href="/venue"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Venue
-            </Link>
-            <Link
               href="/sponsorship"
               className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
               onClick={closeMenu}
@@ -340,13 +345,6 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               onClick={closeMenu}
             >
               Media Partners
-            </Link>
-            <Link
-              href="/submit-abstract"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Submit Abstract
             </Link>
             <Link
               href="/speaker-guidelines"
