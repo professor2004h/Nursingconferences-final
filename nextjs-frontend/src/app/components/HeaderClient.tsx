@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, memo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { type SiteSettings } from '../getSiteSettings';
 
@@ -12,6 +13,7 @@ interface HeaderClientProps {
 const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Debug logging
@@ -27,12 +29,102 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   };
 
   const toggleMoreDropdown = () => {
+    if (!isMoreDropdownOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 8,
+        left: rect.left + window.scrollX
+      });
+    }
     setIsMoreDropdownOpen(prev => !prev);
   };
 
   const closeMoreDropdown = () => {
     setIsMoreDropdownOpen(false);
   };
+
+  // Render dropdown content
+  const renderDropdownContent = () => (
+    <div
+      className="w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
+      style={{
+        position: 'fixed',
+        top: dropdownPosition.top,
+        left: dropdownPosition.left,
+        zIndex: 999999,
+        isolation: 'isolate',
+        transform: 'translateZ(0)'
+      }}
+    >
+      <Link
+        href="/conferences"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Conferences
+      </Link>
+      <Link
+        href="/speakers"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Speakers
+      </Link>
+      <Link
+        href="/sponsorship"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Sponsorship
+      </Link>
+      <Link
+        href="/past-conferences"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Past Conferences
+      </Link>
+      <Link
+        href="/media-partners"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Media Partners
+      </Link>
+      <Link
+        href="/speaker-guidelines"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Speaker Guidelines
+      </Link>
+      <Link
+        href="/poster-presenters"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Poster Presenters
+      </Link>
+      <Link
+        href="/past-conference-gallery"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={closeMoreDropdown}
+      >
+        Gallery
+      </Link>
+      {siteSettings?.journal?.showJournal && (
+        <Link
+          href={siteSettings.journal.journalUrl || "/journal"}
+          target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
+          rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+          onClick={closeMoreDropdown}
+        >
+          Journal
+        </Link>
+      )}
+    </div>
+  );
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -133,78 +225,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               </svg>
             </button>
 
-            {/* Dropdown Menu */}
-            {isMoreDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 dropdown-menu-overlay">
-                <Link
-                  href="/conferences"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Conferences
-                </Link>
-                <Link
-                  href="/speakers"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Speakers
-                </Link>
-                <Link
-                  href="/sponsorship"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Sponsorship
-                </Link>
-                <Link
-                  href="/past-conferences"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Past Conferences
-                </Link>
-                <Link
-                  href="/media-partners"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Media Partners
-                </Link>
-                <Link
-                  href="/speaker-guidelines"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Speaker Guidelines
-                </Link>
-                <Link
-                  href="/poster-presenters"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Poster Presenters
-                </Link>
-                <Link
-                  href="/past-conference-gallery"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                  onClick={closeMoreDropdown}
-                >
-                  Gallery
-                </Link>
-                {siteSettings?.journal?.showJournal && (
-                  <Link
-                    href={siteSettings.journal.journalUrl || "/journal"}
-                    target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
-                    rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                    onClick={closeMoreDropdown}
-                  >
-                    Journal
-                  </Link>
-                )}
-              </div>
-            )}
+
           </div>
 
           {/* Registration Button */}
@@ -403,6 +424,11 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           </div>
         </div>
       )}
+
+      {/* Portal-based Dropdown Menu for Desktop */}
+      {isMoreDropdownOpen && typeof window !== 'undefined' &&
+        createPortal(renderDropdownContent(), document.body)
+      }
     </>
   );
 });
