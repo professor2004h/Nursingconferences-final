@@ -39,8 +39,10 @@ const PayPalButtonAlternative: React.FC<PayPalButtonAlternativeProps> = ({
         return;
       }
 
-      // Try different SDK URLs in order of preference
+      // Try different SDK URLs in order of preference - PRODUCTION READY
       const sdkUrls = [
+        `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons&enable-funding=card,paylater,venmo`,
+        `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons`,
         `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}`,
         `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture`,
         `https://www.paypal.com/sdk/js?client-id=${clientId}`,

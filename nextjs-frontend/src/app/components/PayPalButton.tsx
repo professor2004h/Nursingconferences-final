@@ -140,7 +140,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
 
     console.log('🔧 Actual PayPal Environment:', actualEnvironment);
 
-    // Build SDK URL with guest checkout parameters
+    // Build SDK URL with guest checkout parameters - ENSURE NO ENCODING ISSUES
     // Enable card funding for guest checkout, allow other funding sources
     let sdkUrl = `https://www.paypal.com/sdk/js?client-id=${clientId}&intent=capture&currency=${currency}&components=buttons&enable-funding=card,paylater,venmo`;
 
@@ -338,7 +338,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                   paymentID: captureData.paymentId,
                   details: captureData,
                 });
-                // Redirect to return page with proper URL encoding
+                // Redirect to return page with proper URL encoding - ENSURE NO ENCODING ISSUES
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://nursingeducationconferences.org';
                 const returnUrl = `${baseUrl}/paypal/return` +
                   `?orderID=${encodeURIComponent(data.orderID)}` +
