@@ -900,8 +900,25 @@ function RegistrationPageContent() {
                                       ?.map((regType) => {
                                         // Get pricing for this specific period
                                         const periodPricing = regType.pricingByPeriod?.[period.periodId];
-                                        const price = periodPricing?.price || 0;
-                                        const hasValidPricing = price > 0;
+                                        const basePrice = periodPricing?.price || 0;
+
+                                        // Determine which pricing period to use for currency conversion
+                                        let pricingPeriod: 'earlyBird' | 'nextRound' | 'onSpot' = 'earlyBird';
+                                        switch (period.periodId) {
+                                          case 'nextRound':
+                                            pricingPeriod = 'nextRound';
+                                            break;
+                                          case 'spotRegistration':
+                                            pricingPeriod = 'onSpot';
+                                            break;
+                                          default:
+                                            pricingPeriod = 'earlyBird';
+                                            break;
+                                        }
+
+                                        // Get currency-aware price
+                                        const currencyPrice = getRegistrationPrice(regType, pricingPeriod);
+                                        const hasValidPricing = basePrice > 0;
                                         const canSelect = isActivePeriod && hasValidPricing;
 
                                         return (
@@ -930,7 +947,7 @@ function RegistrationPageContent() {
                                                   </span>
                                                 </label>
                                                 <span className={`text-xs font-semibold ${!canSelect ? 'text-gray-400' : 'text-blue-600'}`}>
-                                                  ${price}
+                                                  {formatPrice(currencyPrice)}
                                                 </span>
                                               </div>
                                             ) : (
