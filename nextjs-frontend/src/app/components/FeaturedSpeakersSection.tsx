@@ -18,11 +18,11 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker, onViewProfile }) => 
             src={speaker.profileImageUrl}
             alt={speaker.name}
             width={300}
-            height={300}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            height={400}
+            className="w-full h-64 lg:h-80 object-cover object-top group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+          <div className="w-full h-64 lg:h-80 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
             <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-xl">
                 {speaker.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
@@ -30,41 +30,29 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker, onViewProfile }) => 
             </div>
           </div>
         )}
-        
-        {/* Category Badge */}
-        <div className="absolute top-3 left-3">
+      </div>
+
+      <div className="p-4">
+        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">
+          {speaker.name}
+        </h3>
+
+        {/* Speaker Category Tags - moved below name */}
+        <div className="flex flex-wrap gap-2 mb-3">
           <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
             {SPEAKER_CATEGORIES[speaker.speakerCategory]}
           </span>
-        </div>
-        
-        {/* Keynote Badge */}
-        {speaker.isKeynote && (
-          <div className="absolute top-3 right-3">
+          {speaker.isKeynote && (
             <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
               Keynote
             </span>
-          </div>
-        )}
-      </div>
-      
-      <div className="p-4">
-        <h3 className="font-bold text-lg text-gray-900 mb-1 line-clamp-2">
-          {speaker.name}
-        </h3>
-        <p className="text-orange-600 font-medium text-sm mb-2">
-          {speaker.title}
-        </p>
-        <p className="text-gray-600 text-sm mb-3">
+          )}
+        </div>
+
+        <p className="text-gray-600 text-sm mb-4">
           {speaker.institution}
         </p>
-        
-        {speaker.sessionTitle && (
-          <p className="text-gray-700 text-sm mb-3 line-clamp-2">
-            <span className="font-medium">Session:</span> {speaker.sessionTitle}
-          </p>
-        )}
-        
+
         <button
           onClick={() => onViewProfile(speaker)}
           className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg transition-colors duration-300 text-sm font-medium"
@@ -203,7 +191,7 @@ const FeaturedSpeakersSection: React.FC = () => {
               </div>
 
               {/* Speakers Grid - 4 columns on PC, 2 columns on mobile */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-8">
                 {categorySpeakers.map((speaker) => (
                   <SpeakerCard
                     key={speaker._id}

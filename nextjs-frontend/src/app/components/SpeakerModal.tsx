@@ -154,8 +154,8 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
       />
 
       {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4 pt-24">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="flex min-h-full items-center justify-center p-4 pt-16 pb-16">
+        <div className="relative bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[85vh] overflow-y-auto">
           {/* Close Button */}
           <button
             onClick={onClose}
