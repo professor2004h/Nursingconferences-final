@@ -1146,7 +1146,8 @@ function RegistrationPageContent() {
                                   </td>
                                   {[2, 3, 5].map((nights) => {
                                     const accommodationKey = `${hotel._id}-${roomOption.roomType}-${nights}`;
-                                    const totalPrice = (roomOption.pricePerNight || 0) * nights;
+                                    const pricePerNight = getAccommodationPrice(roomOption);
+                                    const totalPrice = pricePerNight * nights;
 
                                     return (
                                       <td key={nights} className="border border-gray-300 px-4 py-2 text-center">
@@ -1159,7 +1160,7 @@ function RegistrationPageContent() {
                                             onChange={() => handleRadioChange('accommodation', accommodationKey)}
                                             className="mr-2"
                                           />
-                                          <span className="text-sm">${totalPrice}</span>
+                                          <span className="text-sm">{formatPrice(totalPrice)}</span>
                                         </label>
                                       </td>
                                     );
@@ -1354,7 +1355,7 @@ function RegistrationPageContent() {
                 <h3 className="font-semibold text-gray-900 mb-2">Registration Details:</h3>
                 <p className="text-sm text-gray-600">Registration ID: <span className="font-mono">{currentRegistrationId}</span></p>
                 <p className="text-sm text-gray-600">Selected Type: {getSelection('registrationType') || getSelection('sponsorshipType') || 'None'}</p>
-                <p className="text-sm text-gray-600">Calculated Amount: ${priceCalculation.totalPrice}</p>
+                <p className="text-sm text-gray-600">Calculated Amount: {formatPrice(priceCalculation.totalPrice)}</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
