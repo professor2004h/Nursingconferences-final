@@ -1,5 +1,6 @@
 import { defineType, defineField } from 'sanity'
 
+// Multi-currency registration types schema - Updated 2025-07-30
 export const registrationTypes = defineType({
   name: 'registrationTypes',
   title: 'Registration Types',
