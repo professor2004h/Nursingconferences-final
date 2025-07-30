@@ -33,6 +33,7 @@ import FeaturedSpeakersSection from '@/app/components/FeaturedSpeakersSection';
 import ConferenceTracksSection from '@/app/components/ConferenceTracksSection';
 import NavigationBlocks from '@/app/components/NavigationBlocks';
 import VenueImageGallery from '@/app/components/VenueImageGallery';
+import AboutLocationSection from '@/app/components/AboutLocationSection';
 
 // Direct imports to avoid SSR bailout
 import ContactForm from "./components/ContactForm";
@@ -311,7 +312,10 @@ function HomePageContent({
         </section>
       )}
 
-      {/* 8. Journal Section */}
+      {/* 8. About the Location Section */}
+      <AboutLocationSection venueSettings={venueSettings} />
+
+      {/* 9. Journal Section */}
       {siteSettings?.journal?.showJournal && (
         <section
           className={`py-12 md:py-16 relative overflow-hidden ${
