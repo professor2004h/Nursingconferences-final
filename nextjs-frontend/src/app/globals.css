@@ -4066,7 +4066,7 @@ a.hero-register-button,
 
 .navigation-blocks-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   width: 100%;
 }
@@ -4197,10 +4197,10 @@ a.hero-register-button,
   }
 }
 
-/* Tablet responsive design - 3 columns, 2 rows */
+/* Tablet responsive design - 2 columns, 2 rows */
 @media (min-width: 769px) and (max-width: 1023px) {
   .navigation-blocks-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
   }
 
