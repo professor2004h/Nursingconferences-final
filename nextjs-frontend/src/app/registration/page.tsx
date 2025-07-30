@@ -6,6 +6,9 @@ import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalButton from '@/app/components/PayPalButton';
 import PayPalErrorBoundary from '@/app/components/PayPalErrorBoundary';
+import { CurrencyProvider } from '@/app/contexts/CurrencyContext';
+import CurrencySelector from '@/app/components/CurrencySelector';
+import { useCurrencyPricing } from '@/app/hooks/useCurrencyPricing';
 
 
 // Form data interface
@@ -22,6 +25,7 @@ interface FormData {
   accommodationType: string;
   accommodationNights: string;
   numberOfParticipants: number;
+  currency?: string;
 }
 
 // Countries list from reference site
@@ -63,7 +67,7 @@ const countries = [
   'Virgin Islands (U.S.)', 'Wallis and Futuna Islands', 'Western Sahara', 'Yemen', 'Zaire', 'Zambia', 'Zimbabwe'
 ];
 
-export default function RegistrationPage() {
+function RegistrationPageContent() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
@@ -82,6 +86,9 @@ export default function RegistrationPage() {
     isRegistrationOpen,
     getActivePeriodId,
   } = useDynamicRegistration();
+
+  // Currency pricing hook
+  const { selectedCurrency, formatPrice } = useCurrencyPricing();
 
 
 
@@ -556,6 +563,9 @@ export default function RegistrationPage() {
           name="registrationForm"
           id="registrationForm"
         >
+          {/* Currency Selection Section */}
+          <CurrencySelector />
+
           {/* Personal Details Section */}
           <div className="bg-white rounded-lg shadow-sm border">
             <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
@@ -1278,7 +1288,7 @@ export default function RegistrationPage() {
             <PayPalErrorBoundary>
               <PayPalButton
                 amount={priceCalculation.totalPrice}
-                currency="USD"
+                currency={selectedCurrency}
                 registrationId={currentRegistrationId}
                 registrationData={formData}
                 onSuccess={handlePaymentSuccess}
@@ -1353,7 +1363,7 @@ export default function RegistrationPage() {
                 <PayPalErrorBoundary>
                   <PayPalButton
                     amount={priceCalculation.totalPrice}
-                    currency="USD"
+                    currency={selectedCurrency}
                     registrationId={currentRegistrationId}
                     registrationData={formData}
                     onSuccess={handlePaymentSuccess}
@@ -1396,5 +1406,13 @@ export default function RegistrationPage() {
 
       {/* PayPal integration now uses simple, clean implementation */}
     </div>
+  );
+}
+
+export default function RegistrationPage() {
+  return (
+    <CurrencyProvider>
+      <RegistrationPageContent />
+    </CurrencyProvider>
   );
 }

@@ -38,27 +38,78 @@ export const registrationTypes = defineType({
       description: 'Brief description of what this registration type includes',
     }),
 
+    // USD Pricing (maintain backward compatibility)
     defineField({
       name: 'earlyBirdPrice',
-      title: 'Early Bird Registration Price',
+      title: 'Early Bird Registration Price (USD)',
       type: 'number',
-      description: 'Price during the early bird registration period',
+      description: 'Price in USD during the early bird registration period',
       validation: Rule => Rule.required().min(0),
     }),
 
     defineField({
       name: 'nextRoundPrice',
-      title: 'Next Round Registration Price',
+      title: 'Next Round Registration Price (USD)',
       type: 'number',
-      description: 'Price during the mid-term registration period',
+      description: 'Price in USD during the mid-term registration period',
       validation: Rule => Rule.required().min(0),
     }),
 
     defineField({
       name: 'onSpotPrice',
-      title: 'OnSpot Registration Price',
+      title: 'OnSpot Registration Price (USD)',
       type: 'number',
-      description: 'Price during the final/spot registration period',
+      description: 'Price in USD during the final/spot registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    // EUR Pricing
+    defineField({
+      name: 'earlyBirdPriceEUR',
+      title: 'Early Bird Registration Price (EUR)',
+      type: 'number',
+      description: 'Price in EUR during the early bird registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'nextRoundPriceEUR',
+      title: 'Next Round Registration Price (EUR)',
+      type: 'number',
+      description: 'Price in EUR during the mid-term registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'onSpotPriceEUR',
+      title: 'OnSpot Registration Price (EUR)',
+      type: 'number',
+      description: 'Price in EUR during the final/spot registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    // GBP Pricing
+    defineField({
+      name: 'earlyBirdPriceGBP',
+      title: 'Early Bird Registration Price (GBP)',
+      type: 'number',
+      description: 'Price in GBP during the early bird registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'nextRoundPriceGBP',
+      title: 'Next Round Registration Price (GBP)',
+      type: 'number',
+      description: 'Price in GBP during the mid-term registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'onSpotPriceGBP',
+      title: 'OnSpot Registration Price (GBP)',
+      type: 'number',
+      description: 'Price in GBP during the final/spot registration period',
       validation: Rule => Rule.required().min(0),
     }),
 
@@ -117,10 +168,12 @@ export const registrationTypes = defineType({
       earlyBirdPrice: 'earlyBirdPrice',
       nextRoundPrice: 'nextRoundPrice',
       onSpotPrice: 'onSpotPrice',
+      earlyBirdPriceEUR: 'earlyBirdPriceEUR',
+      earlyBirdPriceGBP: 'earlyBirdPriceGBP',
     },
-    prepare({ title, category, isActive, earlyBirdPrice, nextRoundPrice, onSpotPrice }) {
+    prepare({ title, category, isActive, earlyBirdPrice, nextRoundPrice, onSpotPrice, earlyBirdPriceEUR, earlyBirdPriceGBP }) {
       const priceDisplay = earlyBirdPrice ?
-        `$${earlyBirdPrice}/$${nextRoundPrice}/$${onSpotPrice}` :
+        `$${earlyBirdPrice}/$${nextRoundPrice}/$${onSpotPrice} USD | €${earlyBirdPriceEUR || 'TBD'} EUR | £${earlyBirdPriceGBP || 'TBD'} GBP` :
         'No prices set';
 
       return {

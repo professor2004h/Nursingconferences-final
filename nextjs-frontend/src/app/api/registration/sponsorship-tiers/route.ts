@@ -5,12 +5,14 @@ export async function GET(request: NextRequest) {
   try {
     console.log('📝 Fetching sponsorship tiers...');
 
-    // Fetch sponsorship tiers from Sanity
+    // Fetch sponsorship tiers from Sanity with multi-currency support
     const query = `*[_type == "sponsorshipTiers"] | order(order asc) {
       _id,
       name,
       slug,
       price,
+      priceEUR,
+      priceGBP,
       description,
       benefits,
       color,

@@ -31,6 +31,20 @@ const sponsorshipTiers = defineType({
       description: 'Price in USD for this sponsorship tier',
     }),
     defineField({
+      name: 'priceEUR',
+      title: 'Price (EUR)',
+      type: 'number',
+      validation: (Rule) => Rule.required().min(0),
+      description: 'Price in EUR for this sponsorship tier',
+    }),
+    defineField({
+      name: 'priceGBP',
+      title: 'Price (GBP)',
+      type: 'number',
+      validation: (Rule) => Rule.required().min(0),
+      description: 'Price in GBP for this sponsorship tier',
+    }),
+    defineField({
       name: 'order',
       title: 'Display Order',
       type: 'number',
@@ -130,16 +144,19 @@ const sponsorshipTiers = defineType({
     select: {
       title: 'name',
       price: 'price',
+      priceEUR: 'priceEUR',
+      priceGBP: 'priceGBP',
       order: 'order',
       featured: 'featured',
       active: 'active',
     },
     prepare(selection) {
-      const { title, price, order, featured, active } = selection;
+      const { title, price, priceEUR, priceGBP, order, featured, active } = selection;
       const status = !active ? '🚫' : featured ? '⭐' : '';
+      const priceDisplay = `$${price} USD | €${priceEUR || 'TBD'} EUR | £${priceGBP || 'TBD'} GBP`;
       return {
         title: `${status} ${title}`,
-        subtitle: `$${price} USD - Order: ${order}`,
+        subtitle: `${priceDisplay} - Order: ${order}`,
       };
     },
   },

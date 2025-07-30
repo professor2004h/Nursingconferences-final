@@ -7,15 +7,21 @@ export async function GET() {
 
     // Simplified query - just get the essential data
     const [registrationTypes, pricingPeriods] = await Promise.all([
-      // Get registration types with period-specific pricing
+      // Get registration types with multi-currency pricing
       client.fetch(`*[_type == "registrationTypes" && category in ["speaker-inperson", "speaker-virtual", "listener-inperson", "listener-virtual", "student-inperson", "student-virtual", "eposter-virtual", "exhibitor"] && isActive == true] | order(displayOrder asc) {
         _id,
         name,
         category,
         description,
         earlyBirdPrice,
+        earlyBirdPriceEUR,
+        earlyBirdPriceGBP,
         nextRoundPrice,
+        nextRoundPriceEUR,
+        nextRoundPriceGBP,
         onSpotPrice,
+        onSpotPriceEUR,
+        onSpotPriceGBP,
         benefits,
         isActive,
         displayOrder

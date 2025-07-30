@@ -19,25 +19,33 @@ export async function GET() {
         }
       }`),
 
-      // Registration Types - simplified query
+      // Registration Types - with multi-currency support
       client.fetch(`*[_type == "registrationTypes" && isActive == true && category in ["speaker-inperson", "speaker-virtual", "listener-inperson", "listener-virtual", "student-inperson", "student-virtual", "eposter-virtual", "exhibitor"]] | order(displayOrder asc) {
         _id,
         name,
         category,
         description,
         earlyBirdPrice,
+        earlyBirdPriceEUR,
+        earlyBirdPriceGBP,
         nextRoundPrice,
+        nextRoundPriceEUR,
+        nextRoundPriceGBP,
         onSpotPrice,
+        onSpotPriceEUR,
+        onSpotPriceGBP,
         benefits,
         isActive,
         displayOrder
       }`),
 
-      // Sponsorship Tiers (using correct pricing from sponsorshipTiers)
+      // Sponsorship Tiers (with multi-currency support)
       client.fetch(`*[_type == "sponsorshipTiers" && active == true] | order(order asc) {
         _id,
         name,
         price,
+        priceEUR,
+        priceGBP,
         description,
         benefits,
         color,
@@ -56,6 +64,8 @@ export async function GET() {
         roomOptions[] {
           roomType,
           pricePerNight,
+          pricePerNightEUR,
+          pricePerNightGBP,
           roomDescription,
           maxGuests,
           isAvailable

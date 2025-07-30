@@ -35,6 +35,7 @@ const registrationSchema = z.object({
   accommodationFee: z.number().min(0),
   totalPrice: z.number().min(0),
   pricingPeriod: z.enum(['earlyBird', 'nextRound', 'spotRegistration']),
+  currency: z.enum(['USD', 'EUR', 'GBP']).default('USD'),
 });
 
 // Generate unique registration ID with high entropy

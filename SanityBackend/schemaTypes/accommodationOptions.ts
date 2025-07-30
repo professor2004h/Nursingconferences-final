@@ -84,7 +84,19 @@ export const accommodationOptions = defineType({
             },
             {
               name: 'pricePerNight',
-              title: 'Price Per Night',
+              title: 'Price Per Night (USD)',
+              type: 'number',
+              validation: Rule => Rule.required().min(0),
+            },
+            {
+              name: 'pricePerNightEUR',
+              title: 'Price Per Night (EUR)',
+              type: 'number',
+              validation: Rule => Rule.required().min(0),
+            },
+            {
+              name: 'pricePerNightGBP',
+              title: 'Price Per Night (GBP)',
               type: 'number',
               validation: Rule => Rule.required().min(0),
             },
