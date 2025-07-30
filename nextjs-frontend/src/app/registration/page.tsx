@@ -1030,7 +1030,7 @@ function RegistrationPageContent() {
                                     {tier.name}
                                   </h4>
                                   <div className="text-3xl font-bold text-black mb-3">
-                                    ${tier.price.toLocaleString()}
+                                    {formatPrice(getSponsorshipPrice(tier))}
                                   </div>
                                   <p className="text-sm text-black mb-4">
                                     {tier.description}
