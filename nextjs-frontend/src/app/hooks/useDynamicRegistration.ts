@@ -19,8 +19,14 @@ export interface RegistrationType {
   category: string;
   description?: string;
   earlyBirdPrice: number;
+  earlyBirdPriceEUR: number;
+  earlyBirdPriceGBP: number;
   nextRoundPrice: number;
+  nextRoundPriceEUR: number;
+  nextRoundPriceGBP: number;
   onSpotPrice: number;
+  onSpotPriceEUR: number;
+  onSpotPriceGBP: number;
   pricingByPeriod: {
     [periodId: string]: {
       price: number;
@@ -38,6 +44,8 @@ export interface SponsorshipTier {
   name: string;
   slug: { current: string };
   price: number;
+  priceEUR: number;
+  priceGBP: number;
   order: number;
   featured: boolean;
   description?: string;
@@ -59,6 +67,8 @@ export interface AccommodationOption {
   roomOptions: Array<{
     roomType: string;
     pricePerNight: number;
+    pricePerNightEUR: number;
+    pricePerNightGBP: number;
     roomDescription?: string;
     maxGuests: number;
     isAvailable: boolean;

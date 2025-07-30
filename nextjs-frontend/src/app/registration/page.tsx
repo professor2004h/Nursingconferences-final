@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
@@ -88,7 +88,7 @@ function RegistrationPageContent() {
   } = useDynamicRegistration();
 
   // Currency pricing hook
-  const { selectedCurrency, formatPrice } = useCurrencyPricing();
+  const { selectedCurrency, formatPrice, getRegistrationPrice, getSponsorshipPrice, getAccommodationPrice } = useCurrencyPricing();
 
 
 
@@ -212,17 +212,22 @@ function RegistrationPageContent() {
         tier.name?.toLowerCase() === selectedSponsorType.toLowerCase() ||
         tier.slug?.current === selectedSponsorType.toLowerCase()
       );
-      registrationPrice = sponsorTier?.price || 0;
 
-      // Fallback to hardcoded sponsor pricing if not found in dynamic data
-      if (registrationPrice === 0) {
+      if (sponsorTier) {
+        // Use currency-aware pricing
+        registrationPrice = getSponsorshipPrice(sponsorTier);
+      } else {
+        // Fallback to hardcoded sponsor pricing if not found in dynamic data
         const fallbackPricing: { [key: string]: number } = {
           'platinum': 7500,
           'gold': 6000,
           'silver': 5000,
           'exhibitor': 3000,
         };
-        registrationPrice = fallbackPricing[selectedSponsorType.toLowerCase()] || 0;
+        const usdPrice = fallbackPricing[selectedSponsorType.toLowerCase()] || 0;
+        // Apply currency conversion for fallback pricing
+        const conversionRates = { USD: 1, EUR: 0.85, GBP: 0.75 };
+        registrationPrice = Math.round(usdPrice * (conversionRates[selectedCurrency] || 1));
       }
     } else if (selectedRegistrationType) {
       // Parse the registration type selection (format: typeId-periodId)
@@ -233,19 +238,26 @@ function RegistrationPageContent() {
         const periodId = parts[parts.length - 1]; // Last part is always periodId
         const regType = dynamicData.registrationTypes?.find(type => type._id === typeId);
 
-        if (regType && regType.pricingByPeriod) {
-          // Get pricing for the specific period
-          const periodPricing = regType.pricingByPeriod[periodId];
-          if (periodPricing) {
-            registrationPrice = periodPricing.price || 0;
+        if (regType) {
+          // Determine which pricing period to use
+          let period: 'earlyBird' | 'nextRound' | 'onSpot' = 'earlyBird';
+
+          if (dynamicData.activePeriod) {
+            switch (dynamicData.activePeriod.periodId) {
+              case 'nextRound':
+                period = 'nextRound';
+                break;
+              case 'spotRegistration':
+                period = 'onSpot';
+                break;
+              default:
+                period = 'earlyBird';
+                break;
+            }
           }
 
-          // Fallback pricing if no period pricing found or if active period is null
-          if (registrationPrice === 0 || !dynamicData.activePeriod) {
-            console.log('⚠️ No active period pricing found, using fallback pricing');
-            // Use on-spot pricing as fallback
-            registrationPrice = regType.onSpotPrice || regType.nextRoundPrice || regType.earlyBirdPrice || 0;
-          }
+          // Use currency-aware pricing
+          registrationPrice = getRegistrationPrice(regType, period);
         }
       }
     }
@@ -261,8 +273,9 @@ function RegistrationPageContent() {
       if (hotel) {
         const roomOption = hotel.roomOptions?.find(ro => ro.roomType === roomType);
         if (roomOption) {
-          // Calculate total price: pricePerNight * nights
-          accommodationPrice = (roomOption.pricePerNight || 0) * parseInt(nights);
+          // Calculate total price using currency-aware pricing: pricePerNight * nights
+          const pricePerNight = getAccommodationPrice(roomOption);
+          accommodationPrice = pricePerNight * parseInt(nights);
         }
       }
     }
@@ -292,7 +305,17 @@ function RegistrationPageContent() {
     };
   };
 
-  const priceCalculation = calculateTotalPrice();
+  const priceCalculation = useMemo(() => calculateTotalPrice(), [
+    dynamicData,
+    formData.numberOfParticipants,
+    selectedCurrency,
+    getSelection('sponsorshipType'),
+    getSelection('registrationType'),
+    getSelection('accommodation'),
+    getSponsorshipPrice,
+    getRegistrationPrice,
+    getAccommodationPrice
+  ]);
 
   // Handle payment success
   const handlePaymentSuccess = useCallback((paymentData: any) => {
@@ -1170,7 +1193,7 @@ function RegistrationPageContent() {
                 <div className="space-y-4">
                   <div className="flex justify-between py-2 border-b">
                     <span className="font-medium">Registration Price :</span>
-                    <span>${priceCalculation.registrationPrice}</span>
+                    <span>{formatPrice(priceCalculation.registrationPrice)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="font-medium">No. Of Participants :</span>
@@ -1178,15 +1201,15 @@ function RegistrationPageContent() {
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="font-medium">Total Registration Price :</span>
-                    <span>${priceCalculation.totalRegistrationPrice}</span>
+                    <span>{formatPrice(priceCalculation.totalRegistrationPrice)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="font-medium">Accommodation Registration Price :</span>
-                    <span>${priceCalculation.accommodationPrice}</span>
+                    <span>{formatPrice(priceCalculation.accommodationPrice)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b font-bold text-lg">
                     <span>Total Price :</span>
-                    <span>${priceCalculation.totalPrice}</span>
+                    <span>{formatPrice(priceCalculation.totalPrice)}</span>
                   </div>
                 </div>
               </div>
