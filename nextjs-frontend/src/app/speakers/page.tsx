@@ -212,7 +212,7 @@ const SpeakersPage: React.FC = () => {
                       {SPEAKER_CATEGORY_DESCRIPTIONS[category]}
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
                     {categorySpeakers.map((speaker) => (
                       <SpeakerCard
                         key={speaker._id}
@@ -234,7 +234,7 @@ const SpeakersPage: React.FC = () => {
                     {SPEAKER_CATEGORY_DESCRIPTIONS[selectedCategory]}
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
                   {filteredSpeakers.map((speaker) => (
                     <SpeakerCard
                       key={speaker._id}
@@ -322,7 +322,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker, onViewProfile }) => 
           alt={`${speaker.name} profile photo`}
           width={300}
           height={400}
-          className="w-full h-64 lg:h-80 object-cover object-top"
+          className="w-full h-48 sm:h-56 lg:h-80 object-cover object-top"
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           onError={(e) => {
             console.warn('Failed to load image for', speaker.name);
@@ -331,30 +331,30 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker, onViewProfile }) => 
           }}
         />
       </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
+      <div className="p-3 sm:p-4">
+        <h3 className="font-semibold text-sm sm:text-lg text-gray-900 mb-2 line-clamp-2">
           {speaker.name}
         </h3>
 
         {/* Speaker Category Tags - moved below name */}
-        <div className="flex flex-wrap gap-2 mb-3">
-          <div className={`${getCategoryColor(speaker.speakerCategory)} text-white px-2 py-1 rounded-full text-xs font-semibold`}>
+        <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-3">
+          <div className={`${getCategoryColor(speaker.speakerCategory)} text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-semibold`}>
             {speaker.speakerCategory.charAt(0).toUpperCase() + speaker.speakerCategory.slice(1)}
           </div>
           {speaker.isKeynote && (
-            <div className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+            <div className="bg-yellow-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-semibold">
               Keynote
             </div>
           )}
         </div>
 
-        <p className="text-sm text-gray-500 mb-4 line-clamp-2">
+        <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4 line-clamp-2">
           {speaker.institution}
         </p>
 
         <button
           onClick={() => onViewProfile(speaker)}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-md transition-colors duration-200 text-sm font-medium shadow-sm hover:shadow-md"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-1.5 sm:py-2 px-3 sm:px-4 rounded-md transition-colors duration-200 text-xs sm:text-sm font-medium shadow-sm hover:shadow-md"
         >
           View Profile
         </button>
