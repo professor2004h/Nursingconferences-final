@@ -115,22 +115,16 @@ const ConferenceSessionsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white py-16">
+      <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <span className="text-orange-400 font-semibold text-lg tracking-wide uppercase mb-4 block">
-              Conference Sessions
-            </span>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              All Conference
-              <span className="block bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
-                Tracks
-              </span>
+              Scientific Session
             </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Discover all {tracks.length} specialized tracks covering every aspect of nursing practice, education, and research.
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+              Below are the scientific sessions of the conference
             </p>
           </div>
 
@@ -213,21 +207,21 @@ const ConferenceSessionsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Tracks Grid */}
+        {/* Sessions Grid */}
         {filteredTracks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTracks.map((track, index) => (
-              <TrackCard key={track.value} track={track} index={index} />
+              <SessionCard key={track.value} track={track} index={index} />
             ))}
           </div>
         ) : (
           <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No tracks found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Try adjusting your search terms or filter criteria.
+            <h3 className="mt-2 text-sm font-medium text-white">No sessions found</h3>
+            <p className="mt-1 text-sm text-slate-300">
+              Please check back later for session updates.
             </p>
           </div>
         )}
@@ -236,58 +230,28 @@ const ConferenceSessionsPage: React.FC = () => {
   );
 };
 
-// Track Card Component (reused from homepage component)
-interface TrackCardProps {
+// Session Card Component
+interface SessionCardProps {
   track: TrackName;
   index: number;
 }
 
-const TrackCard: React.FC<TrackCardProps> = ({ track, index }) => {
-  const colors = [
-    'from-blue-500 to-blue-600',
-    'from-green-500 to-green-600',
-    'from-purple-500 to-purple-600',
-    'from-pink-500 to-pink-600',
-    'from-indigo-500 to-indigo-600',
-    'from-teal-500 to-teal-600',
-    'from-red-500 to-red-600',
-    'from-yellow-500 to-yellow-600',
-  ];
-  
-  const colorClass = colors[index % colors.length];
-
+const SessionCard: React.FC<SessionCardProps> = ({ track, index }) => {
   return (
-    <div className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 overflow-hidden">
-      <div className={`h-2 bg-gradient-to-r ${colorClass}`}></div>
-      
-      <div className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${colorClass} flex items-center justify-center flex-shrink-0`}>
-            <span className="text-white font-bold">
-              {track.label.charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <div className="text-right">
-            <span className="text-xs text-gray-500 font-medium">Track</span>
-          </div>
-        </div>
-        
-        <h3 className="font-semibold text-gray-900 text-base mb-3 line-clamp-2 min-h-[3rem] group-hover:text-orange-600 transition-colors duration-200">
-          {track.label}
-        </h3>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
-            Session Available
+    <div className="bg-slate-600/50 backdrop-blur-sm rounded-2xl border border-slate-500/30 hover:bg-slate-500/50 transition-all duration-300 overflow-hidden group cursor-pointer">
+      <div className="p-6 flex items-center space-x-4">
+        {/* Session Number */}
+        <div className="bg-white rounded-xl px-4 py-3 flex-shrink-0">
+          <span className="text-slate-800 font-semibold text-lg">
+            Session {index + 1}
           </span>
-          <svg 
-            className="w-4 h-4 text-gray-400 group-hover:text-orange-500 transition-colors duration-200" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+        </div>
+
+        {/* Session Title */}
+        <div className="flex-1">
+          <h3 className="text-white font-medium text-lg leading-tight group-hover:text-slate-200 transition-colors duration-200">
+            {track.label}
+          </h3>
         </div>
       </div>
     </div>
