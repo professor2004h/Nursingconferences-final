@@ -71,7 +71,7 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
         {/* Two Column Layout for PC */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Column: About the Location */}
-          <div className="bg-slate-50 rounded-xl p-6 sm:p-8">
+          <div className="bg-slate-50 rounded-xl p-6 sm:p-8 flex flex-col h-full">
             <div className="flex items-center mb-6">
               <span className="text-3xl mr-4">🌆</span>
               <h3 className="text-2xl font-bold text-slate-900">About the Location</h3>
@@ -92,29 +92,16 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
 
             {/* Location Description */}
             {venueSettings.locationDescription && (
-              <div className="prose prose-base max-w-none text-slate-700">
+              <div className="prose prose-base max-w-none text-slate-700 flex-grow">
                 <PortableText value={venueSettings.locationDescription} />
               </div>
             )}
-
-            {/* Call to Action for More Info */}
-            <div className="mt-6 pt-6 border-t border-slate-200">
-              <a
-                href="/venue"
-                className="inline-flex items-center bg-slate-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                View Full Venue Details
-                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
           </div>
 
           {/* Right Column: Local Attractions */}
-          <div>
+          <div className="flex flex-col">
             {venueSettings.localAttractions?.attractions && venueSettings.localAttractions.attractions.length > 0 && (
-              <div className="bg-green-50 rounded-xl p-6 sm:p-8 h-full">
+              <div className="bg-green-50 rounded-xl p-6 sm:p-8 flex-grow">
                 <div className="flex items-center mb-6">
                   <span className="text-3xl mr-4">🎯</span>
                   <h3 className="text-2xl font-bold text-slate-900">
@@ -148,6 +135,23 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
                 </div>
               </div>
             )}
+
+            {/* Call to Action - Below Local Attractions */}
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 sm:p-8 text-white text-center mt-8">
+              <h3 className="text-2xl font-bold mb-4">Need More Information?</h3>
+              <p className="text-orange-100 mb-6 leading-relaxed">
+                Explore our comprehensive venue page for detailed maps, amenities, and complete location information.
+              </p>
+              <a
+                href="/venue"
+                className="inline-flex items-center bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                View Full Venue Details
+                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>
