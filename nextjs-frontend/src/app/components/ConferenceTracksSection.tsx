@@ -11,7 +11,7 @@ const ConferenceTracksSection: React.FC = () => {
   const [showAll, setShowAll] = useState(false);
 
   // Number of tracks to show initially on homepage
-  const INITIAL_DISPLAY_COUNT = 8;
+  const INITIAL_DISPLAY_COUNT = 9;
 
   useEffect(() => {
     fetchTracks();
@@ -125,23 +125,7 @@ const ConferenceTracksSection: React.FC = () => {
           </Link>
         </div>
 
-        {/* Statistics */}
-        <div className="mt-12 pt-8 border-t border-slate-600/30">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="text-3xl font-bold text-white mb-2">{tracks.length}+</div>
-              <div className="text-slate-300 font-medium">Scientific Sessions</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white mb-2">Expert</div>
-              <div className="text-slate-300 font-medium">Session Leaders</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white mb-2">Global</div>
-              <div className="text-slate-300 font-medium">Perspectives</div>
-            </div>
-          </div>
-        </div>
+
       </div>
     </section>
   );
