@@ -19,7 +19,6 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
     venueSettings.locationDescription ||
     venueSettings.venueName ||
     venueSettings.venueAddress ||
-    venueSettings.transportation?.options?.length ||
     venueSettings.localAttractions?.attractions?.length
   );
 
@@ -51,16 +50,7 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
     }
   };
 
-  const getTransportationIcon = (type: string) => {
-    switch (type) {
-      case 'airport-shuttle': return '🚌';
-      case 'public-transit': return '🚇';
-      case 'taxi-rideshare': return '🚕';
-      case 'car-rental': return '🚗';
-      case 'walking': return '🚶';
-      default: return '🚌';
-    }
-  };
+
 
   return (
     <section className="py-12 md:py-16 bg-white">
@@ -78,61 +68,29 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Column - Venue & Location Info */}
-          <div className="space-y-8">
-            {/* Venue Information */}
-            <div className="bg-slate-50 rounded-xl p-6 sm:p-8">
-              <div className="flex items-center mb-6">
-                <span className="text-3xl mr-4">🏨</span>
-                <div>
-                  <h3 className="text-2xl font-bold text-slate-900">{venueSettings.venueName}</h3>
-                  {venueSettings.venueAddress && (
-                    <p className="text-lg text-slate-600 mt-1">{formatAddress(venueSettings.venueAddress)}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Location Description */}
-              {venueSettings.locationDescription && (
-                <div className="prose prose-lg max-w-none text-slate-700">
-                  <PortableText value={venueSettings.locationDescription} />
-                </div>
+        {/* Venue Information */}
+        <div className="bg-slate-50 rounded-xl p-6 sm:p-8 mb-8">
+          <div className="flex items-center mb-6">
+            <span className="text-3xl mr-4">🏨</span>
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900">{venueSettings.venueName}</h3>
+              {venueSettings.venueAddress && (
+                <p className="text-lg text-slate-600 mt-1">{formatAddress(venueSettings.venueAddress)}</p>
               )}
             </div>
-
-            {/* Transportation */}
-            {venueSettings.transportation?.options && venueSettings.transportation.options.length > 0 && (
-              <div className="bg-blue-50 rounded-xl p-6 sm:p-8">
-                <div className="flex items-center mb-6">
-                  <span className="text-2xl mr-3">🚌</span>
-                  <h3 className="text-2xl font-bold text-slate-900">
-                    {venueSettings.transportation.title || 'Transportation'}
-                  </h3>
-                </div>
-                <div className="space-y-4">
-                  {venueSettings.transportation.options.slice(0, 3).map((option, index) => (
-                    <div key={index} className="flex items-start bg-white rounded-lg p-4 shadow-sm">
-                      <span className="text-2xl mr-4 mt-1">{getTransportationIcon(option.type)}</span>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-slate-900 mb-1">{option.title}</h4>
-                        {option.description && (
-                          <p className="text-slate-600 text-sm mb-2">{option.description}</p>
-                        )}
-                        <div className="flex gap-4 text-sm text-slate-500">
-                          {option.duration && <span>⏱️ {option.duration}</span>}
-                          {option.cost && <span>💰 {option.cost}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Right Column - Local Attractions */}
-          <div className="space-y-8">
+          {/* Location Description */}
+          {venueSettings.locationDescription && (
+            <div className="prose prose-lg max-w-none text-slate-700">
+              <PortableText value={venueSettings.locationDescription} />
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Local Attractions */}
+          <div>
             {venueSettings.localAttractions?.attractions && venueSettings.localAttractions.attractions.length > 0 && (
               <div className="bg-green-50 rounded-xl p-6 sm:p-8">
                 <div className="flex items-center mb-6">
@@ -161,23 +119,23 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
                 </div>
               </div>
             )}
+          </div>
 
-            {/* Call to Action */}
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 sm:p-8 text-white text-center">
-              <h3 className="text-2xl font-bold mb-4">Need More Information?</h3>
-              <p className="text-orange-100 mb-6 leading-relaxed">
-                Explore our comprehensive venue page for detailed maps, amenities, and complete location information.
-              </p>
-              <a
-                href="/venue"
-                className="inline-flex items-center bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                View Full Venue Details
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
+          {/* Call to Action */}
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 sm:p-8 text-white text-center">
+            <h3 className="text-2xl font-bold mb-4">Need More Information?</h3>
+            <p className="text-orange-100 mb-6 leading-relaxed">
+              Explore our comprehensive venue page for detailed maps, amenities, and complete location information.
+            </p>
+            <a
+              href="/venue"
+              className="inline-flex items-center bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              View Full Venue Details
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
           </div>
         </div>
       </div>

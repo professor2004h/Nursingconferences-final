@@ -21,16 +21,6 @@ export async function getVenueSettings(): Promise<VenueSettings | null> {
           caption
         },
         locationDescription,
-        transportation{
-          title,
-          options[]{
-            type,
-            title,
-            description,
-            duration,
-            cost
-          }
-        },
         localAttractions{
           title,
           attractions[]{
