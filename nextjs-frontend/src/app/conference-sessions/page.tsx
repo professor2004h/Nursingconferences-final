@@ -117,13 +117,13 @@ const ConferenceSessionsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white py-16">
+      <div className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
               Scientific Session
             </h1>
-            <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
               Below are the scientific sessions of the conference
             </p>
           </div>
@@ -150,7 +150,7 @@ const ConferenceSessionsPage: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search and Filter Controls */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -209,7 +209,7 @@ const ConferenceSessionsPage: React.FC = () => {
 
         {/* Sessions Grid */}
         {filteredTracks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredTracks.map((track, index) => (
               <SessionCard key={track.value} track={track} index={index} />
             ))}
@@ -238,18 +238,18 @@ interface SessionCardProps {
 
 const SessionCard: React.FC<SessionCardProps> = ({ track, index }) => {
   return (
-    <div className="bg-slate-600/50 backdrop-blur-sm rounded-2xl border border-slate-500/30 hover:bg-slate-500/50 transition-all duration-300 overflow-hidden group cursor-pointer">
-      <div className="p-6 flex items-center space-x-4">
+    <div className="bg-slate-600/50 backdrop-blur-sm rounded-xl border border-slate-500/30 hover:bg-slate-500/50 transition-all duration-300 overflow-hidden group cursor-pointer">
+      <div className="p-4 flex items-center space-x-3">
         {/* Session Number */}
-        <div className="bg-white rounded-xl px-4 py-3 flex-shrink-0">
-          <span className="text-slate-800 font-semibold text-lg">
+        <div className="bg-white rounded-lg px-3 py-2 flex-shrink-0">
+          <span className="text-slate-800 font-medium text-sm">
             Session {index + 1}
           </span>
         </div>
 
         {/* Session Title */}
         <div className="flex-1">
-          <h3 className="text-white font-medium text-lg leading-tight group-hover:text-slate-200 transition-colors duration-200">
+          <h3 className="text-white font-medium text-sm md:text-base leading-tight group-hover:text-slate-200 transition-colors duration-200">
             {track.label}
           </h3>
         </div>

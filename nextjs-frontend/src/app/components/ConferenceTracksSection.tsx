@@ -65,14 +65,14 @@ const ConferenceTracksSection: React.FC = () => {
   const hasMoreTracks = tracks.length > INITIAL_DISPLAY_COUNT;
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
+    <section className="py-8 md:py-12 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-10 md:mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        <div className="text-center mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
             Scientific Session
           </h2>
-          <p className="text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Below are the scientific sessions of the conference
           </p>
         </div>
@@ -106,7 +106,7 @@ const ConferenceTracksSection: React.FC = () => {
         )}
 
         {/* Sessions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 md:mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 md:mb-8">
           {displayedTracks.map((track, index) => (
             <SessionCard key={track.value} track={track} index={index} />
           ))}
@@ -116,10 +116,10 @@ const ConferenceTracksSection: React.FC = () => {
         <div className="text-center">
           <Link
             href="/conference-sessions"
-            className="inline-flex items-center bg-white text-slate-800 px-8 py-4 rounded-xl font-semibold hover:bg-slate-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg"
+            className="inline-flex items-center bg-white text-slate-800 px-6 py-3 rounded-lg font-medium hover:bg-slate-100 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-sm md:text-base"
           >
             View All Scientific Sessions
-            <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
@@ -139,18 +139,18 @@ interface SessionCardProps {
 
 const SessionCard: React.FC<SessionCardProps> = ({ track, index }) => {
   return (
-    <div className="bg-slate-600/50 backdrop-blur-sm rounded-2xl border border-slate-500/30 hover:bg-slate-500/50 transition-all duration-300 overflow-hidden group cursor-pointer">
-      <div className="p-6 flex items-center space-x-4">
+    <div className="bg-slate-600/50 backdrop-blur-sm rounded-xl border border-slate-500/30 hover:bg-slate-500/50 transition-all duration-300 overflow-hidden group cursor-pointer">
+      <div className="p-4 flex items-center space-x-3">
         {/* Session Number */}
-        <div className="bg-white rounded-xl px-4 py-3 flex-shrink-0">
-          <span className="text-slate-800 font-semibold text-lg">
+        <div className="bg-white rounded-lg px-3 py-2 flex-shrink-0">
+          <span className="text-slate-800 font-medium text-sm">
             Session {index + 1}
           </span>
         </div>
 
         {/* Session Title */}
         <div className="flex-1">
-          <h3 className="text-white font-medium text-lg leading-tight group-hover:text-slate-200 transition-colors duration-200">
+          <h3 className="text-white font-medium text-sm md:text-base leading-tight group-hover:text-slate-200 transition-colors duration-200">
             {track.label}
           </h3>
         </div>
