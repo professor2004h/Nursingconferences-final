@@ -273,7 +273,7 @@ const PosterPresentersPage: React.FC = () => {
       {selectedPresenter && (
         <ErrorBoundary
           fallback={
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-50 pt-24">
               <div className="bg-white p-6 rounded-lg">
                 <p className="text-red-600">Error loading presenter details</p>
                 <button onClick={closeModal} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded">

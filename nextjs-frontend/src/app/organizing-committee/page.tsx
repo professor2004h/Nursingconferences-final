@@ -151,9 +151,9 @@ const OrganizingCommitteePage: React.FC = () => {
       {selectedMember && (
         <ErrorBoundary
           fallback={
-            <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="fixed inset-0 z-[99999] overflow-y-auto">
               <div className="fixed inset-0 bg-black bg-opacity-50" onClick={closeModal} />
-              <div className="flex min-h-full items-center justify-center p-4">
+              <div className="flex min-h-full items-center justify-center p-4 pt-24">
                 <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
                   <h3 className="text-lg font-semibold text-red-600 mb-2">Modal Error</h3>
                   <p className="text-gray-600 mb-4">

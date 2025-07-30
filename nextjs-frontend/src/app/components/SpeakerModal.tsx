@@ -99,9 +99,9 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
   if (!speaker.name || !speaker.title || !speaker.institution || !speaker.country) {
     console.error('SpeakerModal: Missing required speaker data', speaker);
     return (
-      <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="fixed inset-0 z-[99999] overflow-y-auto">
         <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
-        <div className="flex min-h-full items-center justify-center p-4">
+        <div className="flex min-h-full items-center justify-center p-4 pt-24">
           <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-red-600 mb-2">Error Loading Profile</h3>
             <p className="text-gray-600 mb-4">Unable to load speaker information. Some required data is missing.</p>
@@ -146,15 +146,15 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-[99999] overflow-y-auto">
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div className="flex min-h-full items-center justify-center p-4 pt-24">
         <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
           {/* Close Button */}
           <button
