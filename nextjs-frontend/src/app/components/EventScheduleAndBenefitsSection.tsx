@@ -103,21 +103,10 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
   const hasAnyData = scheduleData?.isActive || benefitsData?.isActive;
   const showPlaceholder = !loading && !hasAnyData;
 
-  // TEMPORARY: Always show the section for debugging
-  console.log('🔍 EventScheduleAndBenefitsSection Debug:', {
-    loading,
-    hasAnyData,
-    showPlaceholder,
-    scheduleData: scheduleData ? 'exists' : 'null',
-    benefitsData: benefitsData ? 'exists' : 'null',
-    nodeEnv: process.env.NODE_ENV
-  });
-
   // Don't render anything if both sections are inactive or missing (only in production)
-  // TEMPORARILY DISABLED FOR DEBUGGING
-  // if (!loading && !hasAnyData && process.env.NODE_ENV === 'production') {
-  //   return null;
-  // }
+  if (!loading && !hasAnyData && process.env.NODE_ENV === 'production') {
+    return null;
+  }
 
   if (loading) {
     return (
@@ -256,11 +245,6 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
 
   return (
     <section className={`py-12 md:py-16 lg:py-20 bg-gradient-to-br from-gray-50 to-gray-100 ${className}`}>
-      {/* TEMPORARY DEBUG INDICATOR */}
-      <div className="bg-red-500 text-white text-center py-2 mb-4">
-        🔍 DEBUG: Event Schedule & Benefits Section is Rendering!
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Desktop: 2-column layout, Mobile: 1-column stacked */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">

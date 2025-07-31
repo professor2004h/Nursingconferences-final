@@ -1,15 +1,5 @@
-// Script to create sample Event Schedule and Participation Benefits data in Sanity
-// Run this in Sanity Studio's Vision tool or use the Sanity CLI
-
-import { createClient } from '@sanity/client';
-
-const client = createClient({
-  projectId: 'n3no08m3',
-  dataset: 'production',
-  useCdn: false,
-  apiVersion: '2023-05-03',
-  token: process.env.SANITY_API_TOKEN // You'll need to set this
-});
+import { NextResponse } from 'next/server';
+import { writeClient } from '@/app/sanity/client';
 
 const sampleEventSchedule = {
   _type: 'eventSchedule',
@@ -93,9 +83,7 @@ const sampleEventSchedule = {
       dayNumber: 2,
       date: '2025-08-05',
       displayDate: 'August 05, 2025',
-      sessions: [
-        // Day 2 sessions can be added later by administrators
-      ]
+      sessions: []
     }
   ]
 };
@@ -192,22 +180,67 @@ const sampleParticipationBenefits = {
   ]
 };
 
-async function createSampleData() {
+export async function POST() {
   try {
-    console.log('Creating sample Event Schedule...');
-    const scheduleResult = await client.create(sampleEventSchedule);
-    console.log('✅ Event Schedule created:', scheduleResult._id);
+    console.log('📅 Creating sample Event Schedule and Participation Benefits...');
 
-    console.log('Creating sample Participation Benefits...');
-    const benefitsResult = await client.create(sampleParticipationBenefits);
-    console.log('✅ Participation Benefits created:', benefitsResult._id);
+    // Check if documents already exist
+    const existingSchedule = await writeClient.fetch(
+      '*[_type == "eventSchedule"][0]'
+    );
+    
+    const existingBenefits = await writeClient.fetch(
+      '*[_type == "participationBenefits"][0]'
+    );
 
-    console.log('\n🎉 Sample data created successfully!');
-    console.log('The Event Schedule and Participation Benefits section should now display on the home page.');
+    let scheduleResult = null;
+    let benefitsResult = null;
+
+    // Create Event Schedule if it doesn't exist
+    if (!existingSchedule) {
+      console.log('Creating Event Schedule...');
+      scheduleResult = await writeClient.create(sampleEventSchedule);
+      console.log('✅ Event Schedule created:', scheduleResult._id);
+    } else {
+      console.log('⚠️ Event Schedule already exists:', existingSchedule._id);
+      scheduleResult = existingSchedule;
+    }
+
+    // Create Participation Benefits if it doesn't exist
+    if (!existingBenefits) {
+      console.log('Creating Participation Benefits...');
+      benefitsResult = await writeClient.create(sampleParticipationBenefits);
+      console.log('✅ Participation Benefits created:', benefitsResult._id);
+    } else {
+      console.log('⚠️ Participation Benefits already exists:', existingBenefits._id);
+      benefitsResult = existingBenefits;
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Sample data created successfully!',
+      data: {
+        schedule: {
+          id: scheduleResult._id,
+          created: !existingSchedule
+        },
+        benefits: {
+          id: benefitsResult._id,
+          created: !existingBenefits
+        }
+      }
+    });
+
   } catch (error) {
     console.error('❌ Error creating sample data:', error);
+    
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to create sample data',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
 }
-
-// Run the script
-createSampleData();

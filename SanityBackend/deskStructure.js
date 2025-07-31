@@ -269,9 +269,9 @@ export default (S) =>
         ),
       // Add Event Schedule
       S.listItem()
-        .title('Event Schedule')
+        .title('📅 Event Schedule')
         .id('eventSchedule')
-        .icon(() => '📅')
+        .icon(DocumentIcon)
         .schemaType('eventSchedule')
         .child(
           S.documentTypeList('eventSchedule')
@@ -280,9 +280,9 @@ export default (S) =>
         ),
       // Add Participation Benefits
       S.listItem()
-        .title('Participation Benefits')
+        .title('🎯 Participation Benefits')
         .id('participationBenefits')
-        .icon(() => '🎯')
+        .icon(DocumentIcon)
         .schemaType('participationBenefits')
         .child(
           S.documentTypeList('participationBenefits')
