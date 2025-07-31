@@ -11,9 +11,9 @@ export default (S) =>
       // Main Content
       // Unified Conferences Management Section
       S.listItem()
-        .title('🎯 Conferences')
+        .title('Conferences')
         .id('conferencesManagement')
-        .icon(() => '🎯')
+        .icon(DocumentIcon)
         .child(
           S.list()
             .title('Conferences Management')
@@ -30,7 +30,7 @@ export default (S) =>
                 ),
               // Individual Conference Events
               S.listItem()
-                .title('📅 Conference Events')
+                .title('Conference Events')
                 .id('conferenceEvents')
                 .child(
                   S.documentTypeList('conferenceEvent')

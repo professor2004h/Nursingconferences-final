@@ -244,10 +244,10 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
   }
 
   return (
-    <section className={`py-12 md:py-16 lg:py-20 bg-gradient-to-br from-blue-50 to-indigo-50 ${className}`}>
+    <section className={`py-8 md:py-12 lg:py-16 bg-gradient-to-br from-blue-50 to-indigo-50 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Desktop: 2-column layout with equal heights, Mobile: 1-column stacked */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 lg:items-stretch">
           {/* Event Schedule - Left column on desktop, top on mobile */}
           <div className="order-1">
             <EventScheduleSection scheduleData={scheduleData} />

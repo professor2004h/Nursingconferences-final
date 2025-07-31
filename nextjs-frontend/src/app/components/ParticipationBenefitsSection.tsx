@@ -106,10 +106,10 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
   const sortedBenefits = [...benefitsData.benefits].sort((a, b) => a.displayOrder - b.displayOrder);
 
   return (
-    <div className="bg-white rounded-xl p-6 md:p-8 shadow-xl border border-gray-200 h-full flex flex-col">
+    <div className="bg-white rounded-xl p-4 md:p-6 shadow-xl border border-gray-200 h-full flex flex-col">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+      <div className="text-center mb-6">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
           {benefitsData.title}
         </h2>
         {benefitsData.subtitle && (
@@ -120,18 +120,15 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
         <div className="w-16 h-1 bg-blue-500 mx-auto rounded-full mt-4"></div>
       </div>
 
-      {/* Benefits List - Flex grow to fill remaining space */}
-      <div
-        className="space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-grow"
-        style={{ maxHeight: benefitsData.maxHeight || '400px' }}
-      >
+      {/* Benefits List - Compact layout without forced scrolling */}
+      <div className="space-y-3 flex-grow">
         {sortedBenefits.map((benefit, index) => (
           <div
             key={index}
-            className={`flex items-start gap-4 p-4 rounded-lg transition-all duration-200 hover:shadow-md ${
+            className={`flex items-start gap-3 p-3 rounded-lg transition-all duration-200 hover:shadow-md ${
               benefit.isHighlighted
                 ? 'bg-orange-50 border border-orange-200 shadow-sm'
-                : 'bg-blue-50 hover:bg-blue-100'
+                : 'bg-gray-50 hover:bg-blue-50'
             }`}
           >
             {/* Icon */}
