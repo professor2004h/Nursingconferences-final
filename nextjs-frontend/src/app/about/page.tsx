@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { getAboutUsContent } from "../getAboutUs";
 import { PortableText } from "@portabletext/react";
-import { getAboutPageStatistics, getDefaultStatistics } from "../getStatistics";
-import StatisticsSection from "../components/StatisticsSection";
+import { getAboutPageImageSection, getDefaultImageSection } from "../getImageSection";
+import ImageSection from "../components/ImageSection";
 
 export const metadata = {
   title: "About Us - Intelli Global Conferences",
@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function AboutPage() {
   const about = await getAboutUsContent();
-  const statistics = await getAboutPageStatistics();
+  const imageSection = await getAboutPageImageSection();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -99,9 +99,9 @@ export default async function AboutPage() {
                   </div>
                 )}
 
-                {/* Dynamic Statistics */}
-                <StatisticsSection
-                  data={statistics || getDefaultStatistics()}
+                {/* Dynamic Image Section */}
+                <ImageSection
+                  data={imageSection || getDefaultImageSection()}
                   className="shadow-lg"
                 />
 

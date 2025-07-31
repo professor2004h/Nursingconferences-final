@@ -7,7 +7,7 @@ import { getConferences, getConferenceEvents, getConferencesSectionSettings, typ
 import { getFeaturedPastConferences, type PastConferenceType } from "./getPastConferences";
 import { PortableText } from "@portabletext/react";
 import { getHeroSection } from "./getHeroSection";
-import { getStatisticsContent, getDefaultStatistics } from "./getStatistics";
+import { getImageSectionContent, getDefaultImageSection } from "./getImageSection";
 import { getSiteSettingsSSR } from "./getSiteSettings";
 import { getVenueSettings } from "./getVenueSettings";
 import {
@@ -38,7 +38,7 @@ import AboutLocationSection from '@/app/components/AboutLocationSection';
 // Direct imports to avoid SSR bailout
 import ContactForm from "./components/ContactForm";
 import HeroSlideshow from "./components/HeroSlideshow";
-import StatisticsSection from "./components/StatisticsSection";
+import ImageSection from "./components/ImageSection";
 import LeafletMapLocations from "./components/LeafletMapLocations";
 
 export default async function HomePage() {
@@ -57,7 +57,7 @@ export default async function HomePage() {
       about,
       hero,
       conference,
-      statistics,
+      imageSection,
       siteSettings,
       pastConferencesStyling,
       journalStyling,
@@ -70,7 +70,7 @@ export default async function HomePage() {
       getAboutUsContent(),
       getHeroSection(),
       getConferences(),
-      getStatisticsContent(),
+      getImageSectionContent(),
       getSiteSettingsSSR(),
       getPastConferencesSectionStyling(),
       getJournalSectionStyling(),
@@ -81,9 +81,9 @@ export default async function HomePage() {
 
     // Only log detailed results in development
     if (process.env.NODE_ENV === 'development') {
-      const failedFetches = [events, pastConferences, about, hero, conference, statistics, siteSettings, pastConferencesStyling, journalStyling, customContentData]
+      const failedFetches = [events, pastConferences, about, hero, conference, imageSection, siteSettings, pastConferencesStyling, journalStyling, customContentData]
         .map((result, index) => {
-          const names = ['events', 'pastConferences', 'about', 'hero', 'conference', 'statistics', 'siteSettings', 'pastConferencesStyling', 'journalStyling', 'customContentData'];
+          const names = ['events', 'pastConferences', 'about', 'hero', 'conference', 'imageSection', 'siteSettings', 'pastConferencesStyling', 'journalStyling', 'customContentData'];
           return result.status === 'rejected' ? names[index] : null;
         })
         .filter(Boolean);
@@ -108,7 +108,7 @@ export default async function HomePage() {
       about: about.status === 'fulfilled' ? about.value : null,
       hero: hero.status === 'fulfilled' ? hero.value : null,
       conference: conference.status === 'fulfilled' ? conference.value : null,
-      statistics: statistics.status === 'fulfilled' ? statistics.value : null,
+      imageSection: imageSection.status === 'fulfilled' ? imageSection.value : null,
       siteSettings: siteSettings.status === 'fulfilled' ? siteSettings.value : null,
       pastConferencesStyling: pastConferencesStyling.status === 'fulfilled' ? pastConferencesStyling.value : null,
       journalStyling: journalStyling.status === 'fulfilled' ? journalStyling.value : null,
@@ -145,7 +145,7 @@ export default async function HomePage() {
       about={null}
       hero={null}
       conference={null}
-      statistics={null}
+      imageSection={null}
       siteSettings={null}
       pastConferencesStyling={null}
       journalStyling={null}
@@ -163,7 +163,7 @@ function HomePageContent({
   about,
   hero,
   conference,
-  statistics,
+  imageSection,
   siteSettings,
   pastConferencesStyling,
   journalStyling,
@@ -176,7 +176,7 @@ function HomePageContent({
   about: any;
   hero: any;
   conference: any;
-  statistics: any;
+  imageSection: any;
   siteSettings: any;
   pastConferencesStyling: PastConferencesSectionStyling | null;
   journalStyling: JournalSectionStyling | null;
@@ -185,7 +185,7 @@ function HomePageContent({
   conferencesSectionSettings: ConferencesSectionSettings | null;
 }) {
   // Use fallback data if needed
-  const safeStatistics = statistics || getDefaultStatistics();
+  const safeImageSection = imageSection || getDefaultImageSection();
 
   return (
     <div className="min-h-screen bg-white">
@@ -265,15 +265,15 @@ function HomePageContent({
                     />
                   </div>
 
-                  {/* Dynamic Statistics Section */}
-                  <StatisticsSection
-                    data={safeStatistics}
+                  {/* Dynamic Image Section */}
+                  <ImageSection
+                    data={safeImageSection}
                     className="shadow-2xl"
                   />
                 </div>
               ) : (
-                <StatisticsSection
-                  data={safeStatistics}
+                <ImageSection
+                  data={safeImageSection}
                   className="shadow-2xl"
                 />
               )}

@@ -5,7 +5,7 @@ import heroSection from './heroSection';
 import conferences from "./conferences";
 import conferencesSectionSettings from "./conferencesSectionSettings";
 import siteSettings from './siteSettings';
-import statistics from './statistics';
+import imageSection from './imageSection';
 import sponsorshipTiers from './sponsorshipTiers';
 import sponsorRegistration from './sponsorRegistration';
 import paymentTransaction from './paymentTransaction';
@@ -63,7 +63,7 @@ export const schemaTypes = [
   conferences,
   conferencesSectionSettings,
   siteSettings,
-  statistics,
+  imageSection,
   sponsorshipTiers,
   sponsorRegistration,
   paymentTransaction,
