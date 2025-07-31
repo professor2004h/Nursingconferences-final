@@ -4441,16 +4441,45 @@ a.hero-register-button,
 /* ===== DROPDOWN Z-INDEX FIX ===== */
 /* Force dropdown to appear above all content including hero section */
 .dropdown-menu-overlay {
-  z-index: 999999 !important;
-  position: absolute !important;
+  z-index: 2147483647 !important; /* Maximum safe z-index value */
+  position: fixed !important;
   isolation: isolate !important;
   transform: translateZ(0) !important;
   will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  pointer-events: auto !important;
+  /* Ensure it's always on top regardless of scroll position */
+  contain: layout style paint !important;
 }
 
 .dropdown-container-isolation {
-  z-index: 999998 !important;
+  z-index: 9999 !important;
   position: relative !important;
   isolation: isolate !important;
   transform: translateZ(0) !important;
+  overflow: visible !important;
+}
+
+/* Ensure dropdown appears above all possible content */
+.dropdown-menu-overlay * {
+  pointer-events: auto !important;
+}
+
+/* Force dropdown above any stacking contexts */
+body:has(.dropdown-menu-overlay) {
+  /* Create a new stacking context to ensure dropdown is on top */
+  position: relative;
+}
+
+/* Prevent any content from appearing above dropdown */
+.dropdown-menu-overlay {
+  /* Use the highest possible z-index */
+  z-index: 2147483647 !important;
+  /* Ensure it creates its own stacking context */
+  position: fixed !important;
+  /* Force hardware acceleration */
+  transform: translate3d(0, 0, 0) !important;
+  /* Prevent any interference */
+  isolation: isolate !important;
 }

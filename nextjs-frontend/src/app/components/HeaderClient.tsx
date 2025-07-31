@@ -32,9 +32,27 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   const toggleMoreDropdown = () => {
     if (!isMoreDropdownOpen && dropdownRef.current) {
       const rect = dropdownRef.current.getBoundingClientRect();
+      // Calculate position with better viewport handling
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 300; // Estimated dropdown height
+
+      let top = rect.bottom + 8;
+      let left = rect.left;
+
+      // Adjust if dropdown would go off-screen vertically
+      if (top + dropdownHeight > viewportHeight) {
+        top = rect.top - dropdownHeight - 8;
+      }
+
+      // Adjust if dropdown would go off-screen horizontally
+      const dropdownWidth = 224; // w-56 = 14rem = 224px
+      if (left + dropdownWidth > window.innerWidth) {
+        left = window.innerWidth - dropdownWidth - 16;
+      }
+
       setDropdownPosition({
-        top: rect.bottom + window.scrollY + 8,
-        left: rect.left + window.scrollX
+        top: top,
+        left: left
       });
     }
     setIsMoreDropdownOpen(prev => !prev);
@@ -57,14 +75,18 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   const renderDropdownContent = () => (
     <div
       ref={dropdownContentRef}
-      className="w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
+      className="w-56 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 dropdown-menu-overlay"
       style={{
         position: 'fixed',
         top: dropdownPosition.top,
         left: dropdownPosition.left,
-        zIndex: 999999,
+        zIndex: 2147483647, // Maximum safe z-index value
         isolation: 'isolate',
-        transform: 'translateZ(0)'
+        transform: 'translateZ(0)',
+        willChange: 'transform',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        pointerEvents: 'auto'
       }}
     >
       <Link
@@ -137,7 +159,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
     </div>
   );
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside and handle scroll repositioning
   useEffect(() => {
     if (!isMoreDropdownOpen) return;
 
@@ -151,14 +173,46 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       }
     };
 
+    // Update dropdown position on scroll
+    const handleScroll = () => {
+      if (dropdownRef.current) {
+        const rect = dropdownRef.current.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const dropdownHeight = 300;
+
+        let top = rect.bottom + 8;
+        let left = rect.left;
+
+        // Adjust if dropdown would go off-screen vertically
+        if (top + dropdownHeight > viewportHeight) {
+          top = rect.top - dropdownHeight - 8;
+        }
+
+        // Adjust if dropdown would go off-screen horizontally
+        const dropdownWidth = 224;
+        if (left + dropdownWidth > window.innerWidth) {
+          left = window.innerWidth - dropdownWidth - 16;
+        }
+
+        setDropdownPosition({
+          top: top,
+          left: left
+        });
+      }
+    };
+
     // Add a small delay to ensure portal is rendered
     const timeoutId = setTimeout(() => {
       document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      window.addEventListener('resize', handleScroll, { passive: true });
     }, 10);
 
     return () => {
       clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, [isMoreDropdownOpen]);
 
@@ -179,7 +233,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   return (
     <>
       {/* Desktop Navigation - Reorganized with More dropdown */}
-      <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0 relative z-[9997]">
+      <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0 relative z-[9998]">
         {/* Main navigation links - Keep visible */}
         <div className="flex items-center space-x-3 md:space-x-4 lg:space-x-5 xl:space-x-6 overflow-visible">
           <Link
@@ -222,6 +276,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
           {/* More Dropdown */}
           <div
             className="relative dropdown-container-isolation"
+            style={{ zIndex: 9999 }}
             ref={dropdownRef}
           >
             <button
