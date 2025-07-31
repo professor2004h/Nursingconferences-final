@@ -20,7 +20,7 @@ export default (S) =>
             .items([
               // Master Conference Settings (Singleton)
               S.listItem()
-                .title('⚙️ Conference Section Settings')
+                .title('Conference Section Settings')
                 .id('conferencesSectionSettings')
                 .child(
                   S.document()
@@ -39,7 +39,7 @@ export default (S) =>
                 ),
               // Legacy Conferences Section (for backward compatibility)
               S.listItem()
-                .title('📝 Legacy Conference Content')
+                .title('Legacy Conference Content')
                 .id('legacyConferences')
                 .child(
                   S.documentTypeList('conferences')
@@ -55,7 +55,7 @@ export default (S) =>
       // Registration System
       S.divider(),
       S.listItem()
-        .title('📝 Registration System')
+        .title('Registration System')
         .child(
           S.list()
             .title('Registration Management')
@@ -75,7 +75,7 @@ export default (S) =>
       S.listItem().title('Journal Section Styling').schemaType('journalSection').child(S.documentTypeList('journalSection')),
       // Custom Content Section Settings (Singleton)
       S.listItem()
-        .title('⚙️ Custom Content Section')
+        .title('Custom Content Section')
         .id('customContentSection')
         .child(
           S.document()
@@ -101,7 +101,7 @@ export default (S) =>
             .items([
               // Custom Interactive Table View with Export
               S.listItem()
-                .title('📊 Downloads Table')
+                .title('Downloads Table')
                 .id('brochureDownloadsTable')
                 .child(
                   S.component(BrochureTableView)
@@ -109,7 +109,7 @@ export default (S) =>
                 ),
               // Traditional Document List View
               S.listItem()
-                .title('📄 Downloads List')
+                .title('Downloads List')
                 .id('brochureDownloadsList')
                 .child(
                   S.documentTypeList('brochureDownload')
@@ -129,7 +129,7 @@ export default (S) =>
             .items([
               // Custom Interactive Table View with Export
               S.listItem()
-                .title('📊 Registrations Table')
+                .title('Registrations Table')
                 .id('registrationsTable')
                 .child(
                   S.component(RegistrationTableView)
@@ -137,7 +137,7 @@ export default (S) =>
                 ),
               // Traditional Document List View
               S.listItem()
-                .title('📄 Registrations List')
+                .title('Registrations List')
                 .id('registrationsList')
                 .child(
                   S.documentTypeList('conferenceRegistration')
@@ -148,7 +148,7 @@ export default (S) =>
         ),
       // Add Abstract Submission System
       S.listItem()
-        .title('📝 Abstract')
+        .title('Abstract')
         .id('abstractSubmissionSystem')
         .icon(EditIcon)
         .child(
@@ -157,7 +157,7 @@ export default (S) =>
             .items([
               // Abstract Settings
               S.listItem()
-                .title('⚙️ Abstract Settings')
+                .title('Abstract Settings')
                 .id('abstractSettings')
                 .child(
                   S.documentTypeList('abstractSettings')
@@ -165,7 +165,7 @@ export default (S) =>
                 ),
               // Abstract Submissions Table View
               S.listItem()
-                .title('📊 Abstract Submissions')
+                .title('Abstract Submissions')
                 .id('abstractSubmissionsTable')
                 .child(
                   S.component(AbstractTableView)
@@ -173,7 +173,7 @@ export default (S) =>
                 ),
               // Traditional Document List View
               S.listItem()
-                .title('📄 Abstract List')
+                .title('Abstract List')
                 .id('abstractSubmissionsList')
                 .child(
                   S.documentTypeList('abstractSubmission')
@@ -197,7 +197,7 @@ export default (S) =>
       S.listItem()
         .title('Poster Presenters')
         .id('posterPresenters')
-        .icon(() => '📋')
+        .icon(DocumentIcon)
         .schemaType('posterPresenters')
         .child(
           S.documentTypeList('posterPresenters')
@@ -208,7 +208,7 @@ export default (S) =>
       S.listItem()
         .title('Conference Gallery')
         .id('pastConferenceGallery')
-        .icon(() => '📸')
+        .icon(DocumentIcon)
         .schemaType('pastConferenceGallery')
         .child(
           S.documentTypeList('pastConferenceGallery')
@@ -219,7 +219,7 @@ export default (S) =>
       S.listItem()
         .title('Media Partners')
         .id('mediaPartners')
-        .icon(() => '🤝')
+        .icon(DocumentIcon)
         .schemaType('mediaPartners')
         .child(
           S.documentTypeList('mediaPartners')
@@ -230,7 +230,7 @@ export default (S) =>
       S.listItem()
         .title('Conference Speakers')
         .id('speakers')
-        .icon(() => '🎤')
+        .icon(UserIcon)
         .schemaType('speakers')
         .child(
           S.documentTypeList('speakers')
@@ -241,7 +241,7 @@ export default (S) =>
       S.listItem()
         .title('Speaker Guidelines')
         .id('speakerGuidelines')
-        .icon(() => '🎤')
+        .icon(UserIcon)
         .schemaType('speakerGuidelines')
         .child(
           S.documentTypeList('speakerGuidelines')
@@ -251,7 +251,7 @@ export default (S) =>
       S.listItem()
         .title('Venue Settings')
         .id('venueSettings')
-        .icon(() => '🏨')
+        .icon(PinIcon)
         .schemaType('venueSettings')
         .child(
           S.documentTypeList('venueSettings')
@@ -261,7 +261,7 @@ export default (S) =>
       S.listItem()
         .title('Cancellation Policy')
         .id('cancellationPolicy')
-        .icon(() => '📋')
+        .icon(DocumentIcon)
         .schemaType('cancellationPolicy')
         .child(
           S.documentTypeList('cancellationPolicy')
