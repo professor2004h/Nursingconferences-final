@@ -115,35 +115,49 @@ const VenueMap: React.FC<VenueMapProps> = ({ mapConfig, venueName, venueAddress 
     } else {
       // Mobile-specific touch handling for better two-finger zoom
       let touchCount = 0;
+      let initialTouchCount = 0;
 
       const handleTouchStart = (e: TouchEvent) => {
         touchCount = e.touches.length;
+        initialTouchCount = touchCount;
+
         if (touchCount === 2) {
-          // Two fingers detected - enable zoom
+          // Two fingers detected - ensure zoom is enabled
           map.touchZoom.enable();
-        } else {
-          // Single finger - disable zoom to allow panning
-          map.touchZoom.disable();
+        }
+        // Don't disable zoom for single finger - let Leaflet handle it naturally
+      };
+
+      const handleTouchMove = (e: TouchEvent) => {
+        touchCount = e.touches.length;
+
+        if (touchCount === 2 && initialTouchCount === 2) {
+          // Two-finger gesture in progress - prevent page scrolling
+          e.preventDefault();
+          map.touchZoom.enable();
         }
       };
 
       const handleTouchEnd = (e: TouchEvent) => {
         touchCount = e.touches.length;
-        if (touchCount < 2) {
-          // Less than two fingers - disable zoom
-          map.touchZoom.disable();
+
+        // Only reset when all touches are gone
+        if (touchCount === 0) {
+          initialTouchCount = 0;
         }
       };
 
       // Add mobile touch event listeners
       if (mapRef.current) {
         mapRef.current.addEventListener('touchstart', handleTouchStart, { passive: true });
+        mapRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
         mapRef.current.addEventListener('touchend', handleTouchEnd, { passive: true });
 
         // Cleanup function for mobile controls
         const cleanupMobileControls = () => {
           if (mapRef.current) {
             mapRef.current.removeEventListener('touchstart', handleTouchStart);
+            mapRef.current.removeEventListener('touchmove', handleTouchMove);
             mapRef.current.removeEventListener('touchend', handleTouchEnd);
           }
         };
@@ -286,7 +300,8 @@ const VenueMap: React.FC<VenueMapProps> = ({ mapConfig, venueName, venueAddress 
             minHeight: '400px',
             position: 'relative',
             zIndex: 1,
-            isolation: 'isolate'
+            isolation: 'isolate',
+            touchAction: 'pan-x pan-y pinch-zoom'
           }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
