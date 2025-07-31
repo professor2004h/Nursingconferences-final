@@ -99,8 +99,12 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
     fetchData();
   }, []);
 
-  // Don't render anything if both sections are inactive or missing
-  if (!loading && !scheduleData?.isActive && !benefitsData?.isActive) {
+  // Show placeholder if no data exists (for development/testing)
+  const hasAnyData = scheduleData?.isActive || benefitsData?.isActive;
+  const showPlaceholder = !loading && !hasAnyData;
+
+  // Don't render anything if both sections are inactive or missing (only in production)
+  if (!loading && !hasAnyData && process.env.NODE_ENV === 'production') {
     return null;
   }
 
@@ -167,6 +171,70 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
               </h3>
               <p className="text-red-600">
                 {error}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show placeholder when no data exists (development mode)
+  if (showPlaceholder) {
+    return (
+      <section className={`py-12 md:py-16 lg:py-20 bg-gradient-to-br from-gray-50 to-gray-100 ${className}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Event Schedule & Participation Benefits
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              This section will display the conference schedule and participation benefits once configured in the Sanity CMS.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Schedule Placeholder */}
+            <div className="bg-gray-900 rounded-xl p-6 md:p-8 shadow-xl">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  Event Schedule
+                </h3>
+                <div className="w-16 h-1 bg-green-500 mx-auto rounded-full"></div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-6">
+                <div className="text-center text-gray-300">
+                  <div className="text-6xl mb-4">📅</div>
+                  <p className="text-lg mb-2">No schedule configured</p>
+                  <p className="text-sm opacity-75">
+                    Add an Event Schedule document in Sanity CMS to display the conference schedule here.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Benefits Placeholder */}
+            <div className="bg-white rounded-xl p-6 md:p-8 shadow-xl border border-gray-200">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                  Participation Benefits
+                </h3>
+                <div className="w-16 h-1 bg-green-500 mx-auto rounded-full"></div>
+              </div>
+              <div className="text-center text-gray-600">
+                <div className="text-6xl mb-4">🎯</div>
+                <p className="text-lg mb-2">No benefits configured</p>
+                <p className="text-sm opacity-75">
+                  Add a Participation Benefits document in Sanity CMS to display the benefits here.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-2xl mx-auto">
+              <p className="text-blue-800 text-sm">
+                <strong>For Administrators:</strong> Go to your Sanity Studio to create "Event Schedule" and "Participation Benefits" documents to populate this section.
               </p>
             </div>
           </div>

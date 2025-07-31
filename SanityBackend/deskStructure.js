@@ -267,6 +267,28 @@ export default (S) =>
           S.documentTypeList('cancellationPolicy')
             .title('Cancellation Policy')
         ),
+      // Add Event Schedule
+      S.listItem()
+        .title('Event Schedule')
+        .id('eventSchedule')
+        .icon(() => '📅')
+        .schemaType('eventSchedule')
+        .child(
+          S.documentTypeList('eventSchedule')
+            .title('Event Schedule')
+            .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
+        ),
+      // Add Participation Benefits
+      S.listItem()
+        .title('Participation Benefits')
+        .id('participationBenefits')
+        .icon(() => '🎯')
+        .schemaType('participationBenefits')
+        .child(
+          S.documentTypeList('participationBenefits')
+            .title('Participation Benefits')
+            .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
+        ),
       // Add Map Location with icon
       S.listItem()
         .title('Map Locations')
