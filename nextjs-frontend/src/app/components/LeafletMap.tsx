@@ -48,19 +48,18 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
     // Only run on client side
     if (typeof window === 'undefined' || !mapRef.current || locations.length === 0) return;
 
-    // Initialize map with proper mobile touch controls
+    // Initialize map with two-finger only touch controls
     const map = L.map(mapRef.current, {
       zoomControl: true,
       scrollWheelZoom: false, // Disable default scroll zoom
-      doubleClickZoom: true,
-      touchZoom: true, // Always enable touch zoom for proper mobile support
-      dragging: true,
+      doubleClickZoom: false, // Disable double-click zoom
+      touchZoom: false, // Disable default touch zoom (we'll handle manually)
+      dragging: false, // Disable single-finger dragging
       bounceAtZoomLimits: false,
-      tap: true,
+      tap: false, // Disable tap interactions
       tapTolerance: 15,
-      // Proper mobile touch settings
-      touchZoom: true,
-      touchPan: true,
+      // Disable all single-finger interactions
+      touchPan: false,
       keyboard: false, // Disable keyboard navigation to prevent conflicts
       boxZoom: false, // Disable box zoom to prevent conflicts
     });
@@ -112,7 +111,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
       // Store cleanup function
       (map as any)._cleanupDesktopControls = cleanupDesktopControls;
     } else {
-      // Enhanced mobile touch handling for proper map interaction
+      // Two-finger only touch handling - disable single finger interactions
       let touchCount = 0;
       let initialTouchCount = 0;
       let isMapInteraction = false;
@@ -120,31 +119,34 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
       const handleTouchStart = (e: TouchEvent) => {
         touchCount = e.touches.length;
         initialTouchCount = touchCount;
-        isMapInteraction = true;
 
         if (touchCount === 2) {
           // Two fingers detected - enable zoom and prevent page zoom
+          isMapInteraction = true;
           map.touchZoom.enable();
           e.preventDefault(); // Prevent page zoom
         } else if (touchCount === 1) {
-          // Single finger - enable dragging
-          map.dragging.enable();
+          // Single finger - do nothing, disable all interactions
+          isMapInteraction = false;
+          map.dragging.disable();
+          map.touchZoom.disable();
+          // Don't prevent default for single finger to allow page scroll
         }
       };
 
       const handleTouchMove = (e: TouchEvent) => {
         touchCount = e.touches.length;
 
-        if (isMapInteraction) {
-          if (touchCount === 2 && initialTouchCount === 2) {
-            // Two-finger gesture in progress - prevent page scrolling/zooming
-            e.preventDefault();
-            e.stopPropagation();
-            map.touchZoom.enable();
-          } else if (touchCount === 1 && initialTouchCount === 1) {
-            // Single finger drag - allow map panning but prevent page scroll
-            map.dragging.enable();
-          }
+        if (touchCount === 2 && initialTouchCount === 2 && isMapInteraction) {
+          // Two-finger gesture in progress - prevent page scrolling/zooming
+          e.preventDefault();
+          e.stopPropagation();
+          map.touchZoom.enable();
+        } else if (touchCount === 1) {
+          // Single finger - ensure map interactions are disabled
+          map.dragging.disable();
+          map.touchZoom.disable();
+          // Allow page scroll for single finger
         }
       };
 
@@ -155,12 +157,15 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
         if (touchCount === 0) {
           initialTouchCount = 0;
           isMapInteraction = false;
+          // Ensure all interactions are disabled when no touches
+          map.dragging.disable();
+          map.touchZoom.disable();
         }
       };
 
-      // Prevent default touch behaviors that interfere with map
+      // Only prevent page zoom for two-finger gestures
       const preventPageZoom = (e: TouchEvent) => {
-        if (e.touches.length > 1) {
+        if (e.touches.length === 2) {
           e.preventDefault();
         }
       };
@@ -401,12 +406,13 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
           position: 'relative',
           zIndex: 1,
           isolation: 'isolate',
-          touchAction: 'manipulation', // Better touch handling for maps
+          touchAction: 'pan-y', // Allow vertical page scroll, disable horizontal pan and zoom
           userSelect: 'none', // Prevent text selection during touch
           WebkitUserSelect: 'none',
           msUserSelect: 'none',
           WebkitTouchCallout: 'none', // Disable iOS callout
-          WebkitTapHighlightColor: 'transparent' // Remove tap highlight
+          WebkitTapHighlightColor: 'transparent', // Remove tap highlight
+          pointerEvents: 'auto' // Ensure touch events are captured
         }}
         role="application"
         aria-label="Interactive map showing global locations"
@@ -420,15 +426,16 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
         </div>
       </div>
       <style jsx global>{`
-        /* Enhanced map touch interaction styles */
+        /* Two-finger only map touch interaction styles */
         .leaflet-container {
-          touch-action: manipulation !important;
+          touch-action: pan-y !important; /* Allow vertical scroll, disable horizontal pan and zoom */
           -webkit-user-select: none !important;
           -moz-user-select: none !important;
           -ms-user-select: none !important;
           user-select: none !important;
           -webkit-touch-callout: none !important;
           -webkit-tap-highlight-color: transparent !important;
+          pointer-events: auto !important;
         }
 
         .leaflet-control-container {
