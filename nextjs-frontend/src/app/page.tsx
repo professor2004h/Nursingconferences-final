@@ -34,6 +34,7 @@ import ConferenceTracksSection from '@/app/components/ConferenceTracksSection';
 import NavigationBlocks from '@/app/components/NavigationBlocks';
 import VenueImageGallery from '@/app/components/VenueImageGallery';
 import AboutLocationSection from '@/app/components/AboutLocationSection';
+import EventScheduleAndBenefitsSection from '@/app/components/EventScheduleAndBenefitsSection';
 
 // Direct imports to avoid SSR bailout
 import ContactForm from "./components/ContactForm";
@@ -315,7 +316,10 @@ function HomePageContent({
       {/* 8. About the Location Section */}
       <AboutLocationSection venueSettings={venueSettings} />
 
-      {/* 9. Journal Section */}
+      {/* 9. Event Schedule and Participation Benefits Section */}
+      <EventScheduleAndBenefitsSection />
+
+      {/* 10. Journal Section */}
       {siteSettings?.journal?.showJournal && (
         <section
           className={`py-12 md:py-16 relative overflow-hidden ${

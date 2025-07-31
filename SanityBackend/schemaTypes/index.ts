@@ -55,6 +55,10 @@ import venueSettings from './venueSettings';
 // Cancellation policy schema
 import cancellationPolicy from './cancellationPolicy';
 
+// Event schedule and participation benefits schemas
+import eventSchedule from './eventSchedule';
+import participationBenefits from './participationBenefits';
+
 export const schemaTypes = [
   conferenceEvent,
   pastConference,
@@ -100,5 +104,8 @@ export const schemaTypes = [
   // Venue settings schema
   venueSettings,
   // Cancellation policy schema
-  cancellationPolicy
+  cancellationPolicy,
+  // Event schedule and participation benefits schemas
+  eventSchedule,
+  participationBenefits
 ]
