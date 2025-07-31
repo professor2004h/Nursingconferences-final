@@ -88,14 +88,10 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
           </div>
 
           {/* Call to Action Section */}
-          <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 sm:p-8 text-white text-center">
-            <h3 className="text-2xl font-bold mb-4">Need More Information?</h3>
-            <p className="text-orange-100 mb-6 leading-relaxed">
-              Explore our comprehensive venue page for detailed maps, amenities, and complete location information.
-            </p>
+          <div className="text-center">
             <a
               href="/venue"
-              className="inline-flex items-center bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
               View Full Venue Details
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
