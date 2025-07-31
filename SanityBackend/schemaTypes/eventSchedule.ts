@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { CalendarIcon } from '@sanity/icons'
 
 export default defineType({
   name: 'eventSchedule',
@@ -169,7 +170,7 @@ export default defineType({
       return {
         title: title,
         subtitle: `${isActive ? 'Active' : 'Inactive'} • ${daysCount || 0} days`,
-        media: isActive ? '📅' : '📅'
+        media: CalendarIcon
       }
     }
   },

@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { CheckmarkIcon, BulbOutlineIcon } from '@sanity/icons'
 
 export default defineType({
   name: 'participationBenefits',
@@ -93,21 +94,21 @@ export default defineType({
             },
             prepare({ title, icon, isHighlighted, displayOrder }) {
               const iconMap = {
-                check: '✅',
-                arrow: '➡️',
-                star: '⭐',
-                gift: '🎁',
-                certificate: '📜',
-                book: '📚',
-                coffee: '☕',
-                food: '🍽️',
-                network: '🤝',
-                badge: '🏆'
+                check: 'CheckmarkIcon',
+                arrow: 'ArrowRightIcon',
+                star: 'StarIcon',
+                gift: 'GiftIcon',
+                certificate: 'DocumentIcon',
+                book: 'BookIcon',
+                coffee: 'CoffeeIcon',
+                food: 'RestaurantIcon',
+                network: 'UsersIcon',
+                badge: 'TrophyIcon'
               }
               return {
                 title: title,
-                subtitle: `${iconMap[icon] || '✅'} • Order: ${displayOrder}${isHighlighted ? ' • Highlighted' : ''}`,
-                media: iconMap[icon] || '✅'
+                subtitle: `${iconMap[icon] || 'CheckmarkIcon'} • Order: ${displayOrder}${isHighlighted ? ' • Highlighted' : ''}`,
+                media: CheckmarkIcon
               }
             }
           }
@@ -155,7 +156,7 @@ export default defineType({
       return {
         title: title,
         subtitle: `${isActive ? 'Active' : 'Inactive'} • ${benefitsCount || 0} benefits`,
-        media: isActive ? '🎯' : '🎯'
+        media: BulbOutlineIcon
       }
     }
   },
