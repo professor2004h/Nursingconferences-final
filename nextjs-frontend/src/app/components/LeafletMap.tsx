@@ -48,14 +48,21 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
     // Only run on client side
     if (typeof window === 'undefined' || !mapRef.current || locations.length === 0) return;
 
-    // Initialize map with platform-specific controls
+    // Initialize map with proper mobile touch controls
     const map = L.map(mapRef.current, {
       zoomControl: true,
       scrollWheelZoom: false, // Disable default scroll zoom
       doubleClickZoom: true,
-      touchZoom: isMobile ? 'center' : false, // Enable touch zoom only on mobile
+      touchZoom: true, // Always enable touch zoom for proper mobile support
       dragging: true,
       bounceAtZoomLimits: false,
+      tap: true,
+      tapTolerance: 15,
+      // Proper mobile touch settings
+      touchZoom: true,
+      touchPan: true,
+      keyboard: false, // Disable keyboard navigation to prevent conflicts
+      boxZoom: false, // Disable box zoom to prevent conflicts
     });
 
     mapInstanceRef.current = map;
@@ -105,52 +112,81 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
       // Store cleanup function
       (map as any)._cleanupDesktopControls = cleanupDesktopControls;
     } else {
-      // Mobile-specific touch handling for better two-finger zoom
+      // Enhanced mobile touch handling for proper map interaction
       let touchCount = 0;
       let initialTouchCount = 0;
+      let isMapInteraction = false;
 
       const handleTouchStart = (e: TouchEvent) => {
         touchCount = e.touches.length;
         initialTouchCount = touchCount;
+        isMapInteraction = true;
 
         if (touchCount === 2) {
-          // Two fingers detected - ensure zoom is enabled
+          // Two fingers detected - enable zoom and prevent page zoom
           map.touchZoom.enable();
+          e.preventDefault(); // Prevent page zoom
+        } else if (touchCount === 1) {
+          // Single finger - enable dragging
+          map.dragging.enable();
         }
-        // Don't disable zoom for single finger - let Leaflet handle it naturally
       };
 
       const handleTouchMove = (e: TouchEvent) => {
         touchCount = e.touches.length;
 
-        if (touchCount === 2 && initialTouchCount === 2) {
-          // Two-finger gesture in progress - prevent page scrolling
-          e.preventDefault();
-          map.touchZoom.enable();
+        if (isMapInteraction) {
+          if (touchCount === 2 && initialTouchCount === 2) {
+            // Two-finger gesture in progress - prevent page scrolling/zooming
+            e.preventDefault();
+            e.stopPropagation();
+            map.touchZoom.enable();
+          } else if (touchCount === 1 && initialTouchCount === 1) {
+            // Single finger drag - allow map panning but prevent page scroll
+            map.dragging.enable();
+          }
         }
       };
 
       const handleTouchEnd = (e: TouchEvent) => {
         touchCount = e.touches.length;
 
-        // Only reset when all touches are gone
+        // Reset when all touches are gone
         if (touchCount === 0) {
           initialTouchCount = 0;
+          isMapInteraction = false;
         }
       };
 
-      // Add mobile touch event listeners
+      // Prevent default touch behaviors that interfere with map
+      const preventPageZoom = (e: TouchEvent) => {
+        if (e.touches.length > 1) {
+          e.preventDefault();
+        }
+      };
+
+      // Add mobile touch event listeners with proper passive/active settings
       if (mapRef.current) {
-        mapRef.current.addEventListener('touchstart', handleTouchStart, { passive: true });
-        mapRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
-        mapRef.current.addEventListener('touchend', handleTouchEnd, { passive: true });
+        const mapElement = mapRef.current;
+
+        mapElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+        mapElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+        mapElement.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        // Additional prevention of page zoom
+        mapElement.addEventListener('gesturestart', preventPageZoom, { passive: false });
+        mapElement.addEventListener('gesturechange', preventPageZoom, { passive: false });
+        mapElement.addEventListener('gestureend', preventPageZoom, { passive: false });
 
         // Cleanup function for mobile controls
         const cleanupMobileControls = () => {
-          if (mapRef.current) {
-            mapRef.current.removeEventListener('touchstart', handleTouchStart);
-            mapRef.current.removeEventListener('touchmove', handleTouchMove);
-            mapRef.current.removeEventListener('touchend', handleTouchEnd);
+          if (mapElement) {
+            mapElement.removeEventListener('touchstart', handleTouchStart);
+            mapElement.removeEventListener('touchmove', handleTouchMove);
+            mapElement.removeEventListener('touchend', handleTouchEnd);
+            mapElement.removeEventListener('gesturestart', preventPageZoom);
+            mapElement.removeEventListener('gesturechange', preventPageZoom);
+            mapElement.removeEventListener('gestureend', preventPageZoom);
           }
         };
 
@@ -365,7 +401,12 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
           position: 'relative',
           zIndex: 1,
           isolation: 'isolate',
-          touchAction: 'pan-x pan-y pinch-zoom'
+          touchAction: 'manipulation', // Better touch handling for maps
+          userSelect: 'none', // Prevent text selection during touch
+          WebkitUserSelect: 'none',
+          msUserSelect: 'none',
+          WebkitTouchCallout: 'none', // Disable iOS callout
+          WebkitTapHighlightColor: 'transparent' // Remove tap highlight
         }}
         role="application"
         aria-label="Interactive map showing global locations"
@@ -379,17 +420,36 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ locations, getMarkerColor }) =>
         </div>
       </div>
       <style jsx global>{`
+        /* Enhanced map touch interaction styles */
+        .leaflet-container {
+          touch-action: manipulation !important;
+          -webkit-user-select: none !important;
+          -moz-user-select: none !important;
+          -ms-user-select: none !important;
+          user-select: none !important;
+          -webkit-touch-callout: none !important;
+          -webkit-tap-highlight-color: transparent !important;
+        }
+
+        .leaflet-control-container {
+          pointer-events: auto !important;
+        }
+
+        .leaflet-popup-pane {
+          pointer-events: auto !important;
+        }
+
         .custom-popup .leaflet-popup-content-wrapper {
           border-radius: 12px;
           box-shadow: 0 10px 25px rgba(0,0,0,0.15);
           border: 1px solid #e5e7eb;
         }
-        
+
         .custom-popup .leaflet-popup-content {
           margin: 12px 16px;
           line-height: 1.4;
         }
-        
+
         .custom-popup .leaflet-popup-tip {
           background: white;
           border: 1px solid #e5e7eb;
