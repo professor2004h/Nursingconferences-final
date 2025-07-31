@@ -38,35 +38,35 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
 
   const getSessionTypeColor = (type: string, isHighlighted?: boolean) => {
     if (isHighlighted) {
-      return 'bg-green-100 border-green-500 text-green-800';
+      return 'bg-orange-100 border-orange-500 text-orange-800';
     }
-    
+
     switch (type) {
       case 'keynote':
-        return 'bg-blue-50 border-blue-300 text-blue-800';
+        return 'bg-blue-100 border-blue-400 text-blue-800';
       case 'plenary':
-        return 'bg-purple-50 border-purple-300 text-purple-800';
+        return 'bg-indigo-100 border-indigo-400 text-indigo-800';
       case 'break':
       case 'lunch':
-        return 'bg-orange-50 border-orange-300 text-orange-800';
+        return 'bg-green-100 border-green-400 text-green-800';
       case 'registration':
-        return 'bg-gray-50 border-gray-300 text-gray-800';
+        return 'bg-gray-100 border-gray-400 text-gray-800';
       case 'opening':
       case 'closing':
-        return 'bg-indigo-50 border-indigo-300 text-indigo-800';
+        return 'bg-orange-100 border-orange-400 text-orange-800';
       default:
-        return 'bg-white border-gray-200 text-gray-800';
+        return 'bg-white border-gray-300 text-gray-800';
     }
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl p-6 md:p-8 shadow-xl">
+    <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-6 md:p-8 shadow-xl h-full flex flex-col">
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
           {scheduleData.title}
         </h2>
-        <div className="w-16 h-1 bg-green-500 mx-auto rounded-full"></div>
+        <div className="w-16 h-1 bg-orange-400 mx-auto rounded-full"></div>
       </div>
 
       {/* Day Tabs */}
@@ -77,8 +77,8 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
             onClick={() => setActiveDay(index)}
             className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
               activeDay === index
-                ? 'bg-green-600 text-white shadow-lg transform scale-105'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                ? 'bg-orange-500 text-white shadow-lg transform scale-105'
+                : 'bg-blue-700 text-blue-100 hover:bg-blue-600 hover:text-white'
             }`}
           >
             <div className="text-sm">Day {day.dayNumber}</div>
@@ -87,8 +87,8 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
         ))}
       </div>
 
-      {/* Schedule Content */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      {/* Schedule Content - Flex grow to fill remaining space */}
+      <div className="bg-blue-700 rounded-lg p-6 flex-grow">
         {scheduleData.days[activeDay] && (
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-white text-center mb-6">
@@ -101,19 +101,19 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
                 <div key={sessionIndex} className="flex items-start gap-4">
                   {/* Time */}
                   <div className="flex-shrink-0 w-24 md:w-28">
-                    <div className="text-green-400 font-semibold text-sm">
+                    <div className="text-orange-400 font-semibold text-sm">
                       {session.startTime}
                     </div>
-                    <div className="text-green-300 text-xs">
+                    <div className="text-orange-300 text-xs">
                       {session.endTime}
                     </div>
                   </div>
-                  
+
                   {/* Timeline Line */}
                   <div className="flex-shrink-0 flex flex-col items-center">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                     {sessionIndex < scheduleData.days[activeDay].sessions.length - 1 && (
-                      <div className="w-0.5 h-8 bg-green-500 opacity-50"></div>
+                      <div className="w-0.5 h-8 bg-orange-500 opacity-50"></div>
                     )}
                   </div>
                   

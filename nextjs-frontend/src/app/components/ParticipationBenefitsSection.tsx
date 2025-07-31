@@ -30,7 +30,7 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
   }
 
   const getIconComponent = (iconType: string) => {
-    const iconClasses = "w-5 h-5 text-green-600 flex-shrink-0";
+    const iconClasses = "w-5 h-5 text-blue-600 flex-shrink-0";
     
     switch (iconType) {
       case 'check':
@@ -102,24 +102,11 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
     }
   };
 
-  const getBackgroundClass = (bgColor?: string) => {
-    switch (bgColor) {
-      case 'gray-50':
-        return 'bg-gray-50';
-      case 'green-50':
-        return 'bg-green-50';
-      case 'blue-50':
-        return 'bg-blue-50';
-      default:
-        return 'bg-white';
-    }
-  };
-
   // Sort benefits by display order
   const sortedBenefits = [...benefitsData.benefits].sort((a, b) => a.displayOrder - b.displayOrder);
 
   return (
-    <div className={`${getBackgroundClass(benefitsData.backgroundColor)} rounded-xl p-6 md:p-8 shadow-xl border border-gray-200`}>
+    <div className="bg-white rounded-xl p-6 md:p-8 shadow-xl border border-gray-200 h-full flex flex-col">
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -130,21 +117,21 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
             {benefitsData.subtitle}
           </p>
         )}
-        <div className="w-16 h-1 bg-green-500 mx-auto rounded-full mt-4"></div>
+        <div className="w-16 h-1 bg-blue-500 mx-auto rounded-full mt-4"></div>
       </div>
 
-      {/* Benefits List */}
-      <div 
-        className="space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+      {/* Benefits List - Flex grow to fill remaining space */}
+      <div
+        className="space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-grow"
         style={{ maxHeight: benefitsData.maxHeight || '400px' }}
       >
         {sortedBenefits.map((benefit, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className={`flex items-start gap-4 p-4 rounded-lg transition-all duration-200 hover:shadow-md ${
-              benefit.isHighlighted 
-                ? 'bg-green-50 border border-green-200 shadow-sm' 
-                : 'bg-gray-50 hover:bg-gray-100'
+              benefit.isHighlighted
+                ? 'bg-orange-50 border border-orange-200 shadow-sm'
+                : 'bg-blue-50 hover:bg-blue-100'
             }`}
           >
             {/* Icon */}
