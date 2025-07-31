@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { client } from '@/sanity/lib/client';
+import { NextResponse } from 'next/server';
+import { client } from '@/app/sanity/client';
 
 // GROQ query to fetch event schedule data
 const EVENT_SCHEDULE_QUERY = `
@@ -23,7 +23,7 @@ const EVENT_SCHEDULE_QUERY = `
   }
 `;
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log('🗓️ Fetching event schedule from Sanity...');
 
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Handle OPTIONS request for CORS
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
