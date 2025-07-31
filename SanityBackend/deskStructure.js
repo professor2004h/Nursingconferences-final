@@ -67,7 +67,7 @@ export default (S) =>
               S.listItem().title('Conference Registrations').schemaType('conferenceRegistration').child(S.documentTypeList('conferenceRegistration')),
             ])
         ),
-      S.listItem().title('Statistics Section').schemaType('statistics').child(S.documentTypeList('statistics')),
+      S.listItem().title('Image Section').schemaType('imageSection').child(S.documentTypeList('imageSection')),
       S.listItem().title('Sponsorship Tiers').schemaType('sponsorshipTiers').child(S.documentTypeList('sponsorshipTiers')),
       S.listItem().title('Sponsor Registration').schemaType('sponsorRegistration').child(S.documentTypeList('sponsorRegistration')),
       S.listItem().title('Payment Transaction').schemaType('paymentTransaction').child(S.documentTypeList('paymentTransaction')),
