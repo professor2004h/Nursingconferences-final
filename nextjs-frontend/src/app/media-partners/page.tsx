@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { MediaPartner, MediaPartnersApiResponse } from '@/app/types/mediaPartners';
 
 const MediaPartnersPage: React.FC = () => {
@@ -64,17 +63,17 @@ const MediaPartnersPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-green-600">Media Partners</h1>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+      <div className="relative bg-white py-12 sm:py-16">
+        <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-green-600">Media Partners</h1>
+          <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
             We are grateful to our media partners who help us reach a wider audience and promote our conferences
           </p>
         </div>
       </div>
 
       {/* Partners Grid */}
-      <div className="container mx-auto px-4 pb-16">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-12 sm:pb-16">
         {partners.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-gray-400 text-6xl mb-4">🤝</div>
@@ -82,8 +81,8 @@ const MediaPartnersPage: React.FC = () => {
             <p className="text-gray-500">Partner logos will be displayed here once they are added.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+          <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-6 lg:p-8">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {partners.map((partner) => (
                 <PartnerCard key={partner._id} partner={partner} />
               ))}
@@ -102,32 +101,32 @@ interface PartnerCardProps {
 
 const PartnerCard: React.FC<PartnerCardProps> = ({ partner }) => {
   const cardContent = (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6 hover:shadow-md transition-shadow duration-300 min-h-[140px] sm:min-h-[160px] md:min-h-[180px]">
       {/* Logo */}
-      <div className="relative h-20 mb-3 flex items-center justify-center">
+      <div className="relative h-20 sm:h-24 md:h-26 lg:h-28 mb-3 sm:mb-4 flex items-center justify-center">
         {partner.logo?.asset?.url ? (
           <Image
             src={partner.logo.asset.url}
             alt={partner.logo.alt || partner.companyName}
             fill
             className="object-contain"
-            sizes="200px"
+            sizes="(max-width: 480px) 150px, (max-width: 768px) 180px, (max-width: 1024px) 200px, 250px"
           />
         ) : (
           <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center text-gray-400">
-            <span className="text-xl">🏢</span>
+            <span className="text-xl sm:text-2xl">🏢</span>
           </div>
         )}
       </div>
 
       {/* Company Name */}
-      <h3 className="font-medium text-gray-900 text-center text-sm mb-2">
+      <h3 className="font-medium text-gray-900 text-center text-xs sm:text-sm lg:text-base mb-1 sm:mb-2 leading-tight">
         {partner.companyName}
       </h3>
 
       {/* Description */}
       {partner.description && (
-        <p className="text-xs text-gray-600 text-center line-clamp-2">
+        <p className="text-xs sm:text-xs lg:text-sm text-gray-600 text-center line-clamp-2 leading-tight">
           {partner.description}
         </p>
       )}
