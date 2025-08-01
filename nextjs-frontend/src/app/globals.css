@@ -2112,12 +2112,32 @@ select:focus {
   padding: clamp(0.25rem, 1.2vw, 0.4rem) clamp(0.6rem, 2.5vw, 1rem) !important;
   backdrop-filter: blur(4px) !important;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2) !important;
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   transition: all 0.3s ease !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   max-width: 90% !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Event Type Icon Styling */
+.hero-event-type span:first-child {
+  flex-shrink: 0 !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+  font-size: 1em !important;
+  vertical-align: middle !important;
+}
+
+.hero-event-type span:last-child {
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+  display: inline-block !important;
+  line-height: 1.1 !important;
+  vertical-align: middle !important;
 }
 
 /* Additional specificity for conference title */
@@ -2456,6 +2476,29 @@ a.hero-register-button,
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.2rem !important;
+  }
+
+  /* Very Small Mobile Event Type Icon Styling */
+  .hero-event-type span:first-child {
+    font-size: 0.6rem !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+  }
+
+  .hero-event-type span:last-child {
+    font-size: 0.6rem !important;
+    line-height: 1.1 !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
   }
 
   .hero-date-venue-container {
@@ -2640,6 +2683,29 @@ a.hero-register-button,
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.15rem !important;
+  }
+
+  /* Mobile Event Type Icon Styling */
+  .hero-event-type span:first-child {
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+  }
+
+  .hero-event-type span:last-child {
+    font-size: 0.55rem !important;
+    line-height: 1.1 !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
   }
 
   .hero-info-value-simple {
