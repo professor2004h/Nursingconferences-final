@@ -119,6 +119,39 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
             </p>
           )}
 
+          {/* Event Type */}
+          {hero?.eventType && (
+            <div
+              className="hero-event-type"
+              style={{
+                color: '#10b981',
+                opacity: 1,
+                fontSize: 'clamp(0.65rem, 2.2vw, 0.85rem)',
+                fontWeight: '600',
+                letterSpacing: '0.03em',
+                textTransform: 'uppercase',
+                margin: '0',
+                marginBottom: '0.4rem',
+                lineHeight: '1.1',
+                textAlign: 'center',
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: 'clamp(10px, 2.5vw, 16px)',
+                padding: 'clamp(0.25rem, 1.2vw, 0.4rem) clamp(0.6rem, 2.5vw, 1rem)',
+                backdropFilter: 'blur(4px)',
+                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)',
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '90%'
+              }}
+            >
+              <span style={{ marginRight: '0.3rem' }}>🌐</span>
+              {hero.eventType}
+            </div>
+          )}
+
           {/* Date and Venue Section - Simplified Layout */}
           <div className="hero-date-venue-container">
             {/* Date */}

@@ -24,6 +24,7 @@ export interface HeroSectionType {
   conferenceTheme: string;
   conferenceDate: string;
   conferenceVenue: string;
+  eventType: string;
   abstractSubmissionInfo: string;
   registrationInfo: string;
   showRegisterButton: boolean;
@@ -56,6 +57,7 @@ export async function getHeroSection(): Promise<HeroSectionType | null> {
       conferenceTheme,
       conferenceDate,
       conferenceVenue,
+      eventType,
       abstractSubmissionInfo,
       registrationInfo,
       showRegisterButton,
@@ -108,6 +110,11 @@ export async function getHeroSection(): Promise<HeroSectionType | null> {
       // Default conference venue
       if (!data.conferenceVenue) {
         data.conferenceVenue = 'Hotel Indigo Kuala Lumpur On The Park, Kuala Lumpur, Malaysia';
+      }
+
+      // Default event type
+      if (!data.eventType) {
+        data.eventType = 'Hybrid event (Online and Offline)';
       }
 
       // Default abstract submission info

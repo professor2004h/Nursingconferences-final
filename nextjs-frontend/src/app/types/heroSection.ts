@@ -22,6 +22,7 @@ export interface HeroSectionType {
   conferenceTheme: string;
   conferenceDate: string;
   conferenceVenue: string;
+  eventType: string;
   abstractSubmissionInfo: string;
   registrationInfo: string;
   showRegisterButton: boolean;

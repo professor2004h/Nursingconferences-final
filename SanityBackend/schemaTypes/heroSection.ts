@@ -105,6 +105,14 @@ const heroSection = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'eventType',
+      title: 'Event Type',
+      description: 'Type of event (e.g., Hybrid event (Online and Offline), Online Only, In-Person Only)',
+      type: 'string',
+      initialValue: 'Hybrid event (Online and Offline)',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'abstractSubmissionInfo',
       title: 'Abstract Submission Information',
       description: 'Information about abstract submission deadlines',
