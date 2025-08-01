@@ -140,29 +140,14 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
                 padding: 'clamp(0.25rem, 1.2vw, 0.4rem) clamp(0.6rem, 2.5vw, 1rem)',
                 backdropFilter: 'blur(4px)',
                 boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: 'inline-block',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                maxWidth: '90%',
-                gap: 'clamp(0.15rem, 0.8vw, 0.3rem)',
-                flexWrap: 'nowrap'
+                maxWidth: '90%'
               }}
             >
-              <span style={{
-                display: 'inline-block',
-                flexShrink: 0,
-                lineHeight: '1',
-                fontSize: '1em'
-              }}>🌐</span>
-              <span style={{
-                display: 'inline-block',
-                lineHeight: '1.1',
-                flexShrink: 1,
-                minWidth: 0
-              }}>{hero.eventType}</span>
+              🌐 {hero.eventType}
             </div>
           )}
 
