@@ -40,6 +40,7 @@ import EventScheduleAndBenefitsSection from '@/app/components/EventScheduleAndBe
 import HeroSlideshow from "./components/HeroSlideshow";
 import ImageSection from "./components/ImageSection";
 import ContactAndAboutSection from "./components/ContactAndAboutSection";
+import MediaPartnersSection from "./components/MediaPartnersSection";
 
 export default async function HomePage() {
   // Optimized parallel data fetching with error handling
@@ -715,6 +716,9 @@ function HomePageContent({
         </div>
       </section>
       )}
+
+      {/* Media Partners Section */}
+      <MediaPartnersSection />
 
       {/* Contact and About Us Section */}
       <ContactAndAboutSection />
