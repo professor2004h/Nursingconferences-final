@@ -110,20 +110,45 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
 
   if (loading) {
     return (
-      <section className={`py-12 md:py-16 lg:py-20 bg-gradient-to-br from-gray-50 to-gray-100 ${className}`}>
+      <section className={`py-8 md:py-12 lg:py-16 bg-gradient-to-br from-gray-50 to-gray-100 ${className}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Schedule Skeleton */}
-            <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 animate-pulse h-full flex flex-col">
-              <div className="text-center mb-6">
+          {/* EXACT SKELETON MATCHING: Fixed height grid with explicit dimensions */}
+          <div
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12"
+            style={{
+              minHeight: '600px', // Force minimum height for equal columns
+            }}
+          >
+            {/* Schedule Skeleton - EXACT DIMENSIONS (30% Larger) */}
+            <div
+              className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 animate-pulse flex flex-col"
+              style={{
+                height: '780px', // Increased by 30% to match content
+                minHeight: '780px',
+                maxHeight: '780px',
+              }}
+            >
+              {/* Header - EXACT skeleton match */}
+              <div className="text-center mb-6" style={{ flexShrink: 0 }}>
                 <div className="h-6 bg-gray-300 rounded w-32 mx-auto mb-3"></div>
                 <div className="w-12 h-0.5 bg-gray-300 mx-auto"></div>
               </div>
-              <div className="flex justify-center mb-6 gap-1">
+
+              {/* Day Tabs - EXACT skeleton match */}
+              <div className="flex justify-center mb-6 gap-1" style={{ flexShrink: 0 }}>
                 <div className="h-8 bg-gray-300 w-16"></div>
                 <div className="h-8 bg-gray-300 w-16"></div>
               </div>
-              <div className="flex-1 border border-gray-200 bg-gray-50 overflow-hidden">
+
+              {/* Content Area - EXACT skeleton match */}
+              <div
+                className="border border-gray-200 bg-gray-50 overflow-hidden"
+                style={{
+                  flex: 1,
+                  minHeight: '400px',
+                  maxHeight: '400px',
+                }}
+              >
                 <div className="bg-white px-4 py-3 border-b border-gray-200">
                   <div className="h-4 bg-gray-300 rounded w-24 mx-auto"></div>
                 </div>
@@ -140,13 +165,30 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
               </div>
             </div>
 
-            {/* Benefits Skeleton */}
-            <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 animate-pulse h-full flex flex-col">
-              <div className="text-center mb-6">
+            {/* Benefits Skeleton - EXACT DIMENSIONS (30% Larger) */}
+            <div
+              className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 animate-pulse flex flex-col"
+              style={{
+                height: '780px', // Increased by 30% to match content
+                minHeight: '780px',
+                maxHeight: '780px',
+              }}
+            >
+              {/* Header - EXACT skeleton match */}
+              <div className="text-center mb-6" style={{ flexShrink: 0 }}>
                 <div className="h-6 bg-gray-300 rounded w-48 mx-auto mb-3"></div>
                 <div className="w-12 h-0.5 bg-gray-300 mx-auto"></div>
               </div>
-              <div className="flex-1 border border-gray-200 bg-gray-50 overflow-hidden">
+
+              {/* Content Area - EXACT skeleton match */}
+              <div
+                className="border border-gray-200 bg-gray-50 overflow-hidden"
+                style={{
+                  flex: 1,
+                  minHeight: '460px', // Slightly larger for benefits (no day tabs)
+                  maxHeight: '460px',
+                }}
+              >
                 <div className="p-4 space-y-3">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div key={i} className="bg-white border border-gray-200 p-3">
@@ -254,16 +296,59 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
   return (
     <section className={`py-8 md:py-12 lg:py-16 bg-gradient-to-br from-gray-50 to-gray-100 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Desktop: 2-column layout with equal heights, Mobile: 1-column stacked - UPDATED */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:items-stretch">
-          {/* Event Schedule - Left column on desktop, top on mobile */}
-          <div className="order-1 flex">
-            <EventScheduleSection scheduleData={scheduleData} />
+        {/* Main Grid: Each Column Contains Its Own Heading + Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+          {/* Event Schedule Column - Heading + Content */}
+          <div className="order-1">
+            {/* Event Schedule Heading */}
+            <div className="text-center lg:text-left mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-black mb-2">
+                Event <span className="text-orange-500">Schedule</span>
+              </h2>
+              <div className="w-16 h-0.5 bg-orange-500 mx-auto lg:mx-0 mb-4"></div>
+              <p className="text-gray-600 text-sm md:text-base">
+                Detailed timeline of all conference sessions and activities
+              </p>
+            </div>
+
+            {/* Event Schedule Content - Fixed Equal Height (30% Larger) */}
+            <div
+              style={{
+                display: 'flex',
+                height: '780px', // Increased by 30% (600px × 1.3)
+                minHeight: '780px',
+                maxHeight: '780px',
+              }}
+            >
+              <EventScheduleSection scheduleData={scheduleData} />
+            </div>
           </div>
 
-          {/* Participation Benefits - Right column on desktop, bottom on mobile */}
-          <div className="order-2 flex">
-            <ParticipationBenefitsSection benefitsData={benefitsData} />
+          {/* Participation Benefits Column - Heading + Content */}
+          <div className="order-2">
+            {/* Participation Benefits Heading */}
+            <div className="text-center lg:text-left mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-black mb-2">
+                Participation <span className="text-orange-500">Benefits</span>
+              </h2>
+              <div className="w-16 h-0.5 bg-orange-500 mx-auto lg:mx-0 mb-4"></div>
+              <p className="text-gray-600 text-sm md:text-base">
+                Exclusive advantages and opportunities for conference attendees
+              </p>
+            </div>
+
+            {/* Participation Benefits Content - Fixed Equal Height (30% Larger) */}
+            <div
+              style={{
+                display: 'flex',
+                height: '780px', // Increased by 30% (600px × 1.3)
+                minHeight: '780px',
+                maxHeight: '780px',
+              }}
+            >
+              <ParticipationBenefitsSection benefitsData={benefitsData} />
+            </div>
           </div>
         </div>
       </div>

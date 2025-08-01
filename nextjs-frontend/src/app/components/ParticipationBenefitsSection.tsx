@@ -106,9 +106,18 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
   const sortedBenefits = [...benefitsData.benefits].sort((a, b) => a.displayOrder - b.displayOrder);
 
   return (
-    <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 h-full flex flex-col w-full">
-      {/* Header - Exact skeleton match */}
-      <div className="text-center mb-6">
+    <div
+      className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 w-full"
+      style={{
+        height: '100%',
+        minHeight: '754px', // Increased by 30% (580px × 1.3)
+        maxHeight: '754px',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* Header - EXACT skeleton match */}
+      <div className="text-center mb-6" style={{ flexShrink: 0 }}>
         <h2 className="text-lg font-semibold text-gray-800 mb-3 h-6 flex items-center justify-center">
           {benefitsData.title}
         </h2>
@@ -120,28 +129,54 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
         <div className="w-12 h-0.5 bg-gray-400 mx-auto mt-3"></div>
       </div>
 
-      {/* Benefits List - Exact skeleton match with compact design */}
-      <div className="flex-1 border border-gray-200 bg-gray-50 overflow-hidden">
-        <div className="h-full overflow-y-auto p-4" style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#9ca3af #f3f4f6'
-        }}>
+      {/* Scrolling Container - 30% Larger for Better Readability */}
+      <div
+        className="border border-gray-200 bg-gray-50"
+        style={{
+          flex: 1,
+          minHeight: '598px', // Increased by 30% (460px × 1.3)
+          maxHeight: '598px',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Enhanced Scrolling Area */}
+        <div
+          style={{
+            height: '100%',
+            overflowY: 'scroll',
+            overflowX: 'hidden',
+            padding: '16px',
+            backgroundColor: '#f9fafb',
+            // Enhanced scrollbar styles
+            scrollbarWidth: 'auto',
+            scrollbarColor: '#9ca3af #f3f4f6',
+          }}
+        >
+          {/* Enhanced Scrollbar Styles for Webkit Browsers */}
           <style jsx>{`
             div::-webkit-scrollbar {
-              width: 6px;
+              width: 8px;
+              background: #f3f4f6;
             }
             div::-webkit-scrollbar-track {
               background: #f3f4f6;
-              border-radius: 3px;
+              border-radius: 4px;
             }
             div::-webkit-scrollbar-thumb {
               background: #9ca3af;
-              border-radius: 3px;
+              border-radius: 4px;
+              box-shadow: inset 0 0 2px rgba(0,0,0,0.1);
             }
             div::-webkit-scrollbar-thumb:hover {
               background: #6b7280;
+              box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+            }
+            div::-webkit-scrollbar-corner {
+              background: #f3f4f6;
             }
           `}</style>
+
+          {/* Benefits Content */}
           <div className="space-y-3">
             {sortedBenefits.map((benefit, index) => (
               <div
@@ -151,12 +186,12 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  {/* Icon - Exact skeleton match */}
+                  {/* Icon - EXACT skeleton match */}
                   <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                     {getIconComponent(benefit.icon)}
                   </div>
 
-                  {/* Content - Compact design */}
+                  {/* Content */}
                   <div className="flex-1 min-w-0">
                     <h3 className={`text-sm font-medium mb-1 leading-tight ${
                       benefit.isHighlighted ? 'text-orange-800' : 'text-gray-800'

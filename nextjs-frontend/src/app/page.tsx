@@ -40,7 +40,6 @@ import EventScheduleAndBenefitsSection from '@/app/components/EventScheduleAndBe
 import ContactForm from "./components/ContactForm";
 import HeroSlideshow from "./components/HeroSlideshow";
 import ImageSection from "./components/ImageSection";
-import LeafletMapLocations from "./components/LeafletMapLocations";
 
 export default async function HomePage() {
   // Optimized parallel data fetching with error handling
@@ -802,11 +801,6 @@ function HomePageContent({
           </div>
         </div>
       </section>
-
-
-
-      {/* Conference Locations Map Section - OpenStreetMap with Leaflet */}
-      <LeafletMapLocations />
 
     </div>
   );
