@@ -114,22 +114,26 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Schedule Skeleton */}
-            <div className="bg-gray-900 rounded-xl p-6 md:p-8 shadow-xl animate-pulse">
-              <div className="text-center mb-8">
-                <div className="h-8 bg-gray-700 rounded w-32 mx-auto mb-2"></div>
-                <div className="w-16 h-1 bg-gray-700 mx-auto rounded-full"></div>
+            <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 animate-pulse h-full flex flex-col">
+              <div className="text-center mb-6">
+                <div className="h-6 bg-gray-300 rounded w-32 mx-auto mb-3"></div>
+                <div className="w-12 h-0.5 bg-gray-300 mx-auto"></div>
               </div>
-              <div className="flex justify-center mb-8 gap-2">
-                <div className="h-16 bg-gray-700 rounded-lg w-24"></div>
-                <div className="h-16 bg-gray-700 rounded-lg w-24"></div>
+              <div className="flex justify-center mb-6 gap-1">
+                <div className="h-8 bg-gray-300 w-16"></div>
+                <div className="h-8 bg-gray-300 w-16"></div>
               </div>
-              <div className="bg-gray-800 rounded-lg p-6">
-                <div className="space-y-4">
+              <div className="flex-1 border border-gray-200 bg-gray-50 overflow-hidden">
+                <div className="bg-white px-4 py-3 border-b border-gray-200">
+                  <div className="h-4 bg-gray-300 rounded w-24 mx-auto"></div>
+                </div>
+                <div className="p-4 space-y-3">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="flex items-start gap-4">
-                      <div className="w-24 h-12 bg-gray-700 rounded"></div>
-                      <div className="w-3 h-3 bg-gray-700 rounded-full mt-2"></div>
-                      <div className="flex-1 h-16 bg-gray-700 rounded"></div>
+                    <div key={i} className="bg-white border border-gray-200 p-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-16 h-8 bg-gray-300 rounded"></div>
+                        <div className="flex-1 h-12 bg-gray-300 rounded"></div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -137,21 +141,25 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
             </div>
 
             {/* Benefits Skeleton */}
-            <div className="bg-white rounded-xl p-6 md:p-8 shadow-xl border border-gray-200 animate-pulse">
-              <div className="text-center mb-8">
-                <div className="h-8 bg-gray-300 rounded w-48 mx-auto mb-2"></div>
-                <div className="w-16 h-1 bg-gray-300 mx-auto rounded-full"></div>
+            <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 animate-pulse h-full flex flex-col">
+              <div className="text-center mb-6">
+                <div className="h-6 bg-gray-300 rounded w-48 mx-auto mb-3"></div>
+                <div className="w-12 h-0.5 bg-gray-300 mx-auto"></div>
               </div>
-              <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-300 rounded"></div>
-                    <div className="flex-1">
-                      <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+              <div className="flex-1 border border-gray-200 bg-gray-50 overflow-hidden">
+                <div className="p-4 space-y-3">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="bg-white border border-gray-200 p-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-5 h-5 bg-gray-300 rounded"></div>
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -244,17 +252,17 @@ const EventScheduleAndBenefitsSection: React.FC<EventScheduleAndBenefitsSectionP
   }
 
   return (
-    <section className={`py-8 md:py-12 lg:py-16 bg-gradient-to-br from-blue-50 to-indigo-50 ${className}`}>
+    <section className={`py-8 md:py-12 lg:py-16 bg-gradient-to-br from-gray-50 to-gray-100 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Desktop: 2-column layout with equal heights, Mobile: 1-column stacked */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 lg:items-stretch">
+        {/* Desktop: 2-column layout with equal heights, Mobile: 1-column stacked - UPDATED */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:items-stretch">
           {/* Event Schedule - Left column on desktop, top on mobile */}
-          <div className="order-1">
+          <div className="order-1 flex">
             <EventScheduleSection scheduleData={scheduleData} />
           </div>
-          
+
           {/* Participation Benefits - Right column on desktop, bottom on mobile */}
-          <div className="order-2">
+          <div className="order-2 flex">
             <ParticipationBenefitsSection benefitsData={benefitsData} />
           </div>
         </div>

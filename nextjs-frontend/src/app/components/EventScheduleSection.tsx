@@ -36,107 +36,94 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
     return null;
   }
 
-  const getSessionTypeColor = (type: string, isHighlighted?: boolean) => {
-    if (isHighlighted) {
-      return 'bg-orange-50 border-orange-400 text-orange-800';
-    }
 
-    switch (type) {
-      case 'keynote':
-        return 'bg-blue-50 border-blue-400 text-blue-800';
-      case 'plenary':
-        return 'bg-indigo-50 border-indigo-400 text-indigo-800';
-      case 'break':
-      case 'lunch':
-        return 'bg-green-50 border-green-400 text-green-800';
-      case 'registration':
-        return 'bg-gray-50 border-gray-400 text-gray-800';
-      case 'opening':
-      case 'closing':
-        return 'bg-orange-50 border-orange-400 text-orange-800';
-      default:
-        return 'bg-white border-gray-300 text-gray-700';
-    }
-  };
 
   return (
-    <div className="bg-white rounded-xl p-4 md:p-6 shadow-xl border border-gray-200 h-full flex flex-col">
-      {/* Header */}
+    <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 h-full flex flex-col w-full">
+      {/* Header - Exact skeleton match */}
       <div className="text-center mb-6">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-lg font-semibold text-gray-800 mb-3 h-6 flex items-center justify-center">
           {scheduleData.title}
         </h2>
-        <div className="w-16 h-1 bg-blue-500 mx-auto rounded-full"></div>
+        <div className="w-12 h-0.5 bg-gray-400 mx-auto"></div>
       </div>
 
-      {/* Day Tabs */}
-      <div className="flex flex-wrap justify-center mb-6 gap-2">
+      {/* Day Tabs - Exact skeleton match */}
+      <div className="flex justify-center mb-6 gap-1">
         {scheduleData.days.map((day, index) => (
           <button
             key={day.dayNumber}
             onClick={() => setActiveDay(index)}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 border ${
+            className={`h-8 w-16 text-xs font-medium transition-colors flex items-center justify-center ${
               activeDay === index
-                ? 'bg-blue-600 text-white shadow-lg transform scale-105 border-blue-600'
-                : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700'
+                ? 'bg-gray-800 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            <div className="text-sm">Day {day.dayNumber}</div>
-            <div className="text-xs opacity-90">{day.displayDate}</div>
+            Day {day.dayNumber}
           </button>
         ))}
       </div>
 
-      {/* Schedule Content - Flex grow to fill remaining space */}
-      <div className="bg-gray-50 rounded-lg p-4 flex-grow border border-gray-200">
+      {/* Schedule Content - Exact skeleton match with compact design */}
+      <div className="flex-1 border border-gray-200 bg-gray-50 overflow-hidden">
         {scheduleData.days[activeDay] && (
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-4">
-              Day {scheduleData.days[activeDay].dayNumber} - {scheduleData.days[activeDay].displayDate}
-            </h3>
-            
-            {/* Timeline */}
-            <div className="space-y-2">
-              {scheduleData.days[activeDay].sessions.map((session, sessionIndex) => (
-                <div key={sessionIndex} className="flex items-start gap-3">
-                  {/* Time */}
-                  <div className="flex-shrink-0 w-24 md:w-28">
-                    <div className="text-blue-600 font-semibold text-sm">
-                      {session.startTime}
-                    </div>
-                    <div className="text-blue-500 text-xs">
-                      {session.endTime}
-                    </div>
-                  </div>
+          <div className="h-full flex flex-col">
+            <div className="bg-white px-4 py-3 border-b border-gray-200 flex-shrink-0">
+              <h3 className="text-sm font-medium text-gray-700 text-center h-4 flex items-center justify-center">
+                {scheduleData.days[activeDay].displayDate}
+              </h3>
+            </div>
 
-                  {/* Timeline Line */}
-                  <div className="flex-shrink-0 flex flex-col items-center">
-                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
-                    {sessionIndex < scheduleData.days[activeDay].sessions.length - 1 && (
-                      <div className="w-0.5 h-6 bg-blue-500 opacity-50"></div>
-                    )}
-                  </div>
+            {/* Scrollable Timeline Container - Exact skeleton match */}
+            <div className="flex-1 overflow-y-auto p-4" style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#9ca3af #f3f4f6'
+            }}>
+              <style jsx>{`
+                div::-webkit-scrollbar {
+                  width: 6px;
+                }
+                div::-webkit-scrollbar-track {
+                  background: #f3f4f6;
+                  border-radius: 3px;
+                }
+                div::-webkit-scrollbar-thumb {
+                  background: #9ca3af;
+                  border-radius: 3px;
+                }
+                div::-webkit-scrollbar-thumb:hover {
+                  background: #6b7280;
+                }
+              `}</style>
+              <div className="space-y-3">
+                {scheduleData.days[activeDay].sessions.map((session, sessionIndex) => (
+                  <div key={sessionIndex} className="bg-white border border-gray-200 p-3">
+                    <div className="flex items-start gap-3">
+                      {/* Time - Exact skeleton match */}
+                      <div className="flex-shrink-0 w-16 h-8 flex flex-col justify-center text-xs text-gray-500">
+                        <div className="font-medium leading-tight">{session.startTime}</div>
+                        <div className="leading-tight">{session.endTime}</div>
+                      </div>
 
-                  {/* Session Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className={`p-3 rounded-lg border-l-4 ${getSessionTypeColor(session.type, session.isHighlighted)}`}>
-                      <h4 className="font-semibold text-sm md:text-base mb-1">
-                        {session.title}
-                      </h4>
-                      {session.description && (
-                        <p className="text-xs md:text-sm opacity-80">
-                          {session.description}
-                        </p>
-                      )}
-                      <div className="mt-2">
-                        <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full capitalize">
-                          {session.type.replace('-', ' ')}
+                      {/* Session Content - Compact design */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-gray-800 mb-1 leading-tight">
+                          {session.title}
+                        </h4>
+                        {session.description && (
+                          <p className="text-xs text-gray-600 mb-2 leading-tight">
+                            {session.description}
+                          </p>
+                        )}
+                        <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium leading-none">
+                          {session.type.replace('-', ' ').toUpperCase()}
                         </span>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         )}

@@ -106,53 +106,76 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
   const sortedBenefits = [...benefitsData.benefits].sort((a, b) => a.displayOrder - b.displayOrder);
 
   return (
-    <div className="bg-white rounded-xl p-4 md:p-6 shadow-xl border border-gray-200 h-full flex flex-col">
-      {/* Header */}
+    <div className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 h-full flex flex-col w-full">
+      {/* Header - Exact skeleton match */}
       <div className="text-center mb-6">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-lg font-semibold text-gray-800 mb-3 h-6 flex items-center justify-center">
           {benefitsData.title}
         </h2>
         {benefitsData.subtitle && (
-          <p className="text-gray-600 text-sm md:text-base">
+          <p className="text-gray-600 text-sm">
             {benefitsData.subtitle}
           </p>
         )}
-        <div className="w-16 h-1 bg-blue-500 mx-auto rounded-full mt-4"></div>
+        <div className="w-12 h-0.5 bg-gray-400 mx-auto mt-3"></div>
       </div>
 
-      {/* Benefits List - Compact layout without forced scrolling */}
-      <div className="space-y-3 flex-grow">
-        {sortedBenefits.map((benefit, index) => (
-          <div
-            key={index}
-            className={`flex items-start gap-3 p-3 rounded-lg transition-all duration-200 hover:shadow-md ${
-              benefit.isHighlighted
-                ? 'bg-orange-50 border border-orange-200 shadow-sm'
-                : 'bg-gray-50 hover:bg-blue-50'
-            }`}
-          >
-            {/* Icon */}
-            <div className="flex-shrink-0 mt-0.5">
-              {getIconComponent(benefit.icon)}
-            </div>
-            
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <h3 className={`font-semibold text-sm md:text-base ${
-                benefit.isHighlighted ? 'text-green-800' : 'text-gray-900'
-              }`}>
-                {benefit.title}
-              </h3>
-              {benefit.description && (
-                <p className={`text-xs md:text-sm mt-1 ${
-                  benefit.isHighlighted ? 'text-green-700' : 'text-gray-600'
-                }`}>
-                  {benefit.description}
-                </p>
-              )}
-            </div>
+      {/* Benefits List - Exact skeleton match with compact design */}
+      <div className="flex-1 border border-gray-200 bg-gray-50 overflow-hidden">
+        <div className="h-full overflow-y-auto p-4" style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#9ca3af #f3f4f6'
+        }}>
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              width: 6px;
+            }
+            div::-webkit-scrollbar-track {
+              background: #f3f4f6;
+              border-radius: 3px;
+            }
+            div::-webkit-scrollbar-thumb {
+              background: #9ca3af;
+              border-radius: 3px;
+            }
+            div::-webkit-scrollbar-thumb:hover {
+              background: #6b7280;
+            }
+          `}</style>
+          <div className="space-y-3">
+            {sortedBenefits.map((benefit, index) => (
+              <div
+                key={index}
+                className={`bg-white border border-gray-200 p-3 ${
+                  benefit.isHighlighted ? 'border-orange-300 bg-orange-50' : ''
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  {/* Icon - Exact skeleton match */}
+                  <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                    {getIconComponent(benefit.icon)}
+                  </div>
+
+                  {/* Content - Compact design */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`text-sm font-medium mb-1 leading-tight ${
+                      benefit.isHighlighted ? 'text-orange-800' : 'text-gray-800'
+                    }`}>
+                      {benefit.title}
+                    </h3>
+                    {benefit.description && (
+                      <p className={`text-xs leading-tight ${
+                        benefit.isHighlighted ? 'text-orange-700' : 'text-gray-600'
+                      }`}>
+                        {benefit.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

@@ -4516,3 +4516,25 @@ body:has(.dropdown-menu-overlay) {
 .scrollbar-track-gray-100::-webkit-scrollbar-track {
   background: #f3f4f6;
 }
+
+/* Green scrollbar variants for dark schedule section */
+.scrollbar-thumb-green-300::-webkit-scrollbar-thumb {
+  background: #86efac;
+}
+
+.scrollbar-thumb-green-400::-webkit-scrollbar-thumb {
+  background: #4ade80;
+}
+
+.scrollbar-track-gray-700::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+/* Blue scrollbar variants for light benefits section */
+.scrollbar-thumb-blue-300::-webkit-scrollbar-thumb {
+  background: #93c5fd;
+}
+
+.scrollbar-thumb-blue-400::-webkit-scrollbar-thumb {
+  background: #60a5fa;
+}
