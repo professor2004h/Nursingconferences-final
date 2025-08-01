@@ -13,6 +13,7 @@ interface HeaderClientProps {
 const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
+  const [isMobileMoreExpanded, setIsMobileMoreExpanded] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownContentRef = useRef<HTMLDivElement>(null);
@@ -27,6 +28,11 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+    setIsMobileMoreExpanded(false); // Reset mobile more section when closing menu
+  };
+
+  const toggleMobileMore = () => {
+    setIsMobileMoreExpanded(prev => !prev);
   };
 
   const toggleMoreDropdown = () => {
@@ -407,77 +413,116 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
             {/* Divider */}
             <div className="border-t border-gray-300 my-2"></div>
-            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              More
-            </div>
 
-            {/* More Section Links */}
-            <Link
-              href="/conferences"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
+            {/* Expandable More Button */}
+            <button
+              onClick={toggleMobileMore}
+              className="w-full flex items-center justify-between px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Conferences
-            </Link>
-            <Link
-              href="/speakers"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Speakers
-            </Link>
-            <Link
-              href="/sponsorship"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Sponsorship
-            </Link>
-            <Link
-              href="/past-conferences"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Past Conferences
-            </Link>
-            <Link
-              href="/media-partners"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Media Partners
-            </Link>
-            <Link
-              href="/speaker-guidelines"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Speaker Guidelines
-            </Link>
-            <Link
-              href="/poster-presenters"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Poster Presenters
-            </Link>
-            <Link
-              href="/past-conference-gallery"
-              className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={closeMenu}
-            >
-              Gallery
-            </Link>
-            {siteSettings?.journal?.showJournal && (
-              <Link
-                href={siteSettings.journal.journalUrl || "/journal"}
-                target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
-                rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
-                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={closeMenu}
+              <span className="flex items-center">
+                <svg
+                  className="w-4 h-4 mr-2 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
+                  />
+                </svg>
+                More Options
+              </span>
+              <svg
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  isMobileMoreExpanded ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                Journal
-              </Link>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {/* Expandable More Section Links */}
+            {isMobileMoreExpanded && (
+              <div className="ml-4 space-y-1 border-l-2 border-gray-200 pl-3">
+                <Link
+                  href="/conferences"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Conferences
+                </Link>
+                <Link
+                  href="/speakers"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Speakers
+                </Link>
+                <Link
+                  href="/sponsorship"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Sponsorship
+                </Link>
+                <Link
+                  href="/past-conferences"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Past Conferences
+                </Link>
+                <Link
+                  href="/media-partners"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Media Partners
+                </Link>
+                <Link
+                  href="/speaker-guidelines"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Speaker Guidelines
+                </Link>
+                <Link
+                  href="/poster-presenters"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Poster Presenters
+                </Link>
+                <Link
+                  href="/past-conference-gallery"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Gallery
+                </Link>
+                {siteSettings?.journal?.showJournal && (
+                  <Link
+                    href={siteSettings.journal.journalUrl || "/journal"}
+                    target={siteSettings.journal.openInNewTab ? "_blank" : "_self"}
+                    rel={siteSettings.journal.openInNewTab ? "noopener noreferrer" : undefined}
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={closeMenu}
+                  >
+                    Journal
+                  </Link>
+                )}
+              </div>
             )}
 
             {/* Divider */}
