@@ -179,19 +179,19 @@ const FeaturedSpeakersSection: React.FC = () => {
             </p>
           </div>
 
-          {/* Speakers by Category */}
+          {/* Speakers by Category - ULTRA COMPACT */}
           {Object.entries(speakersByCategory).map(([category, categorySpeakers]) => (
-            <div key={category} className="mb-16">
-              {/* Category Header */}
-              <div className="text-center mb-8">
+            <div key={category} className="mb-8">
+              {/* Category Header - ULTRA COMPACT */}
+              <div className="text-center mb-4">
                 <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                   {SPEAKER_CATEGORIES[category as keyof typeof SPEAKER_CATEGORIES]}
                 </h3>
                 <div className="w-24 h-1 bg-orange-500 mx-auto"></div>
               </div>
 
-              {/* Speakers Grid - 2 columns on mobile, 3-4 columns on larger screens */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-8">
+              {/* Speakers Grid - 2 columns on mobile, 3-4 columns on larger screens - ULTRA COMPACT */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mb-4">
                 {categorySpeakers.map((speaker) => (
                   <SpeakerCard
                     key={speaker._id}

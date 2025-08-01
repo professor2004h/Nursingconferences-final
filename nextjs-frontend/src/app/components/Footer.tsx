@@ -49,8 +49,8 @@ export default async function Footer() {
       <div className="relative z-10">
 
 
-      {/* Newsletter Section */}
-      <div className="bg-white py-12">
+      {/* Newsletter Section - ULTRA COMPACT */}
+      <div className="bg-white py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h3 className="text-2xl font-bold mb-4 text-gray-900">Subscribe to Our Newsletter</h3>
@@ -71,8 +71,8 @@ export default async function Footer() {
         </div>
       </div>
 
-      {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Main Footer Content - ULTRA COMPACT */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info with Logo */}
           <div className="lg:col-span-2">
@@ -272,9 +272,9 @@ export default async function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
+      {/* Bottom Bar - ULTRA COMPACT */}
       <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
               ©2025 Copyright Intelli Global Conferences. All Rights Reserved.

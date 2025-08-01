@@ -793,8 +793,8 @@ a:hover {
 
   /* Mobile spacing after hero */
   .hero-section + * {
-    /* Minimal spacing on mobile */
-    margin-top: 1rem;
+    /* ULTRA MINIMAL spacing on mobile for faster scrolling */
+    margin-top: 0.25rem;
   }
 
   /* Header height compensation for mobile */
@@ -1133,59 +1133,59 @@ html {
   left: 100%;
 }
 
-/* Professional section spacing - Reduced for more compact layout */
+/* Professional section spacing - ULTRA COMPACT for faster scrolling */
 .section-spacing {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 @media (min-width: 768px) {
   .section-spacing {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
   }
 }
 
-/* Compact layout utilities for better vertical rhythm */
+/* Compact layout utilities for better vertical rhythm - ULTRA COMPACT */
 .compact-section {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 @media (min-width: 768px) {
   .compact-section {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
   }
 }
 
-/* Reduced margins for content blocks */
+/* ULTRA COMPACT margins for content blocks */
 .content-block {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 @media (min-width: 768px) {
   .content-block {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.25rem;
   }
 }
 
-/* Tighter spacing for text elements */
+/* ULTRA COMPACT spacing for text elements */
 .text-block h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .text-block p {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.75rem;
 }
 
 @media (min-width: 768px) {
   .text-block h2 {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
   }
 
   .text-block p {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -3170,10 +3170,10 @@ a.hero-register-button,
 
 
 
-/* Professional Spacing and Visual Hierarchy - Reduced for compact layout */
+/* ULTRA COMPACT Spacing and Visual Hierarchy */
 .hero-section + * {
-  /* Reduced spacing after hero section for more compact layout */
-  margin-top: 1.5rem;
+  /* ULTRA COMPACT spacing after hero section for faster scrolling */
+  margin-top: 0.5rem;
 }
 
 /* Mobile spacing consolidated above */
@@ -4023,9 +4023,9 @@ a.hero-register-button,
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  /* Mobile spacing improvements */
+  /* Mobile spacing improvements - ULTRA COMPACT */
   .section-spacing {
-    padding: 24px 16px;
+    padding: 12px 16px;
   }
 
   /* Mobile typography improvements */
@@ -4045,9 +4045,9 @@ a.hero-register-button,
 
 /* Desktop UI Enhancements */
 @media (min-width: 1024px) {
-  /* Enhanced desktop spacing and typography */
+  /* Enhanced desktop spacing and typography - ULTRA COMPACT */
   .section-spacing {
-    padding: 48px 24px;
+    padding: 24px 24px;
   }
 
   /* Desktop card improvements */
@@ -4119,7 +4119,7 @@ a.hero-register-button,
 
 .navigation-blocks-section {
   background: #ffffff;
-  padding: 2rem 0;
+  padding: 1rem 0;
   width: 100%;
   position: relative;
   z-index: 5;
@@ -4224,7 +4224,7 @@ a.hero-register-button,
 /* Mobile responsive design - 2 columns, 3 rows */
 @media (max-width: 768px) {
   .navigation-blocks-section {
-    padding: 1.5rem 0;
+    padding: 0.75rem 0;
   }
 
   .navigation-blocks-container {
@@ -4335,9 +4335,9 @@ a.hero-register-button,
 /* Match Hero section dimensional proportions with proper content visibility */
 
 .past-conferences-section {
-  /* Mobile: Ensure all content is visible */
-  min-height: 100vh;
-  padding: 3rem 0;
+  /* Mobile: Ensure all content is visible - ULTRA COMPACT */
+  min-height: 60vh;
+  padding: 1.5rem 0;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -4348,8 +4348,8 @@ a.hero-register-button,
 /* Tablet: Balanced proportions with content visibility */
 @media (min-width: 641px) and (max-width: 1023px) {
   .past-conferences-section {
-    min-height: 90vh;
-    padding: 4rem 0;
+    min-height: 50vh;
+    padding: 2rem 0;
     align-items: center;
   }
 }
@@ -4357,9 +4357,9 @@ a.hero-register-button,
 /* Desktop: Hero-like proportions with full content visibility */
 @media (min-width: 1024px) {
   .past-conferences-section {
-    min-height: 85vh;
+    min-height: 45vh;
     max-height: none;
-    padding: 5rem 0;
+    padding: 2.5rem 0;
     align-items: center;
   }
 }
@@ -4367,8 +4367,8 @@ a.hero-register-button,
 /* Ultra-wide: Optimized proportions */
 @media (min-width: 1920px) {
   .past-conferences-section {
-    min-height: 80vh;
-    padding: 6rem 0;
+    min-height: 40vh;
+    padding: 3rem 0;
   }
 }
 
