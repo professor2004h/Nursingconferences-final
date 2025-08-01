@@ -57,16 +57,16 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
         <div className="w-12 h-0.5 bg-gray-400 mx-auto"></div>
       </div>
 
-      {/* Day Tabs - EXACT skeleton match */}
+      {/* Day Tabs - Enhanced with Orange Accents */}
       <div className="flex justify-center mb-6 gap-1" style={{ flexShrink: 0 }}>
         {scheduleData.days.map((day, index) => (
           <button
             key={day.dayNumber}
             onClick={() => setActiveDay(index)}
-            className={`h-8 w-16 text-xs font-medium transition-colors flex items-center justify-center ${
+            className={`h-8 w-16 text-xs font-medium transition-colors flex items-center justify-center border-2 ${
               activeDay === index
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-orange-500 text-white border-orange-500 shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200 hover:border-orange-300'
             }`}
           >
             Day {day.dayNumber}
@@ -86,14 +86,16 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
       >
         {scheduleData.days[activeDay] && (
           <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Date Header - FIXED HEIGHT */}
-            <div className="bg-white px-4 py-3 border-b border-gray-200" style={{ flexShrink: 0 }}>
-              <h3 className="text-sm font-medium text-gray-700 text-center h-4 flex items-center justify-center">
-                {scheduleData.days[activeDay].displayDate}
+            {/* Date Header - Enhanced with Orange Accent */}
+            <div className="bg-white px-4 py-3 border-b-2 border-orange-500" style={{ flexShrink: 0 }}>
+              <h3 className="text-sm font-medium text-black text-center h-4 flex items-center justify-center">
+                <span className="bg-orange-100 px-3 py-1 rounded-full text-orange-700 border border-orange-200">
+                  {scheduleData.days[activeDay].displayDate}
+                </span>
               </h3>
             </div>
 
-            {/* Enhanced Scrolling Container */}
+            {/* Enhanced Scrolling Container with Mobile Touch Support */}
             <div
               style={{
                 flex: 1,
@@ -104,6 +106,11 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
                 // Enhanced scrollbar styles
                 scrollbarWidth: 'auto',
                 scrollbarColor: '#9ca3af #f3f4f6',
+                // Mobile touch scrolling optimization
+                WebkitOverflowScrolling: 'touch',
+                touchAction: 'pan-y',
+                // Smooth scrolling behavior
+                scrollBehavior: 'smooth',
               }}
             >
               {/* Enhanced Scrollbar Styles for Webkit Browsers */}
@@ -138,15 +145,15 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
                     className="bg-white border border-gray-200 p-3"
                   >
                     <div className="flex items-start gap-3">
-                      {/* Time Block - EXACT skeleton match */}
-                      <div className="flex-shrink-0 w-16 h-8 flex flex-col justify-center text-xs text-gray-500">
-                        <div className="font-medium leading-tight">{session.startTime}</div>
-                        <div className="leading-tight">{session.endTime}</div>
+                      {/* Time Block - Enhanced with Orange Accent */}
+                      <div className="flex-shrink-0 w-16 h-8 flex flex-col justify-center text-xs bg-orange-50 border-l-2 border-orange-500 pl-2 rounded-r">
+                        <div className="font-medium leading-tight text-orange-600">{session.startTime}</div>
+                        <div className="leading-tight text-orange-500">{session.endTime}</div>
                       </div>
 
-                      {/* Session Content */}
+                      {/* Session Content - Enhanced with Orange Accents */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-800 mb-1 leading-tight">
+                        <h4 className="text-sm font-medium text-black mb-1 leading-tight hover:text-orange-600 transition-colors">
                           {session.title}
                         </h4>
                         {session.description && (
@@ -154,7 +161,7 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
                             {session.description}
                           </p>
                         )}
-                        <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium leading-none">
+                        <span className="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium leading-none border border-orange-200 rounded">
                           {session.type.replace('-', ' ').toUpperCase()}
                         </span>
                       </div>

@@ -37,9 +37,9 @@ import AboutLocationSection from '@/app/components/AboutLocationSection';
 import EventScheduleAndBenefitsSection from '@/app/components/EventScheduleAndBenefitsSection';
 
 // Direct imports to avoid SSR bailout
-import ContactForm from "./components/ContactForm";
 import HeroSlideshow from "./components/HeroSlideshow";
 import ImageSection from "./components/ImageSection";
+import ContactAndAboutSection from "./components/ContactAndAboutSection";
 
 export default async function HomePage() {
   // Optimized parallel data fetching with error handling
@@ -716,91 +716,8 @@ function HomePageContent({
       </section>
       )}
 
-      {/* Contact Section */}
-      <section className="py-12 sm:py-14 md:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="contact-section-grid grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start">
-            <div className="contact-info-section text-slate-900 order-2 lg:order-1">
-              <div className="mb-6 sm:mb-8">
-                <span className="text-orange-500 font-semibold text-base sm:text-lg tracking-wide uppercase mb-3 sm:mb-4 block">Contact Us</span>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 leading-tight text-slate-900">
-                  Get In
-                  <span className="block bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                    Touch
-                  </span>
-                </h2>
-                <p className="text-lg sm:text-xl text-slate-600 leading-relaxed">
-                  To know more about our conferences and events, get in touch with us and join our large network of scientists, professional experts, and research scholars.
-                </p>
-              </div>
-
-              <div className="space-y-4 sm:space-y-6">
-                <div className="flex items-start space-x-3 sm:space-x-4 p-3 sm:p-4 bg-slate-50 rounded-lg sm:rounded-xl border border-slate-200">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h4 className="font-semibold text-base sm:text-lg text-slate-900 mb-1">Address</h4>
-                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                      {siteSettings?.contactInfo?.address || "7 Bell Yard, London, WC2A 2JR, United Kingdom"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3 sm:space-x-4 p-3 sm:p-4 bg-slate-50 rounded-lg sm:rounded-xl border border-slate-200">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h4 className="font-semibold text-base sm:text-lg text-slate-900 mb-1">Email</h4>
-                    <a href={`mailto:${siteSettings?.contactInfo?.email || "intelliglobalconferences@gmail.com"}`} className="text-sm sm:text-base text-orange-500 hover:text-orange-600 transition-colors break-all">
-                      {siteSettings?.contactInfo?.email || "intelliglobalconferences@gmail.com"}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3 sm:space-x-4 p-3 sm:p-4 bg-slate-50 rounded-lg sm:rounded-xl border border-slate-200">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h4 className="font-semibold text-base sm:text-lg text-slate-900 mb-1">WhatsApp</h4>
-                    <a href={`https://wa.me/${(siteSettings?.contactInfo?.whatsapp || "+442045718752").replace(/[^0-9]/g, '')}`} className="text-sm sm:text-base text-orange-500 hover:text-orange-600 transition-colors">
-                      {siteSettings?.contactInfo?.whatsapp || "+44 20 4571 8752"}
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Call to Action */}
-              <div className="mt-6 sm:mt-8">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center bg-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 min-h-[48px]"
-                >
-                  Contact Us Now
-                  <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-
-            <div className="contact-form-section order-1 lg:order-2">
-              <div className="contact-form-container bg-slate-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-slate-200 shadow-sm">
-                <ContactForm />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Contact and About Us Section */}
+      <ContactAndAboutSection />
 
     </div>
   );

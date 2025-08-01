@@ -139,7 +139,7 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
           overflow: 'hidden',
         }}
       >
-        {/* Enhanced Scrolling Area */}
+        {/* Enhanced Scrolling Area with Mobile Touch Support */}
         <div
           style={{
             height: '100%',
@@ -150,6 +150,11 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
             // Enhanced scrollbar styles
             scrollbarWidth: 'auto',
             scrollbarColor: '#9ca3af #f3f4f6',
+            // Mobile touch scrolling optimization
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+            // Smooth scrolling behavior
+            scrollBehavior: 'smooth',
           }}
         >
           {/* Enhanced Scrollbar Styles for Webkit Browsers */}
