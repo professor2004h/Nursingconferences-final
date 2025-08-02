@@ -6,6 +6,13 @@ interface AboutUsData {
   _id: string;
   title: string;
   content: string;
+  // New fields
+  primaryBrandName?: string;
+  secondaryBrandText?: string;
+  brandTagline?: string;
+  // Legacy fields for backward compatibility
+  organizationName?: string;
+  organizationBrandName?: string;
   isActive: boolean;
   _createdAt: string;
   _updatedAt: string;
@@ -26,7 +33,8 @@ export default function AboutUsSection() {
     const fetchAboutUsData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/about-us');
+        // Add cache busting parameter
+        const response = await fetch(`/api/about-us?t=${Date.now()}`);
         const result: AboutUsResponse = await response.json();
 
         if (result.success && result.data) {
@@ -63,9 +71,25 @@ export default function AboutUsSection() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 leading-tight text-slate-900">
                 {aboutUsData.title}
                 <span className="block bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                  Organization
+                  {(() => {
+                    // Use new fields if available, otherwise parse legacy fields, otherwise use defaults
+                    const primaryBrand = aboutUsData.primaryBrandName ||
+                      (aboutUsData.organizationBrandName ?
+                        aboutUsData.organizationBrandName.split(' ').slice(0, -1).join(' ') || 'Nursing' :
+                        'Nursing');
+                    const secondaryBrand = aboutUsData.secondaryBrandText ||
+                      (aboutUsData.organizationBrandName ?
+                        aboutUsData.organizationBrandName.split(' ').slice(-1)[0] || 'Conference 2026' :
+                        'Conference 2026');
+                    return `${primaryBrand} ${secondaryBrand}`;
+                  })()}
                 </span>
               </h2>
+              {aboutUsData.brandTagline && (
+                <p className="text-lg sm:text-xl text-orange-600 font-semibold mb-4 italic">
+                  {aboutUsData.brandTagline}
+                </p>
+              )}
               <div className="text-lg sm:text-xl text-slate-600 leading-relaxed">
                 {aboutUsData.content.split('\n').map((paragraph, index) => (
                   <p key={index} className={index > 0 ? 'mt-4' : ''}>

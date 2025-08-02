@@ -204,9 +204,9 @@ function HomePageContent({
               <div className="mb-6">
                 <span className="text-orange-500 font-semibold text-lg tracking-wide uppercase">About Us</span>
                 <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mt-2 leading-tight">
-                  Intelli Global
+                  {about?.primaryBrandName || 'Nursing'}
                   <span className="block bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                    Conferences
+                    {about?.secondaryBrandText || 'Conference 2026'}
                   </span>
                 </h2>
               </div>
@@ -259,7 +259,7 @@ function HomePageContent({
                   <div className="relative">
                     <Image
                       src={about.imageUrl}
-                      alt="About Intelli Global Conferences"
+                      alt="About Nursing Conference 2026"
                       width={600}
                       height={400}
                       className="w-full h-auto rounded-2xl shadow-2xl"

@@ -1,16 +1,29 @@
 import { Metadata } from 'next';
 import BrochureDownloadForm from './BrochureDownloadForm';
+import { getSiteSettings, getFullBrandName } from '../getSiteSettings';
 
-export const metadata: Metadata = {
-  title: 'Download Brochure | Intelli Global Conferences',
-  description: 'Download our comprehensive conference brochure to learn more about upcoming events, speakers, and opportunities.',
-  keywords: 'conference brochure, download, nursing conferences, medical events, healthcare',
-  openGraph: {
-    title: 'Download Conference Brochure',
-    description: 'Get detailed information about our upcoming conferences and events.',
-    type: 'website',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  let siteSettings = null;
+
+  try {
+    siteSettings = await getSiteSettings();
+  } catch (error) {
+    console.error('Error fetching site settings for brochure metadata:', error);
+  }
+
+  const fullBrandName = getFullBrandName(siteSettings);
+
+  return {
+    title: `Download Brochure | ${fullBrandName}`,
+    description: 'Download our comprehensive conference brochure to learn more about upcoming events, speakers, and opportunities.',
+    keywords: 'conference brochure, download, nursing conferences, medical events, healthcare',
+    openGraph: {
+      title: 'Download Conference Brochure',
+      description: 'Get detailed information about our upcoming conferences and events.',
+      type: 'website',
+    },
+  };
+}
 
 export default function BrochurePage() {
   return (

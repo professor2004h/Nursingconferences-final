@@ -3,15 +3,47 @@ import { getAboutUsContent } from "../getAboutUs";
 import { PortableText } from "@portabletext/react";
 import { getAboutPageImageSection, getDefaultImageSection } from "../getImageSection";
 import ImageSection from "../components/ImageSection";
+import { getSiteSettings, getFullBrandName } from "../getSiteSettings";
 
-export const metadata = {
-  title: "About Us - Intelli Global Conferences",
-  description: "Learn more about Intelli Global Conferences and our mission to connect scholars, researchers, and professionals worldwide.",
-};
+export async function generateMetadata() {
+  const about = await getAboutUsContent();
+  let siteSettings = null;
+
+  try {
+    siteSettings = await getSiteSettings();
+  } catch (error) {
+    console.error('Error fetching site settings for about metadata:', error);
+  }
+
+  // Use organization branding from about data if available, otherwise fallback to site settings
+  const primaryBrand = about?.primaryBrandName || 'Nursing';
+  const secondaryBrand = about?.secondaryBrandText || 'Conference 2026';
+  const brandTagline = about?.brandTagline;
+  const fullBrandName = `${primaryBrand} ${secondaryBrand}`;
+
+  return {
+    title: `About Us - ${fullBrandName}`,
+    description: `Learn more about ${fullBrandName} and our mission to connect scholars, researchers, and professionals worldwide.`,
+  };
+}
 
 export default async function AboutPage() {
   const about = await getAboutUsContent();
   const imageSection = await getAboutPageImageSection();
+
+  // Get site settings for dynamic branding fallback
+  let siteSettings = null;
+  try {
+    siteSettings = await getSiteSettings();
+  } catch (error) {
+    console.error('Error fetching site settings for about page:', error);
+  }
+
+  // Use organization branding from about data if available, otherwise fallback to site settings
+  const primaryBrand = about?.primaryBrandName || 'Nursing';
+  const secondaryBrand = about?.secondaryBrandText || 'Conference 2026';
+  const brandTagline = about?.brandTagline;
+  const fullBrandName = `${primaryBrand} ${secondaryBrand}`;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -22,8 +54,13 @@ export default async function AboutPage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               About
               <span className="block gradient-text bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                Intelli Global Conferences
+                {primaryBrand} {secondaryBrand}
               </span>
+              {brandTagline && (
+                <span className="block text-xl md:text-2xl lg:text-3xl font-medium text-orange-300 mt-3">
+                  {brandTagline}
+                </span>
+              )}
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
               Connecting minds, sharing knowledge, transforming the world through academic excellence
@@ -40,9 +77,21 @@ export default async function AboutPage() {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
                 {about?.title && (
-                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-                    {about.title}
-                  </h2>
+                  <div className="mb-8">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                      {about.title}
+                    </h2>
+                    <div className="text-lg text-orange-600 font-semibold">
+                      <span className="text-xl font-bold text-orange-700">
+                        {primaryBrand} {secondaryBrand}
+                      </span>
+                      {brandTagline && (
+                        <span className="block text-base font-medium text-orange-600 mt-1 italic">
+                          {brandTagline}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 )}
                 
                 <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
@@ -51,8 +100,8 @@ export default async function AboutPage() {
                   ) : (
                     <div className="space-y-6">
                       <p>
-                        We at Intelli Global Conferences built an ecosystem that brings the Scholars, people in the Scientific Study & Research, 
-                        knowledge group of the society, the students, learners and more on a common ground – to share their knowledge, 
+                        We at {fullBrandName} built an ecosystem that brings the Scholars, people in the Scientific Study & Research,
+                        knowledge group of the society, the students, learners and more on a common ground – to share their knowledge,
                         on the scientific progress that brings along the benefits to humanity and to our existence itself.
                       </p>
                       
@@ -91,7 +140,7 @@ export default async function AboutPage() {
                   <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <Image
                       src={about.imageUrl}
-                      alt="About Intelli Global Conferences"
+                      alt={about.imageAlt || `About ${fullBrandName}`}
                       width={400}
                       height={300}
                       className="w-full h-64 object-cover"

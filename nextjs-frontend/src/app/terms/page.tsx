@@ -1,4 +1,4 @@
-import { getSiteSettings } from '../getSiteSettings';
+import { getSiteSettings, getFullBrandName } from '../getSiteSettings';
 import { PortableText } from '@portabletext/react';
 import Link from 'next/link';
 
@@ -83,8 +83,10 @@ export async function generateMetadata() {
     console.error('Error fetching site settings for terms metadata:', error);
   }
 
+  const fullBrandName = getFullBrandName(siteSettings);
+
   return {
-    title: `Terms & Conditions - ${siteSettings?.seo?.metaTitle || 'Intelli Global Conferences'}`,
+    title: `Terms & Conditions - ${fullBrandName}`,
     description: 'Terms and conditions for using our conference services and website.',
   };
 }

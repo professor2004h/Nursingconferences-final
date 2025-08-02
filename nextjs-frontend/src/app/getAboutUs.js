@@ -7,10 +7,18 @@ import { client } from './sanity/client';
 
 
 export async function getAboutUsContent() {
-  const query = `*[_type == "about"][0]{
+  const query = `*[_type == "about" && isActive == true][0]{
+    _id,
     title,
     description,
-    "imageUrl": image.asset->url
+    primaryBrandName,
+    secondaryBrandText,
+    brandTagline,
+    "imageUrl": image.asset->url,
+    "imageAlt": image.alt,
+    isActive,
+    _createdAt,
+    _updatedAt
   }`;
   const about = await client.fetch(query);
   return about;

@@ -15,6 +15,10 @@ export interface SiteSettings {
       url: string;
     };
   };
+  brandName?: string;
+  brandSecondary?: string;
+  brandTagline?: string;
+  websiteUrl?: string;
   siteDescription?: string;
   headerVisibility?: {
     showHeaderSection?: boolean;
@@ -122,6 +126,10 @@ export async function getSiteSettings(forceRefresh = false): Promise<SiteSetting
           url
         }
       },
+      brandName,
+      brandSecondary,
+      brandTagline,
+      websiteUrl,
       siteDescription,
       headerVisibility,
       contactInfo,
@@ -297,6 +305,10 @@ export async function getSiteSettingsForHeader(): Promise<SiteSettings | null> {
           url
         }
       },
+      brandName,
+      brandSecondary,
+      brandTagline,
+      websiteUrl,
       siteDescription,
       headerVisibility,
       contactInfo,
@@ -487,4 +499,35 @@ export function getLogoImageUrl(imageAsset: { asset?: { url?: string } } | null 
     quality: 95,
     format: 'webp'
   });
+}
+
+// Helper function to get the full brand name
+export function getFullBrandName(siteSettings: SiteSettings | null): string {
+  if (!siteSettings) return 'Intelli Global Conferences';
+
+  const brandName = siteSettings.brandName || 'Intelli Global';
+  const brandSecondary = siteSettings.brandSecondary || 'Conferences';
+
+  return `${brandName} ${brandSecondary}`;
+}
+
+// Helper function to get brand name parts
+export function getBrandParts(siteSettings: SiteSettings | null): { primary: string; secondary: string; tagline?: string } {
+  if (!siteSettings) {
+    return {
+      primary: 'Nursing',
+      secondary: 'Conference 2026'
+    };
+  }
+
+  return {
+    primary: siteSettings.brandName || 'Nursing',
+    secondary: siteSettings.brandSecondary || 'Conference 2026',
+    tagline: siteSettings.brandTagline
+  };
+}
+
+// Helper function to get the website URL
+export function getWebsiteUrl(siteSettings: SiteSettings | null): string {
+  return siteSettings?.websiteUrl || 'https://nursingconference2026.com';
 }

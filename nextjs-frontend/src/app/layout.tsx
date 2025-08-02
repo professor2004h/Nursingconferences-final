@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import HeaderWrapper from "./components/HeaderWrapper";
-import { getSiteSettingsSSR, getSiteSettingsFresh, getImageUrl } from './getSiteSettings';
+import { getSiteSettingsSSR, getSiteSettingsFresh, getImageUrl, getFullBrandName, getBrandParts } from './getSiteSettings';
 import Footer from "./components/Footer";
 
 // Import client-side components
@@ -33,9 +33,10 @@ export async function generateMetadata(): Promise<Metadata> {
     ? await getSiteSettingsFresh()
     : await getSiteSettingsSSR();
 
-  const siteName = "Intelli Global Conferences";
+  const siteName = getFullBrandName(siteSettings);
+  const brandParts = getBrandParts(siteSettings);
   const siteDescription = siteSettings?.siteDescription ||
-    "Join leading experts, researchers, and professionals at Intelli Global Conferences. Discover cutting-edge research, network with peers, and advance your career through our international conferences and events.";
+    `Join leading experts, researchers, and professionals at ${siteName}. Discover cutting-edge research, network with peers, and advance your career through our international conferences and events.`;
 
   const metaTitle = siteSettings?.seo?.metaTitle ||
     `${siteName} - Leading Academic & Medical Conferences`;
@@ -51,9 +52,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title: metaTitle,
     description: metaDescription,
     keywords: keywords,
-    authors: [{ name: 'Intelli Global Conferences' }],
-    creator: 'Intelli Global Conferences',
-    publisher: 'Intelli Global Conferences',
+    authors: [{ name: siteName }],
+    creator: siteName,
+    publisher: siteName,
     formatDetection: {
       email: false,
       address: false,

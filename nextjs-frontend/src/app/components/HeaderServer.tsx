@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getSiteSettingsForHeader, getLogoImageUrl } from '../getSiteSettings';
+import { getSiteSettingsForHeader, getLogoImageUrl, getFullBrandName } from '../getSiteSettings';
 import HeaderClient from './HeaderClient';
 
 // Force this component to be dynamic to prevent caching
@@ -213,7 +213,7 @@ export default async function HeaderServer() {
                 <div className="relative h-full max-h-10 sm:max-h-14 md:max-h-16 lg:max-h-18 xl:max-h-20 flex items-center">
                   <Image
                     src={getLogoImageUrl(siteSettings.logo) || ''}
-                    alt={siteSettings.logo.alt || 'Intelli Global Conferences Logo'}
+                    alt={siteSettings.logo.alt || `${getFullBrandName(siteSettings)} Logo`}
                     width={220}
                     height={70}
                     className="h-auto w-auto max-h-full max-w-full object-contain"

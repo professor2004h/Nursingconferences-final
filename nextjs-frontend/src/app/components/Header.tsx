@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getSiteSettings, getImageUrl, type SiteSettings } from '../getSiteSettings';
+import { getSiteSettings, getImageUrl, getFullBrandName, type SiteSettings } from '../getSiteSettings';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -212,7 +212,7 @@ export default function Header() {
             {siteSettings?.logo && getImageUrl(siteSettings.logo) ? (
               <Image
                 src={getImageUrl(siteSettings.logo) || ''}
-                alt={siteSettings.logo.alt || 'Intelli Global Conferences Logo'}
+                alt={siteSettings.logo.alt || `${getFullBrandName(siteSettings)} Logo`}
                 width={250}
                 height={80}
                 className="h-12 sm:h-16 md:h-20 w-auto object-contain"

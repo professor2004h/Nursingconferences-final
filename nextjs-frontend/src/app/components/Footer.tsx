@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getSiteSettings, getImageUrl } from '../getSiteSettings';
+import { getSiteSettings, getImageUrl, getFullBrandName } from '../getSiteSettings';
 
 export default async function Footer() {
   let siteSettings = null;
@@ -102,7 +102,7 @@ export default async function Footer() {
                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mr-3">
                       <span className="text-white font-bold text-lg sm:text-xl">IGC</span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-bold">Intelli Global Conferences</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold">Nursing Conference 2026</h2>
                   </div>
                 )}
               </div>
@@ -126,7 +126,7 @@ export default async function Footer() {
                 </div>
               )}
               <p className="text-gray-300 mb-6 max-w-md">
-                We at Intelli Global Conferences built an ecosystem that brings the Scholars, people in the Scientific Study & Research,
+                We at Nursing Conference 2026 built an ecosystem that brings the Scholars, people in the Scientific Study & Research,
                 knowledge group of the society, the students, learners and more on a common ground – to share their knowledge,
                 on the scientific progress that brings along the benefits to humanity and to our existence itself.
               </p>
@@ -277,7 +277,7 @@ export default async function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              ©2025 Copyright Intelli Global Conferences. All Rights Reserved.
+              ©2025 Copyright {getFullBrandName(siteSettings)}. All Rights Reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">

@@ -1,9 +1,18 @@
 import { MetadataRoute } from 'next'
 import { getPastConferences } from './getPastConferences'
 import { getConferenceEvents } from './getconferences'
+import { getSiteSettings, getWebsiteUrl } from './getSiteSettings'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://intelliglobalconferences.com'
+  let siteSettings = null;
+
+  try {
+    siteSettings = await getSiteSettings();
+  } catch (error) {
+    console.error('Error fetching site settings for sitemap:', error);
+  }
+
+  const baseUrl = getWebsiteUrl(siteSettings);
   
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

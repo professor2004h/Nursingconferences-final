@@ -6,6 +6,13 @@ interface AboutUsData {
   _id: string;
   title: string;
   content: string;
+  // New fields
+  primaryBrandName?: string;
+  secondaryBrandText?: string;
+  brandTagline?: string;
+  // Legacy fields for backward compatibility
+  organizationName?: string;
+  organizationBrandName?: string;
   isActive: boolean;
   _createdAt: string;
   _updatedAt: string;
@@ -37,8 +44,8 @@ export default function ContactAndAboutSection() {
       try {
         setLoading(true);
         
-        // Fetch About Us data
-        const aboutResponse = await fetch('/api/about-us');
+        // Fetch About Us data with cache busting
+        const aboutResponse = await fetch(`/api/about-us?t=${Date.now()}`);
         const aboutResult: AboutUsResponse = await aboutResponse.json();
 
         // Fetch site settings for contact info
