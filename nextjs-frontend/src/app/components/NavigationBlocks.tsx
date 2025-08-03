@@ -43,14 +43,16 @@ const navigationBlocks: NavigationBlock[] = [
     description: 'Conference location details'
   },
   {
-    title: 'Event Details',
-    href: '/api/event-schedule-pdf', // dynamic PDF link from Sanity (opens in new tab)
+    title: 'Speakers',
+    href: '/speakers',
     icon: (
-      <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" role="img">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" role="img">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" />
+        <circle cx="9" cy="7" r="4" strokeWidth="2" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M23 20v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
       </svg>
     ),
-    description: 'View/download the official schedule PDF'
+    description: 'Meet our speakers and view session details'
   }
 ];
 
@@ -65,8 +67,8 @@ const NavigationBlocks: React.FC = () => {
               href={block.href}
               className="navigation-block"
               aria-label={`Navigate to ${block.title} - ${block.description}`}
-              target={block.title === 'Event Details' ? '_blank' : undefined}
-              rel={block.title === 'Event Details' ? 'noopener noreferrer' : undefined}
+              target={undefined}
+              rel={undefined}
             >
               <div className="navigation-block-content">
                 <div className="navigation-block-icon">

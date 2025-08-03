@@ -22,32 +22,7 @@ export const aboutUsSection = defineType({
       description: 'The main content/description for the About Us section',
       rows: 8,
     }),
-    defineField({
-      name: 'primaryBrandName',
-      title: 'Primary Brand Name',
-      type: 'string',
-      description: 'The primary brand name that appears in the About Us section (e.g., "Nursing")',
-      placeholder: 'Nursing',
-      initialValue: 'Nursing',
-      validation: (Rule) => Rule.required().min(2).max(50).error('Primary brand name is required and should be 2-50 characters'),
-    }),
-    defineField({
-      name: 'secondaryBrandText',
-      title: 'Secondary Brand Text',
-      type: 'string',
-      description: 'The secondary brand text that complements the primary brand (e.g., "Conference 2026")',
-      placeholder: 'Conference 2026',
-      initialValue: 'Conference 2026',
-      validation: (Rule) => Rule.required().min(2).max(50).error('Secondary brand text is required and should be 2-50 characters'),
-    }),
-    defineField({
-      name: 'brandTagline',
-      title: 'Brand Tagline (Optional)',
-      type: 'string',
-      description: 'Optional brand tagline or subtitle that appears below the main branding',
-      placeholder: 'Connecting minds, sharing knowledge',
-      validation: (Rule) => Rule.max(150).error('Brand tagline should be under 150 characters'),
-    }),
+    // Branding fields removed; managed under About Us document (schema: about)
     defineField({
       name: 'isActive',
       title: 'Show Section',
@@ -55,22 +30,38 @@ export const aboutUsSection = defineType({
       description: 'Toggle to show or hide the About Us section on the home page',
       initialValue: true,
     }),
+    defineField({
+      name: 'showButton',
+      title: 'Show Button',
+      type: 'boolean',
+      description: 'Toggle to show or hide the button in the About Us section',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'buttonText',
+      title: 'Button Text',
+      type: 'string',
+      description: 'The text to display on the button',
+      hidden: ({ parent }) => !parent?.showButton,
+    }),
+    defineField({
+      name: 'buttonUrl',
+      title: 'Button URL',
+      type: 'url',
+      description: 'The URL the button should link to',
+      hidden: ({ parent }) => !parent?.showButton,
+    }),
   ],
   preview: {
     select: {
       title: 'title',
-      primaryBrandName: 'primaryBrandName',
-      secondaryBrandText: 'secondaryBrandText',
-      brandTagline: 'brandTagline',
       isActive: 'isActive',
     },
     prepare(selection) {
-      const { title, primaryBrandName, secondaryBrandText, brandTagline, isActive } = selection;
-      const fullBrand = `${primaryBrandName || 'Nursing'} ${secondaryBrandText || 'Conference 2026'}`;
-      const taglineDisplay = brandTagline ? ` - ${brandTagline}` : '';
+      const { title, isActive } = selection as any;
       return {
         title: title || 'About Organisation',
-        subtitle: `${fullBrand}${taglineDisplay} ${isActive ? '(Active)' : '(Inactive)'}`,
+        subtitle: `${isActive ? '(Active)' : '(Inactive)'}`,
         media: () => '📖',
       };
     },

@@ -10,7 +10,7 @@ interface VenueImageGalleryProps {
 
 const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({ 
   images, 
-  title = "Venue Gallery" 
+  title = "Conference Venue" 
 }) => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [imageLoading, setImageLoading] = useState<{ [key: number]: boolean }>({});
@@ -74,11 +74,9 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
   return (
     <>
       {/* Gallery Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-        <div className="flex items-center mb-6">
-          <span className="text-2xl mr-3">📸</span>
+      <div className="p-0 mb-0">
+        <div className="sr-only">
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-          <span className="ml-3 text-sm text-gray-500">({images.length} photos)</span>
         </div>
         
         {/* Responsive Grid */}

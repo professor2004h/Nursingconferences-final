@@ -244,12 +244,21 @@ function HomePageContent({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
-                <Link
-                  href="/conferences"
-                  className="inline-flex items-center justify-center border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-semibold text-lg hover:border-orange-500 hover:text-orange-600 transition-all duration-300"
-                >
-                  View Conferences
-                </Link>
+
+                {about?.showScientificProgramButton !== false && about?.scientificProgramPdfUrl ? (
+                  <a
+                    href={about.scientificProgramPdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-semibold text-lg hover:border-orange-500 hover:text-orange-600 transition-all duration-300"
+                  >
+                    {about?.scientificProgramLabel || 'Scientific Program'}
+                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h4m0 0v4m0-4L10 14" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19h14a2 2 0 002-2V7" />
+                    </svg>
+                  </a>
+                ) : null}
               </div>
             </div>
 

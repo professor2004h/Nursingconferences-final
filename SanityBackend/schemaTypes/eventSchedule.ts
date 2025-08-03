@@ -21,15 +21,6 @@ export default defineType({
       initialValue: true
     }),
     defineField({
-      name: 'schedulePdf',
-      title: 'Schedule PDF',
-      type: 'file',
-      description: 'Upload the full schedule as a PDF (optional)',
-      options: {
-        accept: 'application/pdf'
-      }
-    }),
-    defineField({
       name: 'days',
       title: 'Conference Days',
       type: 'array',
@@ -174,12 +165,11 @@ export default defineType({
       title: 'title',
       isActive: 'isActive',
       daysCount: 'days.length',
-      pdf: 'schedulePdf.asset'
     },
-    prepare({ title, isActive, daysCount, pdf }) {
+    prepare({ title, isActive, daysCount }) {
       return {
         title: title,
-        subtitle: `${isActive ? 'Active' : 'Inactive'} • ${daysCount || 0} days${pdf ? ' • PDF attached' : ''}`,
+        subtitle: `${isActive ? 'Active' : 'Inactive'} • ${daysCount || 0} days`,
         media: CalendarIcon
       }
     }

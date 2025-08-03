@@ -48,7 +48,7 @@ export default (S) =>
             ])
         ),
       S.listItem().title('Past Conference').schemaType('pastConference').child(S.documentTypeList('pastConference')),
-      S.listItem().title('About Us').schemaType('about').child(S.documentTypeList('about')),
+      S.listItem().title('About Us Section').schemaType('about').child(S.documentTypeList('about')),
       S.listItem().title('About Organisation').schemaType('aboutUsSection').child(S.documentTypeList('aboutUsSection')),
       S.listItem().title('Hero Section').schemaType('heroSection').child(S.documentTypeList('heroSection')),
       S.listItem().title('Site Settings').schemaType('siteSettings').child(S.documentTypeList('siteSettings')),

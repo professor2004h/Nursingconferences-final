@@ -73,6 +73,29 @@ export default defineType({
       description: 'Toggle to show or hide the About Us page',
       initialValue: true,
     }),
+    defineField({
+      name: 'showScientificProgramButton',
+      title: 'Show Scientific Program Button',
+      type: 'boolean',
+      description: 'Toggle to show or hide the Scientific Program button on the home page',
+      initialValue: true,
+    }),
+    defineField({
+      name: 'scientificProgramPdf',
+      title: 'Scientific Program PDF',
+      type: 'file',
+      options: {
+        accept: 'application/pdf'
+      },
+      description: 'Upload the Scientific Program PDF that will open when the button is clicked',
+    }),
+    defineField({
+      name: 'scientificProgramLabel',
+      title: 'Scientific Program Button Label',
+      type: 'string',
+      description: 'Optional override for the button label',
+      initialValue: 'Scientific Program',
+    }),
   ],
   preview: {
     select: {
@@ -81,14 +104,18 @@ export default defineType({
       secondaryBrandText: 'secondaryBrandText',
       brandTagline: 'brandTagline',
       isActive: 'isActive',
+      showScientificProgramButton: 'showScientificProgramButton',
+      scientificProgramPdf: 'scientificProgramPdf',
     },
     prepare(selection) {
-      const { title, primaryBrandName, secondaryBrandText, brandTagline, isActive } = selection;
+      const { title, primaryBrandName, secondaryBrandText, brandTagline, isActive, showScientificProgramButton, scientificProgramPdf } = selection;
       const fullBrand = `${primaryBrandName || 'Nursing'} ${secondaryBrandText || 'Conference 2026'}`;
       const taglineDisplay = brandTagline ? ` - ${brandTagline}` : '';
+      const btn = showScientificProgramButton ? 'Button: On' : 'Button: Off';
+      const pdf = scientificProgramPdf ? 'PDF: Set' : 'PDF: Missing';
       return {
         title: title || 'About Us',
-        subtitle: `${fullBrand}${taglineDisplay} ${isActive ? '(Active)' : '(Inactive)'}`,
+        subtitle: `${fullBrand}${taglineDisplay} ${isActive ? '(Active)' : '(Inactive)'} • ${btn} • ${pdf}`,
         media: () => '📖',
       };
     },
