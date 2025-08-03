@@ -272,7 +272,7 @@ export default (S) =>
       S.listItem()
         .title('Event Schedule')
         .id('eventSchedule')
-        .icon(DocumentIcon)
+        .icon(DownloadIcon) // Changed to a more relevant icon for schedule/details
         .schemaType('eventSchedule')
         .child(
           S.documentTypeList('eventSchedule')

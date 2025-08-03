@@ -136,16 +136,17 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal - raised z-index and header offset to avoid overlap */}
       {selectedImage !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 backdrop-blur-sm"
+          className="fixed inset-0 z-[2147483000] flex items-center justify-center bg-black/90 backdrop-blur-sm pt-24 md:pt-28"
+          style={{ isolation: 'isolate' }}
           onClick={closeLightbox}
         >
           {/* Close Button */}
           <button
             onClick={closeLightbox}
-            className="absolute top-4 right-4 z-60 text-white hover:text-gray-300 transition-colors p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75"
+            className="absolute top-5 right-5 z-[2147483600] text-white hover:text-gray-300 transition-colors p-2 rounded-full bg-black/60 hover:bg-black/80"
             aria-label="Close gallery"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +160,7 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
               e.stopPropagation();
               navigateImage('prev');
             }}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-60 text-white hover:text-gray-300 transition-colors p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-[2147483600] text-white hover:text-gray-300 transition-colors p-3 rounded-full bg-black/60 hover:bg-black/80"
             aria-label="Previous image"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +174,7 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
               e.stopPropagation();
               navigateImage('next');
             }}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-60 text-white hover:text-gray-300 transition-colors p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-[2147483600] text-white hover:text-gray-300 transition-colors p-3 rounded-full bg-black/60 hover:bg-black/80"
             aria-label="Next image"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,7 +184,7 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
 
           {/* Main Image */}
           <div
-            className="max-w-7xl max-h-full mx-4 flex flex-col items-center"
+            className="max-w-7xl max-h-full mx-4 flex flex-col items-center mt-2"
             onClick={(e) => e.stopPropagation()}
           >
             <img
@@ -204,7 +205,7 @@ const VenueImageGallery: React.FC<VenueImageGalleryProps> = ({
           </div>
 
           {/* Image Counter */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-[2147483600]">
             {images.map((_, index) => (
               <button
                 key={index}

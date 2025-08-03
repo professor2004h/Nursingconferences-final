@@ -96,7 +96,7 @@ export default function AbstractSubmissionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 pt-28 md:pt-32">
       {/* Main Content - Compact Layout */}
       <div className="py-8">
         <div className="container mx-auto px-4">
@@ -128,6 +128,8 @@ export default function AbstractSubmissionPage() {
                       <a
                         href={settings.abstractTemplate.asset.url}
                         download
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300"
                       >
                         📥 Download Here

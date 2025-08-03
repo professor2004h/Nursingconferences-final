@@ -292,29 +292,37 @@ function HomePageContent({
       {/* 6. Conference Sessions and Tracks Section */}
       <ConferenceTracksSection />
 
-      {/* 7. Venue Section */}
-      {venueSettings?.venueImages && venueSettings.venueImages.length > 0 && (
+      {/* 7 & 8. Venue & Location - Merged Section (Full-width stacked: Gallery on top, Info below) */}
+      {(venueSettings?.venueImages && venueSettings.venueImages.length > 0) || venueSettings ? (
         <section className="py-12 md:py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-                VENUE GALLERY
+                Venue & Location
               </h2>
               <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                Explore our stunning venue and discover the perfect setting for your conference experience.
+                Explore our stunning venue, location details and map to plan your visit.
               </p>
             </div>
 
-            <VenueImageGallery
-              images={venueSettings.venueImages}
-              title="Conference Venue"
-            />
+            {/* Full-width Composite: Gallery + Location Info with tighter spacing */}
+            <div className="space-y-6 md:space-y-8">
+              {/* Gallery (full width) */}
+              {venueSettings?.venueImages && venueSettings.venueImages.length > 0 && (
+                <VenueImageGallery
+                  images={venueSettings.venueImages}
+                  title="Conference Venue"
+                />
+              )}
+
+              {/* Venue & Location Information (full width, compact padding) */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-5 lg:p-6">
+                <AboutLocationSection venueSettings={venueSettings} />
+              </div>
+            </div>
           </div>
         </section>
-      )}
-
-      {/* 8. About the Location Section */}
-      <AboutLocationSection venueSettings={venueSettings} />
+      ) : null}
 
       {/* 9. Event Schedule and Participation Benefits Section */}
       <EventScheduleAndBenefitsSection />
