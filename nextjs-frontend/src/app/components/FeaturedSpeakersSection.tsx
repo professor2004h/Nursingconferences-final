@@ -139,7 +139,7 @@ const FeaturedSpeakersSection: React.FC = () => {
 
   if (error) {
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-6 sm:py-8 md:py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <p className="text-red-600 mb-4">{error}</p>
@@ -166,8 +166,8 @@ const FeaturedSpeakersSection: React.FC = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           {/* Section Header */}
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-0">
+          <div className="text-center mb-6 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-0 leading-tight">
               Session <span className="text-orange-500">Speakers</span>
             </h2>
           </div>
