@@ -11,6 +11,8 @@ export async function GET() {
         _id,
         title,
         subtitle,
+        // Project hero image url for header background
+        "heroImageUrl": heroImage.asset->url,
         venueName,
         venueAddress,
         contactInformation,
@@ -34,7 +36,14 @@ export async function GET() {
       }
     `;
 
+    // Fetch from Sanity
     const venueSettings = await client.fetch(query);
+
+    // Normalize heroImageUrl for frontend safety
+    const normalized = {
+      ...venueSettings,
+      heroImageUrl: venueSettings?.heroImageUrl || venueSettings?.heroImage?.asset?.url || null
+    };
     
     if (!venueSettings) {
       console.log('⚠️ No active venue settings found');
@@ -46,10 +55,10 @@ export async function GET() {
     }
 
     console.log(`✅ Found venue settings: ${venueSettings.venueName}`);
-    
+
     return NextResponse.json({
       success: true,
-      data: venueSettings
+      data: normalized
     });
 
   } catch (error) {

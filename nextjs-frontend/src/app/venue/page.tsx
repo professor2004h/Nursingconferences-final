@@ -136,14 +136,14 @@ const VenuePage: React.FC = () => {
         <div className="absolute inset-0 bg-black/70" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <span className="text-orange-400 font-semibold text-lg tracking-wide uppercase mb-4 block">
+            <span className="text-white font-semibold text-lg tracking-wide uppercase mb-4 block">
               Conference Location
             </span>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
               {venueSettings.title}
             </h1>
             {venueSettings.subtitle && (
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed">
                 {venueSettings.subtitle}
               </p>
             )}
@@ -162,7 +162,7 @@ const VenuePage: React.FC = () => {
                   <svg className="w-6 h-6 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-blue-100 ml-1 md:ml-2">Venue</span>
+                  <span className="text-white ml-1 md:ml-2">Venue</span>
                 </div>
               </li>
             </ol>

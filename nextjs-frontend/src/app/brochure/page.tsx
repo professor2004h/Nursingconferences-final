@@ -39,10 +39,8 @@ async function getBrochureSettings(baseUrl?: string) {
 }
 
 function BrochureHeroClient({ imageUrl, overlayPercent }: { imageUrl?: string; overlayPercent?: number }) {
-  // Clamp overlay to 40%–70% as requested (fallback 0.7 if CMS missing)
-  const requested = typeof overlayPercent === 'number' ? overlayPercent : 70;
-  const clamped = Math.min(70, Math.max(40, requested));
-  const opacity = clamped / 100;
+  // Force overlay to exactly 60% as requested
+  const opacity = 0.6;
   // Account for fixed/sticky header overlap with top padding (increase to clear both top bars)
   const headerOffset = 'pt-32 md:pt-40';
   return (
@@ -59,10 +57,10 @@ function BrochureHeroClient({ imageUrl, overlayPercent }: { imageUrl?: string; o
       {!imageUrl ? (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900" />
       ) : null}
-      {/* Black overlay at requested opacity */}
+      {/* Black overlay at requested opacity (0.4 – 0.6) */}
       <div
         className="absolute inset-0"
-        style={{ backgroundColor: `rgba(0,0,0,${opacity})` }}
+        style={{ backgroundColor: `rgba(0, 0, 0, ${opacity})` }}
       />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center">
