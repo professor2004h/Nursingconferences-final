@@ -9,7 +9,16 @@ interface ImageSectionProps {
   className?: string;
 }
 
-const ImageSection: React.FC<ImageSectionProps> = ({ data, className = '' }) => {
+const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = '' }) => {
+  // Normalize to ensure cpdImage is present on the object for TypeScript
+  const data = rawData as ImageSectionData & {
+    cpdImage?: {
+      asset?: { _ref?: string; url?: string };
+      alt?: string;
+      caption?: string;
+      hotspot?: { x: number; y: number };
+    };
+  };
   // Helper function to get aspect ratio class
   const getAspectRatioClass = (ratio: string) => {
     switch (ratio) {
@@ -45,14 +54,15 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data, className = '' }) => 
     }
   };
 
+  // For CPD banner we want full visibility (no crop), so force contain + fixed aspect
   const aspectRatioClass = getAspectRatioClass(data.layout.aspectRatio);
   const borderRadiusClass = getBorderRadiusClass(data.layout.borderRadius);
   const objectFitClass = getObjectFitClass(data.layout.objectFit);
+  const hasCPD = Boolean(data.cpdImage?.asset?.url);
 
   return (
     <section className={`image-section w-full ${className}`}>
       <div className="relative w-full">
-        {/* Optional Title */}
         {data.title && (
           <div className="mb-4 text-center">
             <h3 className="text-lg font-semibold text-slate-900">
@@ -61,27 +71,67 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data, className = '' }) => 
           </div>
         )}
 
-        {/* Image Container */}
-        <div className={`relative w-full overflow-hidden ${borderRadiusClass} ${aspectRatioClass}`}>
-          <Image
-            src={data.image.asset.url}
-            alt={data.image.alt}
-            fill
-            className={`${objectFitClass} transition-all duration-300 hover:scale-105`}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={false}
-          />
-          
-          {/* Overlay for better text readability if needed */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
-        </div>
+        {hasCPD ? (
+          // Two-column layout: Left = About text (outside this component), Right = this column
+          // Stack the CPD banner on top and the 16:9 image below it, both aligned to the top.
+          <div className="flex flex-col gap-3 md:gap-4 md:self-start">
+            {/* CPD banner: force full image (no crop) and keep exact banner aspect */}
+            <div className={`relative w-full overflow-hidden ${borderRadiusClass} aspect-[1552/531]`}>
+              {data.cpdImage?.asset?.url ? (
+                <Image
+                  src={data.cpdImage.asset.url as string}
+                  alt={data.cpdImage.alt || 'CPD Credits'}
+                  fill
+                  className="object-contain bg-white"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 44vw, 44vw"
+                  priority={true}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-500 text-sm">
+                  CPD image not set
+                </div>
+              )}
+            </div>
 
-        {/* Optional Caption */}
-        {data.image.caption && (
-          <div className="mt-3 text-center">
-            <p className="text-sm text-slate-600 italic">
-              {data.image.caption}
-            </p>
+            {/* Main 16:9 image directly below CPD */}
+            <div className={`relative w-full overflow-hidden ${borderRadiusClass} ${aspectRatioClass}`}>
+              <Image
+                src={data.image.asset.url}
+                alt={data.image.alt}
+                fill
+                className={`${objectFitClass}`}
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 44vw, 44vw"
+                priority={false}
+              />
+            </div>
+          </div>
+        ) : (
+          /* Single image fallback */
+          <div className={`relative w-full overflow-hidden ${borderRadiusClass} ${aspectRatioClass} md:self-start`}>
+            <Image
+              src={data.image.asset.url}
+              alt={data.image.alt}
+              fill
+              className={`${objectFitClass} transition-all duration-300 hover:scale-105`}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={false}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+          </div>
+        )}
+
+        {(data.image.caption || data.cpdImage?.caption) && (
+          <div className="mt-3 text-center space-y-1">
+            {data.image.caption && (
+              <p className="text-sm text-slate-600 italic">
+                {data.image.caption}
+              </p>
+            )}
+            {data.cpdImage?.caption && (
+              <p className="text-xs text-slate-500">
+                {data.cpdImage.caption}
+              </p>
+            )}
           </div>
         )}
       </div>

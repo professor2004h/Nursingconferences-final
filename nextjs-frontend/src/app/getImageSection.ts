@@ -17,6 +17,19 @@ export interface ImageSectionData {
       y: number;
     };
   };
+  // NEW: CPD banner image
+  cpdImage?: {
+    asset?: {
+      _ref?: string;
+      url?: string;
+    };
+    alt?: string;
+    caption?: string;
+    hotspot?: {
+      x: number;
+      y: number;
+    };
+  };
   layout: {
     aspectRatio: string;
     objectFit: string;
@@ -34,6 +47,16 @@ export async function getImageSectionContent(): Promise<ImageSectionData | null>
       _id,
       title,
       image{
+        asset->{
+          _ref,
+          url
+        },
+        alt,
+        caption,
+        hotspot
+      },
+      // project CPD image exactly like main image
+      "cpdImage": cpdImage{
         asset->{
           _ref,
           url
@@ -63,6 +86,15 @@ export async function getAboutPageImageSection(): Promise<ImageSectionData | nul
       _id,
       title,
       image{
+        asset->{
+          _ref,
+          url
+        },
+        alt,
+        caption,
+        hotspot
+      },
+      "cpdImage": cpdImage{
         asset->{
           _ref,
           url

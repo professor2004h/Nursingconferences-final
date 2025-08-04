@@ -303,10 +303,10 @@ function HomePageContent({
 
       {/* 7 & 8. Venue & Location - Merged Section (Full-width stacked: Gallery on top, Info below) */}
       {(venueSettings?.venueImages && venueSettings.venueImages.length > 0) || venueSettings ? (
-        <section className="py-12 md:py-16 bg-gray-50">
+        <section className="py-6 md:py-8 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+            <div className="text-center mb-4 md:mb-5">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-3 md:mb-4">
                 Venue & Location
               </h2>
               <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
@@ -315,7 +315,7 @@ function HomePageContent({
             </div>
 
             {/* Full-width Composite: Gallery + Location Info with tighter spacing */}
-            <div className="space-y-6 md:space-y-8">
+            <div className="space-y-3 md:space-y-4">
               {/* Gallery (full width) */}
               {venueSettings?.venueImages && venueSettings.venueImages.length > 0 && (
                 <VenueImageGallery
@@ -325,7 +325,7 @@ function HomePageContent({
               )}
 
               {/* Venue & Location Information (full width, compact padding) */}
-              <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-5 lg:p-6">
+              <div className="bg-white border border-gray-200 rounded-lg p-3 md:p-4 lg:p-5 pb-1 md:pb-2 lg:pb-3 mb-0">
                 <AboutLocationSection venueSettings={venueSettings} />
               </div>
             </div>
@@ -334,7 +334,11 @@ function HomePageContent({
       ) : null}
 
       {/* 9. Event Schedule and Participation Benefits Section */}
-      <EventScheduleAndBenefitsSection />
+      <section className="pt-1 md:pt-2 lg:pt-3 pb-4 md:pb-6 lg:pb-8 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+          <EventScheduleAndBenefitsSection />
+        </div>
+      </section>
 
       {/* 10. Journal Section */}
       {siteSettings?.journal?.showJournal && (

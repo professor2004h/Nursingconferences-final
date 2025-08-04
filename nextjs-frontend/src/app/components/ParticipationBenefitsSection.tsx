@@ -107,7 +107,7 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
 
   return (
     <div
-      className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 w-full"
+      className="bg-white rounded-xl p-3 md:p-4 shadow-lg border border-gray-200 w-full"
       style={{
         height: '100%',
         minHeight: '754px', // Increased by 30% (580px × 1.3)
@@ -117,8 +117,8 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
       }}
     >
       {/* Header - EXACT skeleton match */}
-      <div className="text-center mb-6" style={{ flexShrink: 0 }}>
-        <h2 className="text-lg font-semibold text-gray-800 mb-3 h-6 flex items-center justify-center">
+      <div className="text-center mb-3" style={{ flexShrink: 0 }}>
+        <h2 className="text-lg font-semibold text-gray-800 mb-1 h-6 flex items-center justify-center">
           {benefitsData.title}
         </h2>
         {benefitsData.subtitle && (
@@ -126,7 +126,7 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
             {benefitsData.subtitle}
           </p>
         )}
-        <div className="w-12 h-0.5 bg-gray-400 mx-auto mt-3"></div>
+        <div className="w-12 h-0.5 bg-gray-400 mx-auto mt-1.5"></div>
       </div>
 
       {/* Scrolling Container - 30% Larger for Better Readability */}
@@ -145,7 +145,7 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
             height: '100%',
             overflowY: 'scroll',
             overflowX: 'hidden',
-            padding: '16px',
+            padding: '8px',
             backgroundColor: '#f9fafb',
             // Enhanced scrollbar styles
             scrollbarWidth: 'auto',
@@ -182,11 +182,11 @@ const ParticipationBenefitsSection: React.FC<ParticipationBenefitsSectionProps> 
           `}</style>
 
           {/* Benefits Content */}
-          <div className="space-y-3">
+          <div className="space-y-1.5">
             {sortedBenefits.map((benefit, index) => (
               <div
                 key={index}
-                className={`bg-white border border-gray-200 p-3 ${
+                className={`bg-white border border-gray-200 p-2 sm:p-2 ${
                   benefit.isHighlighted ? 'border-orange-300 bg-orange-50' : ''
                 }`}
               >

@@ -40,7 +40,7 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
 
   return (
     <div
-      className="bg-white rounded-xl p-6 md:p-8 shadow-lg border border-gray-200 w-full"
+      className="bg-white rounded-xl p-3 md:p-4 shadow-lg border border-gray-200 w-full"
       style={{
         height: '100%',
         minHeight: '754px', // Increased by 30% (580px × 1.3)
@@ -50,15 +50,15 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
       }}
     >
       {/* Header - EXACT skeleton match */}
-      <div className="text-center mb-6" style={{ flexShrink: 0 }}>
-        <h2 className="text-lg font-semibold text-gray-800 mb-3 h-6 flex items-center justify-center">
+      <div className="text-center mb-3" style={{ flexShrink: 0 }}>
+        <h2 className="text-lg font-semibold text-gray-800 mb-1 h-6 flex items-center justify-center">
           {scheduleData.title}
         </h2>
         <div className="w-12 h-0.5 bg-gray-400 mx-auto"></div>
       </div>
 
       {/* Day Tabs - Enhanced with Orange Accents */}
-      <div className="flex justify-center mb-6 gap-1" style={{ flexShrink: 0 }}>
+      <div className="flex justify-center mb-3 gap-1" style={{ flexShrink: 0 }}>
         {scheduleData.days.map((day, index) => (
           <button
             key={day.dayNumber}
@@ -87,7 +87,7 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
         {scheduleData.days[activeDay] && (
           <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {/* Date Header - Enhanced with Orange Accent */}
-            <div className="bg-white px-4 py-3 border-b-2 border-orange-500" style={{ flexShrink: 0 }}>
+            <div className="bg-white px-2 py-1.5 border-b-2 border-orange-500" style={{ flexShrink: 0 }}>
               <h3 className="text-sm font-medium text-black text-center h-4 flex items-center justify-center">
                 <span className="bg-orange-100 px-3 py-1 rounded-full text-orange-700 border border-orange-200">
                   {scheduleData.days[activeDay].displayDate}
@@ -101,7 +101,7 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
                 flex: 1,
                 overflowY: 'scroll',
                 overflowX: 'hidden',
-                padding: '16px',
+                padding: '8px',
                 backgroundColor: '#f9fafb',
                 // Enhanced scrollbar styles
                 scrollbarWidth: 'auto',
@@ -138,11 +138,11 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
               `}</style>
 
               {/* Schedule Content */}
-              <div className="space-y-3">
+              <div className="space-y-1.5">
                 {scheduleData.days[activeDay].sessions.map((session, sessionIndex) => (
                   <div
                     key={sessionIndex}
-                    className="bg-white border border-gray-200 p-3"
+                    className="bg-white border border-gray-200 p-2 sm:p-2"
                   >
                     <div className="flex items-start gap-3">
                       {/* Time Block - Enhanced with Orange Accent */}

@@ -14,9 +14,9 @@ export default {
     },
     {
       name: 'image',
-      title: 'Section Image',
+      title: 'Main Section Image (16:9)',
       type: 'image',
-      description: 'Main image to display in this section',
+      description: 'Main image to display in this section (16:9 photo). Recommended size ~1552x874 for exact 16:9.',
       validation: (Rule: any) => Rule.required(),
       options: {
         hotspot: true,
@@ -38,15 +38,45 @@ export default {
       ],
     },
     {
+      name: 'cpdImage',
+      title: 'CPD Credit Image (1552x531)',
+      type: 'image',
+      description: 'Upload the CPD credit points image (target 1552x531). This will be shown alongside the main image in a gallery layout.',
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alternative Text',
+          type: 'string',
+          description: 'Describe the CPD credit image for accessibility/SEO',
+          validation: (Rule: any) => Rule.required(),
+        },
+        {
+          name: 'caption',
+          title: 'Caption',
+          type: 'string',
+          description: 'Optional caption for the CPD image',
+        },
+      ],
+      validation: (Rule: any) =>
+        Rule.custom((value: any) => {
+          if (!value) return true; // optional field
+          // We cannot reliably access image metadata here; provide a friendly pass-through
+          return true;
+        }).warning('Recommended dimensions are 1552x531 (approx 2.92:1).'),
+    },
+    {
       name: 'layout',
       title: 'Layout Settings',
       type: 'object',
       fields: [
         {
           name: 'aspectRatio',
-          title: 'Aspect Ratio',
+          title: 'Main Image Aspect Ratio',
           type: 'string',
-          description: 'Choose the aspect ratio for the image display',
+          description: 'Choose the aspect ratio for the MAIN image display',
           options: {
             list: [
               { title: '16:9 (Widescreen)', value: '16/9' },
@@ -60,9 +90,9 @@ export default {
         },
         {
           name: 'objectFit',
-          title: 'Image Fit',
+          title: 'Main Image Fit',
           type: 'string',
-          description: 'How the image should fit within its container',
+          description: 'How the MAIN image should fit within its container',
           options: {
             list: [
               { title: 'Cover (Fill container)', value: 'cover' },
@@ -76,7 +106,7 @@ export default {
           name: 'borderRadius',
           title: 'Border Radius',
           type: 'string',
-          description: 'Rounded corners for the image',
+          description: 'Rounded corners for images in this section',
           options: {
             list: [
               { title: 'None', value: 'none' },
@@ -88,6 +118,32 @@ export default {
             ],
           },
           initialValue: 'lg',
+        },
+        {
+          name: 'cpdAspectRatio',
+          title: 'CPD Image Aspect Ratio',
+          type: 'string',
+          description: 'Display ratio hint for the CPD image (content is 1552x531 ~ 2.92:1)',
+          options: {
+            list: [
+              { title: 'Auto (Original)', value: 'auto' },
+              { title: '3:1 (Wide banner approx)', value: '3/1' },
+            ],
+          },
+          initialValue: 'auto',
+        },
+        {
+          name: 'galleryStyle',
+          title: 'Gallery Layout',
+          type: 'string',
+          description: 'How the two images should be arranged',
+          options: {
+            list: [
+              { title: 'Side-by-side (2 columns)', value: 'cols' },
+              { title: 'Stacked (Main above CPD)', value: 'stack' },
+            ],
+          },
+          initialValue: 'cols',
         },
       ],
       initialValue: {
