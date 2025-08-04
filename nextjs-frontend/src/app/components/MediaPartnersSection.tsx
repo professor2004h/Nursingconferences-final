@@ -75,18 +75,14 @@ const MediaPartnersSection: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8 md:mb-12">
-          <span className="text-orange-500 font-semibold text-sm sm:text-base lg:text-lg tracking-wide uppercase mb-2 sm:mb-3 block">
-            OUR PARTNERS
-          </span>
+          {/* Heading removed as requested */}
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight text-slate-900">
             Media
             <span className="block bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
               Partners
             </span>
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto px-2">
-            We are grateful to our media partners who help us reach a wider audience and promote our conferences
-          </p>
+          {/* Subtext removed as requested */}
         </div>
 
         {/* Partners Grid */}

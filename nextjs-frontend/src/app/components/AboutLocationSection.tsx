@@ -45,29 +45,54 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
     <section className="py-12 md:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <span className="text-orange-500 font-semibold text-lg tracking-wide uppercase mb-4 block">
-            Conference Location
-          </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+        <div className="text-center mb-6 sm:mb-8">
+          {/* Heading removed as requested */}
+          <h2 className="text-xl sm:text-2xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 whitespace-nowrap">
             Venue & Location Information
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Discover everything you need to know about our conference venue and the surrounding area.
-          </p>
+          {/* Subtext removed as requested */}
         </div>
 
         {/* Single Column Layout */}
         <div className="max-w-4xl mx-auto">
           {/* About the Location Section */}
-          <div className="bg-slate-50 rounded-xl p-6 sm:p-8 mb-8">
-            <div className="flex items-center mb-6">
+          <div className="bg-slate-50 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="flex items-center mb-4 sm:mb-5">
               <span className="text-3xl mr-4">🌆</span>
-              <h3 className="text-2xl font-bold text-slate-900">About the Location</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900">About the Location</h3>
             </div>
 
-            {/* Venue Information */}
-            <div className="mb-6">
+            {/* Mobile-only scroll container to show limited content initially */}
+            <div className="block md:hidden relative max-h-72 overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch] scrollbar-thin w-full">
+              {/* gradient fade at bottom for subtle cue */}
+              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-50 to-transparent"></div>
+              <div className="space-y-6">
+                {/* Venue Information (mobile scroll area) */}
+                <div className="mb-3">
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="text-2xl leading-none">🏨</span>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-base font-bold text-slate-900 break-words">{venueSettings.venueName}</h4>
+                      {venueSettings.venueAddress && (
+                        <p className="text-sm text-slate-600 mt-1 break-words">{formatAddress(venueSettings.venueAddress)}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location Description (mobile scroll area) */}
+                {venueSettings.locationDescription && (
+                  <div className="prose prose-sm max-w-none text-slate-700">
+                    <PortableText value={venueSettings.locationDescription} />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Desktop and tablet view (no scroll truncation) */}
+            <div className="hidden md:block">
+              {/* Venue Information */}
+              <div className="mb-6">
               <div className="flex items-center mb-4">
                 <span className="text-2xl mr-3">🏨</span>
                 <div>
@@ -86,6 +111,8 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
               </div>
             )}
           </div>
+          {/* close desktop container */}
+        </div>
 
           {/* Call to Action Section */}
           <div className="text-center">

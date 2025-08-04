@@ -167,16 +167,12 @@ const FeaturedSpeakersSection: React.FC = () => {
         <div className="container mx-auto px-4">
           {/* Section Header */}
           <div className="text-center mb-12">
-            <p className="text-orange-500 font-semibold text-sm uppercase tracking-wider mb-2">
-              OUR DISTINGUISHED SPEAKERS
-            </p>
+          {/* Heading removed as requested */}
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Featured
               <span className="text-orange-500 ml-2">Speakers</span>
             </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto">
-              Meet our distinguished speakers and thought leaders who will share their expertise and insights at our conference.
-            </p>
+          {/* Subtext removed as requested */}
           </div>
 
           {/* Speakers by Category - ULTRA COMPACT */}
