@@ -126,7 +126,7 @@ const FeaturedSpeakersSection: React.FC = () => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-8 md:py-12 lg:py-16 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
@@ -166,7 +166,7 @@ const FeaturedSpeakersSection: React.FC = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           {/* Section Header */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-0">
               Session <span className="text-orange-500">Speakers</span>
             </h2>
