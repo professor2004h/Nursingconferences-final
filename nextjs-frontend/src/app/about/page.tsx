@@ -47,22 +47,40 @@ export default async function AboutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+      {/* Hero Section - Use About image as background with 40% black overlay */}
+      <section
+        className="relative py-16 md:py-24"
+        style={{
+          backgroundImage: about?.imageUrl ? `url(${about.imageUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Fallback gradient if no image */}
+        {!about?.imageUrl && (
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900" />
+        )}
+        {/* 40% black overlay (force with inline style for reliability) */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2 md:mb-4 text-white">
               About
-              <span className="block gradient-text bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                {primaryBrand} {secondaryBrand}
-              </span>
-              {brandTagline && (
-                <span className="block text-xl md:text-2xl lg:text-3xl font-medium text-orange-300 mt-3">
-                  {brandTagline}
-                </span>
-              )}
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
+            <span className="block text-2xl md:text-4xl lg:text-5xl font-extrabold text-white">
+              {primaryBrand} {secondaryBrand}
+            </span>
+            {brandTagline && (
+              <span className="block text-lg md:text-xl lg:text-2xl font-medium text-white mt-3">
+                {brandTagline}
+              </span>
+            )}
+            <p className="mt-4 text-lg md:text-2xl text-white max-w-3xl mx-auto">
               Connecting minds, sharing knowledge, transforming the world through academic excellence
             </p>
           </div>
@@ -135,18 +153,7 @@ export default async function AboutPage() {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="space-y-8">
-                {/* Image */}
-                {about?.imageUrl && (
-                  <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <Image
-                      src={about.imageUrl}
-                      alt={about.imageAlt || `About ${fullBrandName}`}
-                      width={400}
-                      height={300}
-                      className="w-full h-64 object-cover"
-                    />
-                  </div>
-                )}
+                {/* Image removed to avoid duplicating hero background image */}
 
                 {/* Dynamic Image Section */}
                 <ImageSection
