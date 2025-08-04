@@ -215,7 +215,7 @@ function HomePageContent({
                 {about?.description ? (
                   <div className="space-y-6">
                     {/* Show truncated content from backend */}
-                    <div className="line-clamp-6 text-lg leading-relaxed">
+                    <div className="text-lg leading-relaxed line-clamp-6 md:line-clamp-[10] lg:line-clamp-[12]">
                       <PortableText value={about.description} />
                     </div>
                   </div>

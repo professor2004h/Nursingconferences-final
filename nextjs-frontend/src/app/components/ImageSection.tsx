@@ -62,7 +62,8 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
 
   return (
     <section className={`image-section w-full ${className}`}>
-      <div className="relative w-full">
+      {/* On desktop, stretch this right column to match the left column height */}
+      <div className="relative w-full md:h-full">
         {data.title && (
           <div className="mb-4 text-center">
             <h3 className="text-lg font-semibold text-slate-900">
@@ -74,7 +75,8 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
         {hasCPD ? (
           // Two-column layout: Left = About text (outside this component), Right = this column
           // Stack the CPD banner on top and the 16:9 image below it, both aligned to the top.
-          <div className="flex flex-col gap-3 md:gap-4 md:self-start">
+          // Make this column fill available height on desktop.
+          <div className="flex flex-col gap-3 md:gap-4 md:self-stretch md:h-full">
             {/* CPD banner: force full image (no crop) and keep exact banner aspect */}
             <div className={`relative w-full overflow-hidden ${borderRadiusClass} aspect-[1552/531]`}>
               {data.cpdImage?.asset?.url ? (
@@ -82,7 +84,7 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
                   src={data.cpdImage.asset.url as string}
                   alt={data.cpdImage.alt || 'CPD Credits'}
                   fill
-                  className="object-contain bg-white"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, (max-width: 1280px) 44vw, 44vw"
                   priority={true}
                 />
@@ -94,7 +96,7 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
             </div>
 
             {/* Main 16:9 image directly below CPD */}
-            <div className={`relative w-full overflow-hidden ${borderRadiusClass} ${aspectRatioClass}`}>
+            <div className={`relative w-full overflow-hidden ${borderRadiusClass} ${aspectRatioClass} md:flex-1`}>
               <Image
                 src={data.image.asset.url}
                 alt={data.image.alt}
@@ -107,16 +109,16 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
           </div>
         ) : (
           /* Single image fallback */
-          <div className={`relative w-full overflow-hidden ${borderRadiusClass} ${aspectRatioClass} md:self-start`}>
+          <div className={`relative w-full overflow-hidden ${borderRadiusClass} ${aspectRatioClass} md:self-stretch md:h-full`}>
             <Image
               src={data.image.asset.url}
               alt={data.image.alt}
               fill
-              className={`${objectFitClass} transition-all duration-300 hover:scale-105`}
+              className={`${objectFitClass}`}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               priority={false}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            
           </div>
         )}
 
