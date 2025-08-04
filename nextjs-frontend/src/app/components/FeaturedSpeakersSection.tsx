@@ -167,11 +167,9 @@ const FeaturedSpeakersSection: React.FC = () => {
         <div className="container mx-auto px-4">
           {/* Section Header */}
           <div className="text-center mb-12">
-          {/* Heading removed as requested */}
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-0">
               Session <span className="text-orange-500">Speakers</span>
             </h2>
-          {/* Subtext removed as requested */}
           </div>
 
           {/* Speakers by Category - ULTRA COMPACT */}
