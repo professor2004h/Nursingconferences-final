@@ -263,30 +263,11 @@ function HomePageContent({
             </div>
 
             <div className="animate-fade-in-up lg:animate-fade-in-right">
-              {about?.imageUrl ? (
-                <div className="space-y-6">
-                  <div className="relative">
-                    <Image
-                      src={about.imageUrl}
-                      alt="About Nursing Conference 2026"
-                      width={600}
-                      height={400}
-                      className="w-full h-auto rounded-2xl shadow-2xl"
-                    />
-                  </div>
-
-                  {/* Dynamic Image Section */}
-                  <ImageSection
-                    data={safeImageSection}
-                    className="shadow-2xl"
-                  />
-                </div>
-              ) : (
-                <ImageSection
-                  data={safeImageSection}
-                  className="shadow-2xl"
-                />
-              )}
+              {/* Always render only the dynamic Image Section; do not render About image on homepage */}
+              <ImageSection
+                data={safeImageSection}
+                className="shadow-2xl"
+              />
             </div>
           </div>
         </div>

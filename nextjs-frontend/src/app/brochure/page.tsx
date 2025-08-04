@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import BrochureDownloadForm from './BrochureDownloadForm';
 import { getSiteSettings, getFullBrandName } from '../getSiteSettings';
 
@@ -25,24 +26,84 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function BrochurePage() {
+async function getBrochureSettings(baseUrl?: string) {
+  try {
+    const url = `${baseUrl ?? ''}/api/brochure-settings`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res?.ok) return null;
+    return await res.json();
+  } catch (e) {
+    console.error('Failed to load brochure settings:', e);
+    return null;
+  }
+}
+
+function BrochureHeroClient({ imageUrl, overlayPercent }: { imageUrl?: string; overlayPercent?: number }) {
+  // Clamp overlay to 40%–70% as requested (fallback 0.7 if CMS missing)
+  const requested = typeof overlayPercent === 'number' ? overlayPercent : 70;
+  const clamped = Math.min(70, Math.max(40, requested));
+  const opacity = clamped / 100;
+  // Account for fixed/sticky header overlap with top padding (increase to clear both top bars)
+  const headerOffset = 'pt-32 md:pt-40';
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Compact Hero Section */}
-      <div className="bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold">
-              BROCHURE FORM
-            </h1>
-            <nav className="mt-4 text-sm text-blue-100">
-              <span>Home</span>
-              <span className="mx-2">»</span>
-              <span>Brochure Form</span>
-            </nav>
-          </div>
+    <section
+      className={`relative text-white ${headerOffset} pb-16 md:pb-24`}
+      style={{
+        backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Fallback gradient only when no image */}
+      {!imageUrl ? (
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900" />
+      ) : null}
+      {/* Black overlay at requested opacity */}
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: `rgba(0,0,0,${opacity})` }}
+      />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center text-center">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-wide drop-shadow-md">
+            BROCHURE FORM
+          </h1>
+          <nav className="mt-2 md:mt-3 text-sm md:text-base text-blue-100">
+            <span>Home</span>
+            <span className="mx-2">»</span>
+            <span>Brochure Form</span>
+          </nav>
         </div>
       </div>
+    </section>
+  );
+}
+
+export default async function BrochurePage() {
+  // Load CMS hero settings server-side (SSR)
+  let heroImageUrl: string | undefined = undefined;
+  let overlayPercent: number | undefined = 40;
+
+  // Build absolute base URL for the server (handles prod/preview/dev)
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.VERCEL_URL?.startsWith('http') ? process.env.VERCEL_URL : (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+
+  try {
+    const data = await getBrochureSettings(baseUrl);
+    if (data) {
+      heroImageUrl = data.heroBackgroundImageUrl || data.imageUrl || undefined;
+      overlayPercent = typeof data.heroOverlayOpacity === 'number' ? data.heroOverlayOpacity : 40;
+    }
+  } catch (e) {
+    console.warn('Brochure hero settings fetch failed, using defaults.', e);
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section - CMS background with overlay matching About page style */}
+      <BrochureHeroClient imageUrl={heroImageUrl} overlayPercent={overlayPercent} />
 
       {/* Main Content */}
       <div className="py-12">
@@ -63,24 +124,24 @@ export default function BrochurePage() {
             </div>
 
             {/* Right Column - Download Section */}
-            <div className="bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] rounded-lg shadow-lg p-8 text-white">
-              <div className="text-center">
+            <div className="rounded-lg shadow-lg p-8 text-white" style={{backgroundColor: '#0b2a6b'}}>
+              <div className="text-left sm:text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-[#f97316] rounded-full mb-6">
                   <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-4">
+                <h3 className="text-2xl font-extrabold mb-4 text-white">
                   Download Conference Brochure
                 </h3>
-                <p className="text-blue-100 text-sm mb-6">
+                <p className="text-white/90 text-sm mb-6 leading-relaxed">
                   Submit the form on the left to get instant access to our comprehensive conference brochure with all details about speakers, schedule, and registration information.
                 </p>
-                <div className="text-sm text-blue-200">
-                  <p>✓ Complete conference schedule</p>
-                  <p>✓ Speaker profiles and abstracts</p>
-                  <p>✓ Registration information</p>
-                  <p>✓ Venue and accommodation details</p>
+                <div className="text-sm text-white space-y-2">
+                  <p className="flex items-start gap-2"><span className="text-white">✓</span> <span className="text-white">Complete conference schedule</span></p>
+                  <p className="flex items-start gap-2"><span className="text-white">✓</span> <span className="text-white">Speaker profiles and abstracts</span></p>
+                  <p className="flex items-start gap-2"><span className="text-white">✓</span> <span className="text-white">Registration information</span></p>
+                  <p className="flex items-start gap-2"><span className="text-white">✓</span> <span className="text-white">Venue and accommodation details</span></p>
                 </div>
               </div>
             </div>
