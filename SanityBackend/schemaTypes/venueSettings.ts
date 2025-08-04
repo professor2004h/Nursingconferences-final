@@ -19,6 +19,26 @@ export default defineType({
       type: 'string',
       initialValue: 'Conference venue and accommodation information'
     }),
+    // Hero background image for /venue header
+    defineField({
+      name: 'heroImage',
+      title: 'Hero Background Image',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Important for accessibility and SEO'
+        }),
+        defineField({
+          name: 'caption',
+          title: 'Caption',
+          type: 'string'
+        })
+      ]
+    }),
     defineField({
       name: 'venueName',
       title: 'Venue Name',

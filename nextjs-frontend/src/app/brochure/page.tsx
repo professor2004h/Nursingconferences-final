@@ -134,7 +134,7 @@ export default async function BrochurePage() {
                 <h3 className="text-2xl font-extrabold mb-4 text-white">
                   Download Conference Brochure
                 </h3>
-                <p className="text-white/90 text-sm mb-6 leading-relaxed">
+                <p className="text-white text-sm mb-6 leading-relaxed">
                   Submit the form on the left to get instant access to our comprehensive conference brochure with all details about speakers, schedule, and registration information.
                 </p>
                 <div className="text-sm text-white space-y-2">

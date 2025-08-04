@@ -92,37 +92,49 @@ const VenuePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="mt-4">Loading venue information...</p>
-          </div>
+      <section className="relative text-white pt-32 md:pt-40 pb-16 md:pb-24" style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900" />
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4">Loading venue information...</p>
         </div>
-      </div>
+      </section>
     );
   }
 
   if (error || !venueSettings) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Venue Information</h1>
-            <p className="text-xl text-red-300">
-              {error || 'Venue information not available'}
-            </p>
-          </div>
+      <section className="relative text-white pt-32 md:pt-40 pb-16 md:pb-24">
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900" />
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Venue Information</h1>
+          <p className="text-xl text-blue-100">
+            {error || 'Venue information not available'}
+          </p>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Header with CMS image + 70% black overlay */}
+      <section
+        className="relative text-white pt-32 md:pt-40 pb-16 md:pb-24"
+        style={{
+          backgroundImage: venueSettings?.heroImageUrl ? `url(${venueSettings.heroImageUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {!venueSettings?.heroImageUrl && (
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900" />
+        )}
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <span className="text-orange-400 font-semibold text-lg tracking-wide uppercase mb-4 block">
               Conference Location
@@ -156,7 +168,7 @@ const VenuePage: React.FC = () => {
             </ol>
           </nav>
         </div>
-      </div>
+      </section>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

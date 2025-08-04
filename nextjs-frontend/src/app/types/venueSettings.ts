@@ -64,6 +64,8 @@ export interface VenueSettings {
   _id: string;
   title: string;
   subtitle?: string;
+  /** Optional hero background image URL for /venue header (from Sanity venueSettings) */
+  heroImageUrl?: string;
   venueName: string;
   venueAddress: VenueAddress;
   contactInformation?: ContactInformation;
