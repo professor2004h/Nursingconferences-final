@@ -76,10 +76,9 @@ const MediaPartnersSection: React.FC = () => {
         {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8 md:mb-12">
           {/* Heading removed as requested */}
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight text-slate-900">
-            Media
-            <span className="block bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-              Partners
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight text-slate-900 whitespace-nowrap">
+            <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+              Media Partners
             </span>
           </h2>
           {/* Subtext removed as requested */}
