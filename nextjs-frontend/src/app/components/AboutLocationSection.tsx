@@ -46,8 +46,8 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8">
-          {/* Heading removed as requested */}
-          <h2 className="text-xl sm:text-2xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 whitespace-nowrap">
+          {/* Heading adjusted for perfect centering on mobile */}
+          <h2 className="text-xl sm:text-2xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 mx-auto text-center">
             Venue & Location Information
           </h2>
           {/* Subtext removed as requested */}
@@ -56,7 +56,7 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
         {/* Single Column Layout */}
         <div className="max-w-4xl mx-auto">
           {/* About the Location Section */}
-          <div className="bg-slate-50 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="bg-slate-50 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 relative">
             <div className="flex items-center mb-4 sm:mb-5">
               <span className="text-3xl mr-4">🌆</span>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900">About the Location</h3>
@@ -64,8 +64,8 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
 
             {/* Mobile-only scroll container to show limited content initially */}
             <div className="block md:hidden relative max-h-72 overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch] scrollbar-thin w-full">
-              {/* gradient fade at bottom for subtle cue */}
-              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-50 to-transparent"></div>
+              {/* gradient fade at bottom for subtle cue - keep inside the card bounds */}
+              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-50 to-transparent rounded-b-xl"></div>
               <div className="space-y-6">
                 {/* Venue Information (mobile scroll area) */}
                 <div className="mb-3">
