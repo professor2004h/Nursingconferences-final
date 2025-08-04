@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@sanity/client';
+import { getSanityClient } from '@/app/lib/sanityClient';
 
 // Read config from env, but do NOT assert non-null at module scope.
 // Fall back to safe defaults so that importing this file during build does not throw.
@@ -18,30 +18,9 @@ const apiVersion =
 
 // At module scope, always construct a READ-ONLY client (no token) to avoid
 // build-time token requirements if the module gets imported.
-const readOnlyClient = createClient({
-  projectId,
-  dataset,
-  apiVersion,
-  useCdn: true,
-  token: undefined,
-});
 
 // Lazily create an authenticated client only inside the request handler if a token exists.
 // This avoids referencing write credentials during build.
-function getClient() {
-  const token = process.env.SANITY_READ_TOKEN || process.env.SANITY_API_TOKEN;
-  if (token && projectId) {
-    return createClient({
-      projectId,
-      dataset,
-      apiVersion,
-      useCdn: false,
-      token,
-    });
-  }
-  // Fallback to read-only client when no token is available
-  return readOnlyClient;
-}
 
 export async function GET() {
   try {
@@ -56,7 +35,7 @@ export async function GET() {
       );
     }
 
-    const client = getClient();
+    const client = getSanityClient();
 
     const query = `*[_type == "brochureSettings"] | order(_updatedAt desc)[0]{
       "heroBackgroundImageUrl": coalesce(heroBackgroundImage.asset->url, heroBackgroundImage.url),
