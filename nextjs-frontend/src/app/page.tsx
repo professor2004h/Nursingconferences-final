@@ -309,7 +309,7 @@ function HomePageContent({
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
                 Venue & Location
               </h2>
-              <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
                 Explore our stunning venue, location details and map to plan your visit.
               </p>
             </div>
