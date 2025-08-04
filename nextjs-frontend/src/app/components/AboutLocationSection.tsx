@@ -64,8 +64,7 @@ const AboutLocationSection: React.FC<AboutLocationSectionProps> = ({ venueSettin
 
             {/* Mobile-only scroll container to show limited content initially */}
             <div className="block md:hidden relative max-h-72 overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch] scrollbar-thin w-full">
-              {/* gradient fade at bottom for subtle cue - keep inside the card bounds */}
-              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-50 to-transparent rounded-b-xl"></div>
+              {/* Removed gradient fade overlay on mobile per request */}
               <div className="space-y-6">
                 {/* Venue Information (mobile scroll area) */}
                 <div className="mb-3">
