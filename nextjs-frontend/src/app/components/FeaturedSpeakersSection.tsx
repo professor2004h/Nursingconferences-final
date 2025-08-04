@@ -176,11 +176,9 @@ const FeaturedSpeakersSection: React.FC = () => {
           {Object.entries(speakersByCategory).map(([category, categorySpeakers]) => (
             <div key={category} className="mb-8">
               {/* Category Header - ULTRA COMPACT */}
-              <div className="text-center mb-4">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                  {SPEAKER_CATEGORIES[category as keyof typeof SPEAKER_CATEGORIES]}
-                </h3>
-                <div className="w-24 h-1 bg-orange-500 mx-auto"></div>
+              {/* Category header hidden as requested */}
+              <div className="text-center mb-2">
+                {/* Removed subheading below Session Speakers */}
               </div>
 
               {/* Speakers Grid - 2 columns on mobile, 3-4 columns on larger screens - ULTRA COMPACT */}
