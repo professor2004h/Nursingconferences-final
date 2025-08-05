@@ -11,11 +11,16 @@ export async function GET() {
         _id,
         title,
         content,
+        // Branding (legacy/compat)
         primaryBrandName,
         secondaryBrandText,
         brandTagline,
         organizationName,
         organizationBrandName,
+        // Button fields
+        showButton,
+        buttonText,
+        buttonUrl,
         isActive,
         _createdAt,
         _updatedAt

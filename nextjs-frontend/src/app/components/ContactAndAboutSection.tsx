@@ -13,6 +13,10 @@ interface AboutUsData {
   // Legacy fields for backward compatibility
   organizationName?: string;
   organizationBrandName?: string;
+  // Button fields from Sanity
+  showButton?: boolean;
+  buttonText?: string;
+  buttonUrl?: string;
   isActive: boolean;
   _createdAt: string;
   _updatedAt: string;
@@ -182,6 +186,23 @@ export default function ContactAndAboutSection() {
                 ))}
               </div>
             </div>
+
+            {/* Optional About button configured in Sanity */}
+            {aboutUsData.showButton && aboutUsData.buttonUrl ? (
+              <div className="pt-6">
+                <a
+                  href={aboutUsData.buttonUrl}
+                  target={aboutUsData.buttonUrl.startsWith('http') ? '_blank' : undefined}
+                  rel={aboutUsData.buttonUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  {aboutUsData.buttonText || 'Learn More'}
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
