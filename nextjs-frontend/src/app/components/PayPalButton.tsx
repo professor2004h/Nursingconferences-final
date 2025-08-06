@@ -339,7 +339,7 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                   details: captureData,
                 });
                 // Redirect to return page with proper URL encoding - ENSURE NO ENCODING ISSUES
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://nursingeducationconferences.org';
+                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
                 const returnUrl = `${baseUrl}/paypal/return` +
                   `?orderID=${encodeURIComponent(data.orderID)}` +
                   `&paymentID=${encodeURIComponent(captureData.paymentId)}` +
@@ -365,7 +365,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           },
           onCancel: function(_data: any) {
             console.log('⚠️ Payment cancelled');
-            if (onCancelRef.current) onCancelRef.current();
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+            const cancelUrl = `${baseUrl}/paypal/cancel?registrationId=${encodeURIComponent(registrationId)}&amount=${encodeURIComponent(amount.toFixed(2))}&currency=${encodeURIComponent(currency)}`;
+            if (onCancelRef.current) {
+              try {
+                onCancelRef.current();
+              } catch (e) {
+                console.warn('⚠️ onCancel callback error:', e);
+              }
+            }
+            window.location.href = cancelUrl;
           },
           onError: function(err: any) {
             console.error('❌ PayPal error:', err);

@@ -1,66 +1,66 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
+import React from 'react';
 
-const PayPalCancelPage: React.FC = () => {
+export default function PayPalCancelPage() {
+  const search = useSearchParams();
   const router = useRouter();
 
-  useEffect(() => {
-    // Clear any stored PayPal order data
-    sessionStorage.removeItem('paypal_order_data');
-  }, []);
+  const amount = search.get('amount') || '';
+  const currency = search.get('currency') || '';
+  const registrationId = search.get('registrationId') || '';
+
+  const onRetry = () => {
+    // Navigate back to registration page where PayPal button is rendered
+    const target = registrationId ? `/registration?registrationId=${encodeURIComponent(registrationId)}` : '/registration';
+    router.push(target);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-        <div className="text-yellow-500 text-6xl mb-4">⚠️</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Cancelled</h1>
-        <p className="text-gray-600 mb-6">
-          Your PayPal payment was cancelled. Don't worry - your registration has been saved 
-          and you can complete the payment later.
-        </p>
-        
-        <div className="space-y-3">
-          <button
-            onClick={() => router.push('/registration')}
-            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            Try Payment Again
-          </button>
-          
-          <Link
-            href="/"
-            className="block w-full bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
-          >
-            Back to Home
-          </Link>
+    <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6">
+        <div className="flex items-center mb-4">
+          <span className="text-2xl mr-2">⚠️</span>
+          <h1 className="text-xl font-semibold text-yellow-900">Payment Cancelled</h1>
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-center">
-            <span className="text-blue-500 text-lg mr-2">ℹ️</span>
-            <div className="text-left">
-              <p className="text-sm font-medium text-blue-800">What's Next?</p>
-              <p className="text-xs text-blue-600">
-                Your registration is saved. You can complete payment anytime before the conference.
-              </p>
+        <p className="text-yellow-800 mb-4">
+          Your PayPal payment was cancelled. No funds were captured.
+        </p>
+
+        <div className="bg-white rounded-md border border-yellow-100 p-4 text-sm text-gray-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div className="text-gray-500">Registration ID</div>
+              <div className="font-mono break-all">{registrationId || '-'}</div>
+            </div>
+            <div>
+              <div className="text-gray-500">Amount</div>
+              <div className="font-mono">{currency} {amount || '-'}</div>
             </div>
           </div>
         </div>
 
-        <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500">
-            Need help? Contact us at{' '}
-            <a href="mailto:support@intelliglobalconferences.com" className="text-blue-600 hover:underline">
-              support@intelliglobalconferences.com
-            </a>
-          </p>
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={onRetry}
+            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Retry Payment
+          </button>
+          <button
+            onClick={() => router.push('/')}
+            className="px-4 py-2 rounded border border-blue-300 text-blue-800 hover:bg-blue-100"
+          >
+            Go to Home
+          </button>
         </div>
+
+        <p className="text-xs text-gray-500 mt-4">
+          If the issue persists, please contact support with your Registration ID.
+        </p>
       </div>
     </div>
   );
-};
-
-export default PayPalCancelPage;
+}
