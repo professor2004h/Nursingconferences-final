@@ -298,6 +298,11 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
           },
           onApprove: async function(data, _actions) {
             try {
+              // Ensure we have the PayPal Order ID and use it as the Registration ID
+              const paypalOrderId = data?.orderID;
+              if (!paypalOrderId) {
+                console.warn('⚠️ Missing PayPal orderID in onApprove data');
+              }
               console.log('✅ Payment approved, capturing server-side...');
 
               const controller = new AbortController();
@@ -338,14 +343,14 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
                   paymentID: captureData.paymentId,
                   details: captureData,
                 });
-                // Redirect to return page with proper URL encoding - ENSURE NO ENCODING ISSUES
+                // Redirect to return page; use PayPal Order ID as Registration ID
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
                 const returnUrl = `${baseUrl}/paypal/return` +
                   `?orderID=${encodeURIComponent(data.orderID)}` +
                   `&paymentID=${encodeURIComponent(captureData.paymentId)}` +
                   `&amount=${encodeURIComponent(captureData.amount)}` +
                   `&currency=${encodeURIComponent(captureData.currency)}` +
-                  `&registrationId=${encodeURIComponent(registrationId)}`;
+                  `&registrationId=${encodeURIComponent(data.orderID)}`;
                 window.location.href = returnUrl;
               } else {
                 let msg = captureData.error || 'Failed to capture payment';
@@ -363,10 +368,16 @@ const PayPalButton: React.FC<PayPalButtonProps> = ({
               throw error;
             }
           },
-          onCancel: function(_data: any) {
-            console.log('⚠️ Payment cancelled');
+          onCancel: function(data: any) {
+            console.log('⚠️ Payment cancelled', data);
+            // Use PayPal Order ID as the Registration ID on cancel page as well
+            const orderID = data?.orderID || '';
             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
-            const cancelUrl = `${baseUrl}/paypal/cancel?registrationId=${encodeURIComponent(registrationId)}&amount=${encodeURIComponent(amount.toFixed(2))}&currency=${encodeURIComponent(currency)}`;
+            const cancelUrl =
+              `${baseUrl}/paypal/cancel?registrationId=${encodeURIComponent(orderID || registrationId)}` +
+              `&amount=${encodeURIComponent(amount.toFixed(2))}` +
+              `&currency=${encodeURIComponent(currency)}` +
+              (orderID ? `&orderID=${encodeURIComponent(orderID)}` : '');
             if (onCancelRef.current) {
               try {
                 onCancelRef.current();

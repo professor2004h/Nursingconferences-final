@@ -11,7 +11,8 @@ export default function PayPalReturnPage() {
   const paymentID = search.get('paymentID') || '';
   const amount = search.get('amount') || '';
   const currency = search.get('currency') || '';
-  const registrationId = search.get('registrationId') || '';
+  // Use PayPal Order ID as the Registration ID everywhere
+  const registrationId = search.get('registrationId') || search.get('orderID') || '';
 
   const onContinue = () => {
     // Safest default: go back to registration page if present, else home
@@ -33,11 +34,11 @@ export default function PayPalReturnPage() {
         <div className="bg-white rounded-md border border-green-100 p-4 text-sm text-gray-800">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <div className="text-gray-500">Payment ID (Capture)</div>
+              <div className="text-gray-500">Payment Capture ID</div>
               <div className="font-mono break-all">{paymentID || '-'}</div>
             </div>
             <div>
-              <div className="text-gray-500">Order ID</div>
+              <div className="text-gray-500">PayPal Order ID</div>
               <div className="font-mono break-all">{orderID || '-'}</div>
             </div>
             <div>
@@ -67,7 +68,7 @@ export default function PayPalReturnPage() {
         </div>
 
         <p className="text-xs text-gray-500 mt-4">
-          Save your Payment ID and Order ID for future reference.
+          Save your Registration ID (PayPal Order ID) and Payment Capture ID for future reference.
         </p>
       </div>
     </div>

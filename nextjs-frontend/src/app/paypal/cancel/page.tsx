@@ -9,7 +9,8 @@ export default function PayPalCancelPage() {
 
   const amount = search.get('amount') || '';
   const currency = search.get('currency') || '';
-  const registrationId = search.get('registrationId') || '';
+  // Show the PayPal Order ID as the Registration ID on cancel page
+  const registrationId = search.get('registrationId') || search.get('orderID') || '';
 
   const onRetry = () => {
     // Navigate back to registration page where PayPal button is rendered
