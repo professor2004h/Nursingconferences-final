@@ -8,7 +8,9 @@ export const metadata = {
 
 export default async function JournalPage() {
   const siteSettings = await getSiteSettings();
-  const journalMatter = siteSettings?.journal?.matterDescription;
+  // journal in siteSettings only has showJournal/journalUrl/openInNewTab per schema.
+  // Keep fallback test content until separate journal matter is implemented in Studio.
+  const journalMatter = null as unknown as string | null;
 
   return (
     <div className="min-h-screen bg-white">

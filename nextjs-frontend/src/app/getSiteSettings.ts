@@ -45,6 +45,12 @@ export interface SiteSettings {
     journalUrl?: string;
     openInNewTab?: boolean;
   };
+  refundPolicy?: {
+    title?: string;
+    isActive?: boolean;
+    lastUpdated?: string;
+    matterDescription?: any[]; // Portable Text
+  };
   adminSettings?: {
     adminEmail?: string;
     invoiceEmailSubject?: string;
@@ -136,6 +142,7 @@ export async function getSiteSettings(forceRefresh = false): Promise<SiteSetting
       socialMedia,
       seo,
       journal,
+      refundPolicy,
       adminSettings,
       footerContent{
         termsAndConditions,
@@ -232,6 +239,7 @@ export async function getSiteSettingsFresh(): Promise<SiteSettings | null> {
       socialMedia,
       seo,
       journal,
+      refundPolicy,
       adminSettings,
       footerContent{
         termsAndConditions,
@@ -315,6 +323,7 @@ export async function getSiteSettingsForHeader(): Promise<SiteSettings | null> {
       socialMedia,
       seo,
       journal,
+      refundPolicy,
       adminSettings,
       footerContent{
         termsAndConditions,

@@ -131,6 +131,13 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
         Media Partners
       </Link>
       <Link
+        href="/exhibitors"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={handleDropdownLinkClick}
+      >
+        Exhibitors
+      </Link>
+      <Link
         href="/speaker-guidelines"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
         onClick={handleDropdownLinkClick}
@@ -476,6 +483,13 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                   onClick={closeMenu}
                 >
                   Media Partners
+                </Link>
+                <Link
+                  href="/exhibitors"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Exhibitors
                 </Link>
                 <Link
                   href="/speaker-guidelines"
