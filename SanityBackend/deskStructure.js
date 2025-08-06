@@ -227,6 +227,17 @@ export default (S) =>
             .title('Media Partners')
             .defaultOrdering([{field: 'companyName', direction: 'asc'}])
         ),
+      // Add Exhibitors
+      S.listItem()
+        .title('Exhibitors')
+        .id('exhibitors')
+        .icon(DocumentIcon)
+        .schemaType('exhibitors')
+        .child(
+          S.documentTypeList('exhibitors')
+            .title('Exhibitors')
+            .defaultOrdering([{field: 'companyName', direction: 'asc'}])
+        ),
       // Add Speakers
       S.listItem()
         .title('Conference Speakers')

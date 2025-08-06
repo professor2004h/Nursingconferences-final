@@ -24,8 +24,8 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
     return () => clearInterval(interval);
   }, [hero?.images]);
 
-  // Simple overlay settings
-  const overlayOpacity = hero?.slideshowSettings?.overlayOpacity || 40;
+  // Simple overlay settings (slightly stronger default overlay for text contrast)
+  const overlayOpacity = hero?.slideshowSettings?.overlayOpacity ?? 55;
   const overlayColor = typeof hero?.slideshowSettings?.overlayColor === 'string'
     ? hero.slideshowSettings.overlayColor
     : hero?.slideshowSettings?.overlayColor?.hex || '#000000';
@@ -33,7 +33,7 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
 
 
   return (
-    <section className="hero-section">
+    <section className="hero-section" aria-label="Conference hero">
       {/* Background Images with Slideshow */}
       {hero?.images && hero.images.length > 0 ? (
         <div className="absolute inset-0">
@@ -76,13 +76,14 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
             style={{
               color: hero?.textColor?.hex || '#ffffff',
               opacity: hero?.textColor?.alpha || 1,
-              fontSize: 'clamp(0.6rem, 2vw, 1.1rem)',
-              fontWeight: '700',
+              fontSize: 'clamp(0.8rem, 2.6vw, 1.25rem)',
+              fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               margin: '0',
-              marginBottom: '0.1rem',
-              lineHeight: '1.2'
+              marginBottom: '0.2rem',
+              lineHeight: 1.2,
+              textShadow: '0 2px 8px rgba(0,0,0,0.5)'
             }}
           >
             {hero?.conferenceTitle || 'INTERNATIONAL CONFERENCE ON'}
@@ -94,13 +95,14 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
             style={{
               color: '#f97316',
               opacity: 1,
-              fontSize: 'clamp(1.1rem, 3.5vw, 1.8rem)',
-              fontWeight: '900',
+              fontSize: 'clamp(1.4rem, 4.5vw, 2.2rem)',
+              fontWeight: 900,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               margin: '0',
-              marginBottom: '0.25rem',
-              lineHeight: '1.1'
+              marginBottom: '0.35rem',
+              lineHeight: 1.1,
+              textShadow: '0 3px 12px rgba(0,0,0,0.45)'
             }}
           >
             {hero?.conferenceSubject || 'NURSING'}
@@ -112,7 +114,12 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
               className="hero-conference-theme"
               style={{
                 color: hero?.textColor?.hex || '#ffffff',
-                opacity: hero?.textColor?.alpha || 1
+                opacity: hero?.textColor?.alpha || 1,
+                fontSize: 'clamp(0.8rem, 2.4vw, 1rem)',
+                lineHeight: 1.35,
+                textAlign: 'center',
+                textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+                marginBottom: '0.35rem'
               }}
             >
               {hero.conferenceTheme}
@@ -126,8 +133,8 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
               style={{
                 color: '#10b981',
                 opacity: 1,
-                fontSize: 'clamp(0.65rem, 2.2vw, 0.85rem)',
-                fontWeight: '600',
+                fontSize: 'clamp(0.72rem, 2.4vw, 0.95rem)',
+                fontWeight: 700,
                 letterSpacing: '0.03em',
                 textTransform: 'uppercase',
                 margin: '0',
@@ -144,7 +151,8 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                maxWidth: '90%'
+                maxWidth: '90%',
+                textShadow: '0 1px 4px rgba(0,0,0,0.3)'
               }}
             >
               🌐 {hero.eventType}
@@ -167,7 +175,8 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
                   style={{
                     color: hero?.textColor?.hex || '#ffffff',
                     opacity: hero?.textColor?.alpha || 1,
-                    fontSize: 'clamp(0.65rem, 2.2vw, 0.875rem)'
+                  fontSize: 'clamp(0.75rem, 2.6vw, 0.95rem)',
+                  textShadow: '0 2px 8px rgba(0,0,0,0.45)'
                   }}
                 >
                   {hero?.conferenceDate || 'June 23-24, 2025'}
@@ -189,7 +198,8 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
                   style={{
                     color: hero?.textColor?.hex || '#ffffff',
                     opacity: hero?.textColor?.alpha || 1,
-                    fontSize: 'clamp(0.65rem, 2.2vw, 0.875rem)'
+                  fontSize: 'clamp(0.75rem, 2.6vw, 0.95rem)',
+                  textShadow: '0 2px 8px rgba(0,0,0,0.45)'
                   }}
                 >
                   {hero?.conferenceVenue || 'Hotel Indigo Kuala Lumpur On The Park, Kuala Lumpur, Malaysia'}
@@ -206,7 +216,8 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
                 style={{
                   color: hero?.textColor?.hex || '#ffffff',
                   opacity: hero?.textColor?.alpha || 1,
-                  fontSize: 'clamp(0.65rem, 2.2vw, 0.875rem)'
+                  fontSize: 'clamp(0.75rem, 2.6vw, 0.95rem)',
+                  textShadow: '0 2px 8px rgba(0,0,0,0.45)'
                 }}
               >
                 <span className="hero-bullet-icon">📝</span>
@@ -243,11 +254,11 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
                 className="hero-register-button"
                 aria-label={hero?.registerButtonText || 'Register for conference'}
                 style={{
-                  fontSize: 'clamp(0.65rem, 2.5vw, 0.95rem)',
-                  padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 4vw, 2.2rem)',
-                  minHeight: 'clamp(36px, 8vw, 48px)',
-                  minWidth: 'clamp(120px, 30vw, 200px)',
-                  maxWidth: 'clamp(160px, 40vw, 240px)',
+                  fontSize: 'clamp(0.78rem, 3vw, 1.05rem)',
+                  padding: 'clamp(0.55rem, 2.4vw, 0.85rem) clamp(1.1rem, 4.4vw, 2.4rem)',
+                  minHeight: 'clamp(40px, 8.5vw, 52px)',
+                  minWidth: 'clamp(140px, 32vw, 220px)',
+                  maxWidth: 'clamp(180px, 42vw, 260px)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -258,9 +269,10 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
                   textDecoration: 'none',
                   background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                   color: '#ffffff',
-                  boxShadow: '0 4px 16px rgba(249, 115, 22, 0.4)',
-                  border: '2px solid transparent',
-                  whiteSpace: 'nowrap'
+                  boxShadow: '0 6px 18px rgba(249, 115, 22, 0.45)',
+                  border: '2px solid rgba(255,255,255,0.15)',
+                  whiteSpace: 'nowrap',
+                  backdropFilter: 'blur(2px)'
                 }}
               >
                 {hero?.registerButtonText || 'Register Now'}
@@ -270,23 +282,6 @@ export default function HeroSlideshow({ hero }: HeroSlideshowProps) {
         </div>
       </div>
 
-      {/* Navigation Dots - Desktop Only */}
-      {hero?.images && hero.images.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 hidden lg:flex space-x-2">
-          {hero.images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentImageIndex
-                  ? 'bg-white scale-110'
-                  : 'bg-white/50 hover:bg-white/75'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
     </section>
   );
 }
