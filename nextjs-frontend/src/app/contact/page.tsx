@@ -84,7 +84,7 @@ export default async function ContactPage() {
                   <div>
                     <h4 className="font-semibold text-lg text-slate-900 mb-1">Phone</h4>
                     <a 
-                      href={`tel:${siteSettings?.contactInfo?.phone || "+442045718752"}`}
+                      href={`tel:${(siteSettings?.contactInfo?.phone || "+442045718752").toString().replace(/[^0-9+]/g, '')}`}
                       className="text-orange-600 hover:text-orange-700 transition-colors"
                     >
                       {siteSettings?.contactInfo?.phone || "+44 20 4571 8752"}
@@ -102,7 +102,7 @@ export default async function ContactPage() {
                   <div>
                     <h4 className="font-semibold text-lg text-slate-900 mb-1">WhatsApp</h4>
                     <a
-                      href={`https://wa.me/${siteSettings?.contactInfo?.whatsapp || "442045718752"}`}
+                      href={`https://wa.me/${(siteSettings?.contactInfo?.whatsapp || "442045718752").toString().replace(/[^0-9]/g, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-orange-600 hover:text-orange-700 transition-colors"

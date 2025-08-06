@@ -52,8 +52,14 @@ export default function ContactAndAboutSection() {
         const aboutResponse = await fetch(`/api/about-us?t=${Date.now()}`);
         const aboutResult: AboutUsResponse = await aboutResponse.json();
 
-        // Fetch site settings for contact info
-        const settingsResponse = await fetch('/api/site-settings');
+        // Fetch site settings for contact info (force fresh data to reflect latest Studio changes)
+        const settingsResponse = await fetch(`/api/site-settings?t=${Date.now()}`, {
+          method: 'GET',
+          cache: 'no-store',
+          headers: {
+            'x-no-cache': '1'
+          }
+        });
         const settingsResult = await settingsResponse.json();
 
         if (aboutResult.success && aboutResult.data) {
@@ -121,7 +127,7 @@ export default function ContactAndAboutSection() {
 
               {/* Email */}
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -137,6 +143,24 @@ export default function ContactAndAboutSection() {
                 </div>
               </div>
 
+              {/* Phone */}
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-semibold text-lg text-slate-900 mb-1">Phone</h4>
+                  <a
+                    href={`tel:${(siteSettings?.contactInfo?.phone || "+14709166880").toString().replace(/[^0-9+]/g, '')}`}
+                    className="text-orange-600 hover:text-orange-700 transition-colors break-all text-sm sm:text-base"
+                  >
+                    {siteSettings?.contactInfo?.phone || "+1 (470)-916-6880"}
+                  </a>
+                </div>
+              </div>
+
               {/* WhatsApp */}
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -147,12 +171,12 @@ export default function ContactAndAboutSection() {
                 <div className="min-w-0 flex-1">
                   <h4 className="font-semibold text-lg text-slate-900 mb-1">WhatsApp</h4>
                   <a
-                    href={`https://wa.me/${siteSettings?.contactInfo?.whatsapp || "91987654321"}`}
+                    href={`https://wa.me/${(siteSettings?.contactInfo?.whatsapp || "+14709166880").toString().replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-orange-600 hover:text-orange-700 transition-colors break-all text-sm sm:text-base"
                   >
-                    {siteSettings?.contactInfo?.whatsapp || "+91987654321"}
+                    {siteSettings?.contactInfo?.whatsapp || "+1 (470)-916-6880"}
                   </a>
                 </div>
               </div>
