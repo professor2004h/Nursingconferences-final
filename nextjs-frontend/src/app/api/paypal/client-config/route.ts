@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
     console.log('✅ PayPal client config provided:', {
       hasClientId: !!clientId,
       clientIdLength: clientId.length,
+      clientIdPrefix: clientId.substring(0, 10) + '...',
       environment,
       baseUrl
     });
@@ -46,7 +47,8 @@ export async function GET(request: NextRequest) {
       clientId,
       environment,
       baseUrl,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      source: 'server-api'
     });
 
   } catch (error) {
