@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
-import PayPalProductionButton from '@/app/components/PayPalProductionButton';
+import PayPalButtonFixed from '@/app/components/PayPalButtonFixed';
 import PayPalErrorBoundary from '@/app/components/PayPalErrorBoundary';
 import { CurrencyProvider } from '@/app/contexts/CurrencyContext';
 import CurrencySelector from '@/app/components/CurrencySelector';
@@ -1233,6 +1233,16 @@ function RegistrationPageContent() {
               </div>
             </div>
 
+            {/* Debug Information */}
+            <div className="mt-4 p-4 bg-gray-100 rounded-lg text-sm">
+              <h3 className="font-semibold mb-2">Debug Info:</h3>
+              <div>Total Price: {priceCalculation.totalPrice}</div>
+              <div>Current Registration ID: {currentRegistrationId || 'None'}</div>
+              <div>Show PayPal Section: {showPayPalSection ? 'Yes' : 'No'}</div>
+              <div>Selected Currency: {selectedCurrency}</div>
+              <div>PayPal Client ID: {process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? 'Set' : 'Missing'}</div>
+            </div>
+
             {/* Official PayPal Payment Button - Production */}
             {priceCalculation.totalPrice > 0 && (
               <div className="mt-8">
@@ -1252,7 +1262,7 @@ function RegistrationPageContent() {
 
                     {currentRegistrationId ? (
                       <PayPalErrorBoundary>
-                        <PayPalProductionButton
+                        <PayPalButtonFixed
                           amount={priceCalculation.totalPrice}
                           currency={selectedCurrency}
                           registrationId={currentRegistrationId}
@@ -1292,7 +1302,7 @@ function RegistrationPageContent() {
               </p>
             </div>
             <PayPalErrorBoundary>
-              <PayPalProductionButton
+              <PayPalButtonFixed
                 amount={priceCalculation.totalPrice}
                 currency={selectedCurrency}
                 registrationId={currentRegistrationId}
