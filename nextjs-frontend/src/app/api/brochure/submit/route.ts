@@ -3,9 +3,9 @@ import { createClient } from '@sanity/client';
 import { normalizeCountryValue } from '../../../utils/countries';
 
 // Validate environment variables
-const projectId = process.env.SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'n3no08m3';
-const dataset = process.env.SANITY_DATASET || process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-const apiVersion = process.env.SANITY_API_VERSION || process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2023-05-03';
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || 'n3no08m3';
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
+const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || process.env.SANITY_API_VERSION || '2023-05-03';
 const token = process.env.SANITY_API_TOKEN;
 
 if (!token) {
@@ -37,7 +37,7 @@ interface BrochureFormData {
   fullName: string;
   email: string;
   phone: string;
-  organization?: string;
+  organization: string;
   country: string;
   professionalTitle?: string;
 }

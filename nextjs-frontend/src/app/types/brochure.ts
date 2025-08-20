@@ -4,7 +4,7 @@ export interface BrochureFormData {
   fullName: string;
   email: string;
   phone: string;
-  organization?: string;
+  organization: string;
   country: string;
   professionalTitle?: string;
 }
@@ -32,7 +32,7 @@ export interface BrochureDownload {
   fullName: string;
   email: string;
   phone: string;
-  organization?: string;
+  organization: string;
   country: string;
   professionalTitle?: string;
   downloadTimestamp: string;
