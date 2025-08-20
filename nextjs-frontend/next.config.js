@@ -20,13 +20,21 @@ const nextConfig = {
     unoptimized: false,
   },
   env: {
+    // Sanity Configuration
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
     NEXT_PUBLIC_SANITY_API_VERSION: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
+
+    // PayPal Configuration - Ensure all variables are available at build time
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || process.env.PAYPAL_CLIENT_ID,
+    NEXT_PUBLIC_PAYPAL_ENVIRONMENT: process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || process.env.PAYPAL_ENVIRONMENT || 'production',
+    NEXT_PUBLIC_PAYPAL_CURRENCY: process.env.NEXT_PUBLIC_PAYPAL_CURRENCY || 'USD',
+
+    // Base URL
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'https://nursingeducationconferences.org',
-    // Force PayPal environment variables for client-side
-    PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || 'production',
+
+    // Build information for debugging
+    BUILD_TIME: new Date().toISOString(),
   },
   // Optimize for production
   compress: true,

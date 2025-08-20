@@ -17,11 +17,16 @@ interface CreateOrderRequest {
  */
 async function getPayPalAccessToken(): Promise<string | null> {
   try {
-    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    // Use server-side environment variables for API calls
+    const clientId = process.env.PAYPAL_CLIENT_ID || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
     const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
-      console.error('❌ Missing PayPal production credentials');
+      console.error('❌ Missing PayPal production credentials:', {
+        hasClientId: !!clientId,
+        hasClientSecret: !!clientSecret,
+        clientIdSource: process.env.PAYPAL_CLIENT_ID ? 'PAYPAL_CLIENT_ID' : 'NEXT_PUBLIC_PAYPAL_CLIENT_ID'
+      });
       return null;
     }
 

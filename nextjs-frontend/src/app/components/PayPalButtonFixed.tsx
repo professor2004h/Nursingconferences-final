@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 interface PayPalButtonFixedProps {
@@ -36,28 +36,127 @@ export default function PayPalButtonFixed({
     message: '',
   });
 
-  // Get environment variables
-  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-  
+  // Get environment variables with runtime fallback
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [environment, setEnvironment] = useState<string>('production');
+  const [configLoaded, setConfigLoaded] = useState(false);
+
+  // Load configuration on component mount
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const { getPayPalRuntimeConfig } = await import('@/app/utils/runtimeConfig');
+        const config = await getPayPalRuntimeConfig();
+
+        setClientId(config.clientId);
+        setEnvironment(config.environment);
+        setConfigLoaded(true);
+
+        console.log('🔍 PayPal Configuration Loaded:', {
+          clientId: config.clientId ? `${config.clientId.substring(0, 10)}...` : 'Missing',
+          environment: config.environment,
+          isLoaded: config.isLoaded
+        });
+      } catch (error) {
+        console.error('❌ Error loading PayPal configuration:', error);
+        setConfigLoaded(true);
+      }
+    };
+
+    loadConfig();
+  }, []);
+
+  // Enhanced debugging for production issues
   console.log('🔍 PayPal Button Debug:', {
     clientId: clientId ? `${clientId.substring(0, 10)}...` : 'Missing',
+    clientIdLength: clientId?.length || 0,
     amount,
     currency,
     registrationId,
-    environment: process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT
+    environment,
+    hasNextPublicPayPalClientId: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+    nodeEnv: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
   });
 
-  // Validate client ID
+  // Additional runtime check for production debugging
+  if (typeof window !== 'undefined') {
+    console.log('🌐 Client-side environment check:', {
+      userAgent: navigator.userAgent.substring(0, 50),
+      location: window.location.href,
+      hasProcessEnv: typeof process !== 'undefined',
+      processEnvKeys: typeof process !== 'undefined' ? Object.keys(process.env || {}).filter(k => k.includes('PAYPAL')) : []
+    });
+  }
+
+  // Show loading state while configuration is being loaded
+  if (!configLoaded) {
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+          <div>
+            <h3 className="text-blue-800 font-medium">Loading PayPal Configuration</h3>
+            <p className="text-blue-700 text-sm">
+              Initializing payment system...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Validate client ID after configuration is loaded
   if (!clientId) {
+    console.error('❌ PayPal Client ID missing after configuration load:', {
+      NEXT_PUBLIC_PAYPAL_CLIENT_ID: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+      NODE_ENV: process.env.NODE_ENV,
+      configLoaded,
+      availableEnvVars: Object.keys(process.env).filter(key => key.includes('PAYPAL'))
+    });
+
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <div className="flex items-center">
           <span className="text-red-500 text-lg mr-2">❌</span>
           <div>
             <h3 className="text-red-800 font-medium">PayPal Configuration Error</h3>
-            <p className="text-red-700 text-sm">
+            <p className="text-red-700 text-sm mb-2">
               PayPal Client ID is missing. Please check environment variables.
             </p>
+            <p className="text-red-600 text-xs mb-2">
+              Required: NEXT_PUBLIC_PAYPAL_CLIENT_ID
+            </p>
+            <button
+              onClick={async () => {
+                setConfigLoaded(false);
+                try {
+                  const { clearPayPalConfigCache, getPayPalRuntimeConfig } = await import('@/app/utils/runtimeConfig');
+                  clearPayPalConfigCache();
+                  const config = await getPayPalRuntimeConfig();
+                  setClientId(config.clientId);
+                  setEnvironment(config.environment);
+                  setConfigLoaded(true);
+                } catch (error) {
+                  console.error('❌ Retry failed:', error);
+                  setConfigLoaded(true);
+                }
+              }}
+              className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+            >
+              Retry Configuration
+            </button>
+            {process.env.NODE_ENV === 'development' && (
+              <details className="mt-2">
+                <summary className="text-red-600 text-xs cursor-pointer">Debug Info</summary>
+                <pre className="text-xs mt-1 bg-red-100 p-2 rounded">
+                  Available PayPal env vars: {JSON.stringify(
+                    Object.keys(process.env).filter(key => key.includes('PAYPAL')),
+                    null, 2
+                  )}
+                </pre>
+              </details>
+            )}
           </div>
         </div>
       </div>
