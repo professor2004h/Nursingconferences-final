@@ -37,18 +37,32 @@ export default async function ConferencesPage() {
           {events && events.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {events.map((event) => (
-                <Link href={`/events/${encodeURIComponent(event.slug.current)}`} key={event._id}>
-                  <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-slate-200 hover:border-orange-200">
-                    {event.imageUrl && (
-                      <div className="relative h-56 overflow-hidden">
-                        <Image
-                          src={event.imageUrl}
-                          alt={event.title}
-                          width={400}
-                          height={250}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+                <div key={event._id} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-slate-200 hover:border-orange-200">
+                  {event.imageUrl && (
+                    <div className="relative h-56 overflow-hidden">
+                      {event.mainConferenceUrl ? (
+                        <a href={event.mainConferenceUrl} className="block w-full h-full">
+                          <Image
+                            src={event.imageUrl}
+                            alt={event.title}
+                            width={400}
+                            height={250}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+                        </a>
+                      ) : (
+                        <>
+                          <Image
+                            src={event.imageUrl}
+                            alt={event.title}
+                            width={400}
+                            height={250}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+                        </>
+                      )}
 
                         {/* Date Badge */}
                         <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
@@ -82,8 +96,6 @@ export default async function ConferencesPage() {
                         {event.registerNowUrl && event.registerNowUrl.trim() !== '' ? (
                           <a
                             href={event.registerNowUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-lg font-semibold text-base hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl text-center"
                           >
                             Register Now
@@ -100,8 +112,6 @@ export default async function ConferencesPage() {
                         {event.submitAbstractUrl && event.submitAbstractUrl.trim() !== '' ? (
                           <a
                             href={event.submitAbstractUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className="w-full border-2 border-slate-300 text-slate-700 px-4 py-3 rounded-lg font-semibold text-base hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-center"
                           >
                             Submit Abstract
@@ -117,7 +127,6 @@ export default async function ConferencesPage() {
                       </div>
                     </div>
                   </div>
-                </Link>
               ))}
             </div>
           ) : (

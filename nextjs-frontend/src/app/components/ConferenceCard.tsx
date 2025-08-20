@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 
 interface ConferenceCardProps {
   event: {
@@ -9,6 +8,7 @@ interface ConferenceCardProps {
     date: string;
     location: string;
     imageUrl?: string;
+    mainConferenceUrl?: string;
     registerNowUrl?: string;
     submitAbstractUrl?: string;
   };
@@ -16,20 +16,34 @@ interface ConferenceCardProps {
 
 export default function ConferenceCard({ event }: ConferenceCardProps) {
   return (
-    <Link href={`/events/${event.slug.current}`} className="block">
-      <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 card-hover conference-card min-h-[44px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-        {event.imageUrl && (
-          <div className="relative h-48 sm:h-52 md:h-48 overflow-hidden">
-            <Image
-              src={event.imageUrl}
-              alt={event.title}
-              width={400}
-              height={250}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          </div>
-        )}
+    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 card-hover conference-card min-h-[44px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+      {event.imageUrl && (
+        <div className="relative h-48 sm:h-52 md:h-48 overflow-hidden">
+          {event.mainConferenceUrl ? (
+            <a href={event.mainConferenceUrl} className="block w-full h-full">
+              <Image
+                src={event.imageUrl}
+                alt={event.title}
+                width={400}
+                height={250}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            </a>
+          ) : (
+            <>
+              <Image
+                src={event.imageUrl}
+                alt={event.title}
+                width={400}
+                height={250}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            </>
+          )}
+        </div>
+      )}
         <div className="p-4 sm:p-6">
           <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 leading-tight">{event.title}</h3>
           <div className="flex items-center text-gray-600 mb-2 sm:mb-3">
@@ -61,10 +75,7 @@ export default function ConferenceCard({ event }: ConferenceCardProps) {
             {event.registerNowUrl && event.registerNowUrl.trim() !== '' ? (
               <a
                 href={event.registerNowUrl}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 text-sm text-center"
-
               >
                 Register Now
               </a>
@@ -81,10 +92,7 @@ export default function ConferenceCard({ event }: ConferenceCardProps) {
             {event.submitAbstractUrl && event.submitAbstractUrl.trim() !== '' ? (
               <a
                 href={event.submitAbstractUrl}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm text-center"
-
               >
                 Submit Abstract
               </a>
@@ -100,6 +108,5 @@ export default function ConferenceCard({ event }: ConferenceCardProps) {
           </div>
         </div>
       </div>
-    </Link>
   );
 }

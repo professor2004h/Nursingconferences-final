@@ -50,6 +50,15 @@ export const conferenceEvent = defineType({
         Rule.email().error('Must be a valid email address'),
     }),
     defineField({
+      name: 'mainConferenceUrl',
+      title: 'Main Conference Website URL',
+      type: 'url',
+      description: 'Main conference website URL - used when clicking on the conference image',
+      validation: (Rule) => Rule.uri({
+        scheme: ['http', 'https']
+      }).error('Must be a valid URL (http:// or https://)'),
+    }),
+    defineField({
       name: 'registerNowUrl',
       title: 'Register Now Button URL',
       type: 'url',

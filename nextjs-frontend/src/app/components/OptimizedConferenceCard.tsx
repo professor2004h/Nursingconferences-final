@@ -12,6 +12,9 @@ interface ConferenceCardProps {
     date: string;
     location: string;
     imageUrl?: string;
+    mainConferenceUrl?: string;
+    registerNowUrl?: string;
+    submitAbstractUrl?: string;
   };
   priority?: boolean;
   className?: string;
@@ -43,7 +46,11 @@ const OptimizedConferenceCard = memo(function ConferenceCard({
 
   return (
     <article className={`group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden ${className}`}>
-      <Link href={`/events/${conference.slug.current}`} className="block">
+      {conference.mainConferenceUrl ? (
+        <a href={conference.mainConferenceUrl} className="block">
+      ) : (
+        <Link href={`/events/${conference.slug.current}`} className="block">
+      )}
         <div className="relative h-48 overflow-hidden">
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
@@ -104,7 +111,11 @@ const OptimizedConferenceCard = memo(function ConferenceCard({
             </span>
           </div>
         </div>
-      </Link>
+      {conference.mainConferenceUrl ? (
+        </a>
+      ) : (
+        </Link>
+      )}
     </article>
   );
 });

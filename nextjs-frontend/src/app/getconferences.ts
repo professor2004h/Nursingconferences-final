@@ -15,6 +15,7 @@ export interface ConferenceEventType {
   location: string;
   imageUrl?: string;
   email?: string;
+  mainConferenceUrl?: string;
   registerNowUrl?: string;
   submitAbstractUrl?: string;
   isActive?: boolean;
@@ -119,6 +120,7 @@ export async function getConferenceEvents(limit: number = 12): Promise<Conferenc
       date,
       location,
       email,
+      mainConferenceUrl,
       registerNowUrl,
       submitAbstractUrl,
       isActive,
@@ -180,6 +182,7 @@ export async function getConferenceBySlug(slug: string): Promise<ConferenceEvent
       date,
       location,
       email,
+      mainConferenceUrl,
       registerNowUrl,
       submitAbstractUrl,
       description,
