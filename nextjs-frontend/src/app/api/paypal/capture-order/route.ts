@@ -1,68 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { client } from '@/app/sanity/client';
-import { getPayPalConfig, logPayPalConfigStatus } from '@/app/utils/paypalConfig';
-import { paypalService } from '@/app/services/paypalService';
 
-// Get PayPal access token
-async function getPayPalAccessToken(config: any) {
+/**
+ * PayPal Capture Order API Route - Production Version
+ * Captures a PayPal order for live payments using production credentials
+ */
+
+interface CaptureOrderRequest {
+  orderId: string;
+  registrationId: string;
+}
+
+/**
+ * Get PayPal Access Token for Production
+ */
+async function getPayPalAccessToken(): Promise<string | null> {
   try {
-    const auth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
-    console.log('🔐 Requesting PayPal access token for capture...');
-    const response = await fetch(`${config.baseUrl}/v1/oauth2/token`, {
+    if (!clientId || !clientSecret) {
+      console.error('❌ Missing PayPal production credentials');
+      return null;
+    }
+
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
+    console.log('🔐 Requesting PayPal production access token for capture...');
+    const response = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${auth}`,
       },
       body: 'grant_type=client_credentials',
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ PayPal auth failed:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText
-      });
-      throw new Error(`PayPal auth failed: ${response.status} - ${errorText}`);
+      console.error('❌ Failed to get PayPal production access token:', data);
+      return null;
     }
 
-    const data = await response.json();
-    console.log('✅ PayPal access token obtained for capture');
+    console.log('✅ PayPal production access token obtained for capture');
     return data.access_token;
   } catch (error) {
-    console.error('❌ PayPal auth error:', error);
-    throw error;
+    console.error('❌ Error getting PayPal production access token:', error);
+    return null;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('💰 Capturing PayPal payment...');
+    console.log('💰 Capturing PayPal production payment...');
 
-    // Log configuration status for debugging
-    logPayPalConfigStatus();
-
-    // Get and validate PayPal configuration
-    let paypalConfig;
-    try {
-      paypalConfig = getPayPalConfig();
-    } catch (configError) {
-      console.error('❌ PayPal configuration error:', configError);
-      return NextResponse.json(
-        {
-          error: 'PayPal configuration error. Please contact support.',
-          details: configError instanceof Error ? configError.message : 'Unknown configuration error'
-        },
-        { status: 500 }
-      );
-    }
-
-    const body = await request.json();
+    const body: CaptureOrderRequest = await request.json();
     const { orderId, registrationId } = body;
 
-    // Validate required fields
+    // Validate request data
     if (!orderId || !registrationId) {
       return NextResponse.json(
         { error: 'Missing required fields: orderId, registrationId' },
@@ -70,114 +65,110 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('📝 Capture details:', { orderId, registrationId });
-    console.log(`🔒 Capturing payment in ${paypalConfig.environment.toUpperCase()} mode`);
-
-    // Use production PayPal service
-    console.log('🔄 Attempting to capture PayPal payment...');
-    const captureData = await paypalService.capturePayment(orderId);
-
-    console.log('📋 PayPal capture response:', {
-      status: captureData.status,
-      id: captureData.id,
-      purchase_units: captureData.purchase_units?.length || 0,
-      hasCaptures: !!captureData.purchase_units?.[0]?.payments?.captures?.length
-    });
-
-    // Validate capture response structure
-    if (!captureData.purchase_units || !captureData.purchase_units[0] ||
-        !captureData.purchase_units[0].payments || !captureData.purchase_units[0].payments.captures ||
-        !captureData.purchase_units[0].payments.captures[0]) {
-      console.error('❌ Invalid capture response structure:', captureData);
-      throw new Error('Invalid PayPal capture response structure');
+    // Get PayPal access token
+    const accessToken = await getPayPalAccessToken();
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: 'Failed to authenticate with PayPal' },
+        { status: 500 }
+      );
     }
 
-    // Extract payment details
-    const capture = captureData.purchase_units[0].payments.captures[0];
-    const paymentId = capture.id;
-    const amount = parseFloat(capture.amount.value);
-    const currency = capture.amount.currency_code;
-    const status = capture.status;
+    console.log('📦 Capturing PayPal order:', orderId);
 
-    console.log('✅ PayPal payment captured:', {
-      paymentId,
+    // Capture the PayPal order
+    const response = await fetch(`https://api-m.paypal.com/v2/checkout/orders/${orderId}/capture`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'PayPal-Request-Id': `${registrationId}-capture-${Date.now()}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ PayPal order capture failed:', result);
+      return NextResponse.json(
+        { error: 'Failed to capture PayPal payment', details: result },
+        { status: response.status }
+      );
+    }
+
+    // Extract transaction details
+    const capture = result.purchase_units?.[0]?.payments?.captures?.[0];
+    const transactionId = capture?.id;
+    const amount = capture?.amount?.value;
+    const currency = capture?.amount?.currency_code;
+    const status = capture?.status;
+
+    console.log('✅ PayPal production payment captured successfully:', {
+      orderId,
+      transactionId,
+      amount,
+      currency,
+      status
+    });
+
+    // Update registration status in database (optional)
+    try {
+      await updateRegistrationPaymentStatus(registrationId, {
+        orderId,
+        transactionId,
+        amount: parseFloat(amount || '0'),
+        currency,
+        status: 'completed',
+        paymentMethod: 'paypal',
+        capturedAt: new Date().toISOString(),
+      });
+    } catch (dbError) {
+      console.error('⚠️ Failed to update registration payment status:', dbError);
+      // Don't fail the request if database update fails
+    }
+
+    return NextResponse.json({
+      success: true,
+      orderId,
+      transactionId,
       amount,
       currency,
       status,
-      registrationId
+      registrationId,
+      capturedAt: new Date().toISOString(),
     });
 
-    // Update registration in Sanity with payment details
-    try {
-      const paymentDetails = {
-        paymentId,
-        paymentMethod: 'paypal',
-        amount,
-        currency,
-        paymentDate: new Date().toISOString(),
-        paypalOrderId: orderId,
-        paypalCaptureId: capture.id,
-        status: 'completed',
-        invoiceNumber: `INV_${registrationId}_${Date.now()}`,
-      };
-
-      // Find and update the registration
-      const registrationQuery = `*[_type == "registration" && registrationId == $registrationId][0]`;
-      const registration = await client.fetch(registrationQuery, { registrationId });
-
-      if (!registration) {
-        console.error('❌ Registration not found:', registrationId);
-        return NextResponse.json(
-          { error: 'Registration not found' },
-          { status: 404 }
-        );
-      }
-
-      // Update registration with payment details
-      await client
-        .patch(registration._id)
-        .set({
-          status: 'confirmed',
-          paymentDetails,
-          paymentStatus: 'completed',
-        })
-        .commit();
-
-      console.log('✅ Registration updated with PayPal payment details');
-
-      return NextResponse.json({
-        success: true,
-        paymentId,
-        registrationId,
-        amount,
-        currency,
-        status: 'completed',
-        captureData,
-      });
-
-    } catch (sanityError) {
-      console.error('❌ Error updating registration in Sanity:', sanityError);
-      // Payment was successful but registration update failed
-      return NextResponse.json({
-        success: true,
-        paymentId,
-        registrationId,
-        amount,
-        currency,
-        status: 'completed',
-        warning: 'Payment successful but registration update failed',
-        captureData,
-      });
-    }
-
   } catch (error) {
-    console.error('❌ PayPal capture error:', error);
+    console.error('❌ Error in capture-order API:', error);
     return NextResponse.json(
-      { 
-        error: 'Internal server error', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
-      },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Update registration payment status in database
+ * This is a placeholder - implement based on your database structure
+ */
+async function updateRegistrationPaymentStatus(registrationId: string, paymentData: any) {
+  try {
+    // TODO: Implement database update logic
+    // This could be updating Sanity, a SQL database, or other storage
+    console.log('📝 Would update registration payment status:', {
+      registrationId,
+      paymentData
+    });
+
+    // Example implementation for Sanity:
+    // const client = getSanityClient();
+    // await client.patch(registrationId).set({
+    //   paymentStatus: 'completed',
+    //   paymentData: paymentData
+    // }).commit();
+
+  } catch (error) {
+    console.error('❌ Error updating registration payment status:', error);
+    throw error;
   }
 }

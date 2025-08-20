@@ -1,131 +1,155 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPayPalConfig, logPayPalConfigStatus } from '@/app/utils/paypalConfig';
-import { paypalService } from '@/app/services/paypalService';
 
-// Get PayPal access token
-async function getPayPalAccessToken(config: any) {
+/**
+ * PayPal Create Order API Route - Production Version
+ * Creates a PayPal order for live payments using production credentials
+ */
+
+interface CreateOrderRequest {
+  amount: string;
+  currency: string;
+  registrationId: string;
+  registrationData: any;
+}
+
+/**
+ * Get PayPal Access Token for Production
+ */
+async function getPayPalAccessToken(): Promise<string | null> {
   try {
-    const auth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
-    console.log('🔐 Requesting PayPal access token...');
-    const response = await fetch(`${config.baseUrl}/v1/oauth2/token`, {
+    if (!clientId || !clientSecret) {
+      console.error('❌ Missing PayPal production credentials');
+      return null;
+    }
+
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
+    console.log('🔐 Requesting PayPal production access token...');
+    const response = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${auth}`,
       },
       body: 'grant_type=client_credentials',
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ PayPal auth failed:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText
-      });
-      throw new Error(`PayPal auth failed: ${response.status} - ${errorText}`);
+      console.error('❌ Failed to get PayPal production access token:', data);
+      return null;
     }
 
-    const data = await response.json();
-    console.log('✅ PayPal access token obtained successfully');
+    console.log('✅ PayPal production access token obtained successfully');
     return data.access_token;
   } catch (error) {
-    console.error('❌ PayPal auth error:', error);
-    throw error;
+    console.error('❌ Error getting PayPal production access token:', error);
+    return null;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🎯 Creating PayPal order...');
+    console.log('🎯 Creating PayPal production order...');
 
-    // Log configuration status for debugging
-    logPayPalConfigStatus();
-
-    // Get and validate PayPal configuration
-    let paypalConfig;
-    try {
-      paypalConfig = getPayPalConfig();
-    } catch (configError) {
-      console.error('❌ PayPal configuration error:', configError);
-      return NextResponse.json(
-        {
-          error: 'PayPal configuration error. Please contact support.',
-          details: configError instanceof Error ? configError.message : 'Unknown configuration error'
-        },
-        { status: 500 }
-      );
-    }
-
-    const body = await request.json();
+    const body: CreateOrderRequest = await request.json();
     const { amount, currency = 'USD', registrationId, registrationData } = body;
 
-    // Validate required fields
-    if (!amount || !registrationId || !registrationData) {
+    // Validate request data
+    if (!amount || !currency || !registrationId) {
       return NextResponse.json(
-        { error: 'Missing required fields: amount, registrationId, registrationData' },
+        { error: 'Missing required fields: amount, currency, registrationId' },
         { status: 400 }
       );
     }
 
-    // Validate amount is greater than 0
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount) || numericAmount <= 0) {
       console.error('❌ Invalid payment amount:', amount);
       return NextResponse.json(
-        {
-          error: 'Invalid payment amount. Amount must be greater than 0.',
-          details: `Received amount: ${amount}`,
-          registrationId
-        },
+        { error: 'Invalid amount provided' },
         { status: 400 }
       );
     }
 
-    // Validate amount is reasonable (between $1 and $50,000)
-    if (numericAmount < 1 || numericAmount > 50000) {
-      console.error('❌ Payment amount out of range:', amount);
+    // Get PayPal access token
+    const accessToken = await getPayPalAccessToken();
+    if (!accessToken) {
       return NextResponse.json(
-        {
-          error: 'Payment amount out of acceptable range ($1 - $50,000).',
-          details: `Received amount: $${numericAmount}`,
-          registrationId
-        },
-        { status: 400 }
+        { error: 'Failed to authenticate with PayPal' },
+        { status: 500 }
       );
     }
 
-    console.log('📝 Order details:', { amount: numericAmount, currency, registrationId });
-    console.log(`🔒 Processing in ${paypalConfig.environment.toUpperCase()} mode`);
+    // Create PayPal order
+    const orderData = {
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          reference_id: registrationId,
+          amount: {
+            currency_code: currency,
+            value: amount,
+          },
+          description: `Conference Registration - ID: ${registrationId}`,
+          custom_id: registrationId,
+        },
+      ],
+      application_context: {
+        brand_name: 'Nursing Conferences',
+        landing_page: 'NO_PREFERENCE',
+        user_action: 'PAY_NOW',
+        return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/registration/success`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/registration`,
+      },
+    };
 
-    // Use production PayPal service
-    const order = await paypalService.createOrder({
-      amount: numericAmount,
+    console.log('📦 Creating PayPal order with data:', {
+      amount,
       currency,
       registrationId,
-      registrationData,
-      description: `Conference Registration - ${registrationData.firstName} ${registrationData.lastName}`
+      intent: 'CAPTURE'
     });
 
-    console.log('✅ PayPal order created successfully:', order.id);
+    const response = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'PayPal-Request-Id': `${registrationId}-${Date.now()}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ PayPal order creation failed:', result);
+      return NextResponse.json(
+        { error: 'Failed to create PayPal order', details: result },
+        { status: response.status }
+      );
+    }
+
+    console.log('✅ PayPal production order created successfully:', result.id);
 
     return NextResponse.json({
-      success: true,
-      orderId: order.id,
-      registrationId,
-      approvalUrl: order.links?.find((link: any) => link.rel === 'approve')?.href,
-      environment: paypalConfig.environment
+      orderId: result.id,
+      status: result.status,
+      links: result.links,
     });
 
   } catch (error) {
-    console.error('❌ PayPal order creation error:', error);
+    console.error('❌ Error in create-order API:', error);
     return NextResponse.json(
-      { 
-        error: 'Internal server error', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
-      },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
+
+

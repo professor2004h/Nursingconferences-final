@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
-import PayPalButton from '@/app/components/PayPalButton';
+import PayPalProductionButton from '@/app/components/PayPalProductionButton';
 import PayPalErrorBoundary from '@/app/components/PayPalErrorBoundary';
 import { CurrencyProvider } from '@/app/contexts/CurrencyContext';
 import CurrencySelector from '@/app/components/CurrencySelector';
@@ -1233,6 +1233,51 @@ function RegistrationPageContent() {
               </div>
             </div>
 
+            {/* Official PayPal Payment Button - Production */}
+            {priceCalculation.totalPrice > 0 && (
+              <div className="mt-8">
+                <div className="bg-white rounded-lg shadow-sm border">
+                  <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
+                    <h2 className="text-lg font-bold text-white">Complete Payment</h2>
+                  </div>
+                  <div className="p-6">
+                    <div className="mb-4 text-center">
+                      <p className="text-gray-600 mb-2">
+                        Please complete your payment to confirm your registration
+                      </p>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {formatPrice(priceCalculation.totalPrice)}
+                      </div>
+                    </div>
+
+                    {currentRegistrationId ? (
+                      <PayPalErrorBoundary>
+                        <PayPalProductionButton
+                          amount={priceCalculation.totalPrice}
+                          currency={selectedCurrency}
+                          registrationId={currentRegistrationId}
+                          registrationData={formData}
+                          onSuccess={handlePaymentSuccess}
+                          onError={handlePaymentError}
+                          onCancel={handlePaymentCancel}
+                          disabled={isLoading}
+                        />
+                      </PayPalErrorBoundary>
+                    ) : (
+                      <div className="text-center">
+                        <button
+                          type="submit"
+                          disabled={isLoading}
+                          className="w-full bg-blue-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {isLoading ? 'Saving Registration...' : 'Save Registration & Continue to Payment'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
           </div>
         </form>
@@ -1247,7 +1292,7 @@ function RegistrationPageContent() {
               </p>
             </div>
             <PayPalErrorBoundary>
-              <PayPalButton
+              <PayPalProductionButton
                 amount={priceCalculation.totalPrice}
                 currency={selectedCurrency}
                 registrationId={currentRegistrationId}
@@ -1255,6 +1300,7 @@ function RegistrationPageContent() {
                 onSuccess={handlePaymentSuccess}
                 onError={handlePaymentError}
                 onCancel={handlePaymentCancel}
+                disabled={isLoading}
               />
             </PayPalErrorBoundary>
           </div>
