@@ -19,8 +19,8 @@ export default function ConferenceCard({ event }: ConferenceCardProps) {
     <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 card-hover conference-card min-h-[44px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
       {event.imageUrl && (
         <div className="relative h-48 sm:h-52 md:h-48 overflow-hidden">
-          {event.mainConferenceUrl ? (
-            <a href={event.mainConferenceUrl} className="block w-full h-full">
+          {event.imageLinkUrl && event.imageLinkUrl.trim() !== '' ? (
+            <a href={event.imageLinkUrl} className="block w-full h-full" title={`External link to ${event.imageLinkUrl}`} target="_blank" rel="noopener noreferrer">
               <Image
                 src={event.imageUrl}
                 alt={event.title}
@@ -31,7 +31,7 @@ export default function ConferenceCard({ event }: ConferenceCardProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             </a>
           ) : (
-            <>
+            <div className="block w-full h-full cursor-default">
               <Image
                 src={event.imageUrl}
                 alt={event.title}
@@ -40,12 +40,18 @@ export default function ConferenceCard({ event }: ConferenceCardProps) {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            </>
+            </div>
           )}
         </div>
       )}
         <div className="p-4 sm:p-6">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 leading-tight">{event.title}</h3>
+          {event.imageLinkUrl && event.imageLinkUrl.trim() !== '' ? (
+            <a href={event.imageLinkUrl} className="block" title={`External link to ${event.imageLinkUrl}`} target="_blank" rel="noopener noreferrer">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 leading-tight hover:text-orange-600 transition-colors">{event.title}</h3>
+            </a>
+          ) : (
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 leading-tight">{event.title}</h3>
+          )}
           <div className="flex items-center text-gray-600 mb-2 sm:mb-3">
             <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

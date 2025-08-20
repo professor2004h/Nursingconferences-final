@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { getConferenceEvents, type ConferenceEventType } from "../getconferences";
 import { getConferences } from "../getconferences";
 
@@ -10,6 +9,11 @@ export default async function ConferencesPage() {
   try {
     events = await getConferenceEvents(50); // Get more events for the dedicated page
     conference = await getConferences();
+    console.log('Fetched events:', events.map(e => ({
+      title: e.title,
+      mainConferenceUrl: e.mainConferenceUrl,
+      slug: e.slug?.current
+    })));
   } catch (error) {
     console.error('Error fetching conferences:', error);
     events = [];
@@ -36,12 +40,14 @@ export default async function ConferencesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {events && events.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {events.map((event) => (
+              {events.map((event) => {
+                console.log('Rendering event:', event.title, 'mainConferenceUrl:', event.mainConferenceUrl);
+                return (
                 <div key={event._id} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-slate-200 hover:border-orange-200">
                   {event.imageUrl && (
                     <div className="relative h-56 overflow-hidden">
-                      {event.mainConferenceUrl ? (
-                        <a href={event.mainConferenceUrl} className="block w-full h-full">
+                      {event.imageLinkUrl && event.imageLinkUrl.trim() !== '' ? (
+                        <a href={event.imageLinkUrl} className="block w-full h-full" title={`External link to ${event.imageLinkUrl}`} target="_blank" rel="noopener noreferrer">
                           <Image
                             src={event.imageUrl}
                             alt={event.title}
@@ -52,16 +58,16 @@ export default async function ConferencesPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
                         </a>
                       ) : (
-                        <>
+                        <div className="block w-full h-full cursor-default">
                           <Image
                             src={event.imageUrl}
                             alt={event.title}
                             width={400}
                             height={250}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
-                        </>
+                        </div>
                       )}
 
                         {/* Date Badge */}
@@ -80,9 +86,17 @@ export default async function ConferencesPage() {
                     )}
 
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 leading-tight group-hover:text-orange-600 transition-colors">
-                        {event.title}
-                      </h3>
+                      {event.imageLinkUrl && event.imageLinkUrl.trim() !== '' ? (
+                        <a href={event.imageLinkUrl} className="block" title={`External link to ${event.imageLinkUrl}`} target="_blank" rel="noopener noreferrer">
+                          <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 leading-tight group-hover:text-orange-600 transition-colors hover:text-orange-600">
+                            {event.title}
+                          </h3>
+                        </a>
+                      ) : (
+                        <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 leading-tight">
+                          {event.title}
+                        </h3>
+                      )}
 
                       <div className="flex items-center text-slate-600 mb-4">
                         <svg className="w-4 h-4 mr-2 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +141,8 @@ export default async function ConferencesPage() {
                       </div>
                     </div>
                   </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-16">
