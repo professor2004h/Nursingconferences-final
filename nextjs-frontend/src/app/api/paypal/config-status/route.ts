@@ -14,6 +14,9 @@ export async function GET(request: NextRequest) {
       hasNextPublicPayPalClientId: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
       nextPublicPayPalClientIdLength: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID?.length || 0,
       nextPublicPayPalClientIdPrefix: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID?.substring(0, 5) || 'N/A',
+      nextPublicPayPalClientIdValue: process.env.NODE_ENV === 'development' ?
+        process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID :
+        (process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? `${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID.substring(0, 10)}...` : 'Missing'),
       
       hasNextPublicPayPalEnvironment: !!process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT,
       nextPublicPayPalEnvironment: process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || 'Not set',
@@ -68,8 +71,36 @@ export async function GET(request: NextRequest) {
         paypalEnvVarNames,
         configurationComplete: validationResults.allPayPalVarsPresent,
         readyForPayments: validationResults.hasRequiredClientVars && validationResults.hasRequiredServerVars
+      },
+      deployment: {
+        nodeEnv: process.env.NODE_ENV,
+        platform: process.platform,
+        nodeVersion: process.version,
+        buildTime: process.env.BUILD_TIME || 'Unknown',
+        deploymentId: process.env.DEPLOYMENT_ID || 'Unknown'
+      },
+      troubleshooting: {
+        missingVars: [],
+        recommendations: []
       }
     };
+
+    // Add troubleshooting information
+    if (!configStatus.hasNextPublicPayPalClientId) {
+      response.troubleshooting.missingVars.push('NEXT_PUBLIC_PAYPAL_CLIENT_ID');
+      response.troubleshooting.recommendations.push('Add NEXT_PUBLIC_PAYPAL_CLIENT_ID to environment variables');
+    }
+    if (!configStatus.hasPayPalClientId) {
+      response.troubleshooting.missingVars.push('PAYPAL_CLIENT_ID');
+      response.troubleshooting.recommendations.push('Add PAYPAL_CLIENT_ID to environment variables');
+    }
+    if (!configStatus.hasPayPalClientSecret) {
+      response.troubleshooting.missingVars.push('PAYPAL_CLIENT_SECRET');
+      response.troubleshooting.recommendations.push('Add PAYPAL_CLIENT_SECRET to environment variables');
+    }
+    if (!validationResults.clientIdConsistency) {
+      response.troubleshooting.recommendations.push('Ensure PAYPAL_CLIENT_ID and NEXT_PUBLIC_PAYPAL_CLIENT_ID have the same value');
+    }
 
     console.log('✅ PayPal configuration status:', {
       hasClientId: configStatus.hasNextPublicPayPalClientId,
