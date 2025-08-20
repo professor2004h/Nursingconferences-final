@@ -30,9 +30,13 @@ NODE_ENV=production
 NEXT_TELEMETRY_DISABLED=1
 ```
 
-#### **Optional Variables (for full functionality):**
+#### **Required for Brochure Downloads:**
 ```env
-SANITY_API_TOKEN=your_token_here
+SANITY_API_TOKEN=skIrRjdaaygkwN7mE9JXLLV8IUPfHl2phKAu0umRR5eCLYuRw4oFi4kXfh3kXa0xxHHJZcv451AY6SFMxGuLWbHUMrPjxppFxA0NAFwgrkEZggVUYPJ3jtKA76br4f07USUJMDOR1JQoS7U0vSsiJzCp8q2CwgAcHiksA7H4FrN04Vh3kC3c
+```
+
+#### **Optional Variables (for additional functionality):**
+```env
 NEXT_PUBLIC_RAZORPAY_KEY_ID=your_key_here
 RAZORPAY_SECRET_KEY=your_secret_here
 SMTP_HOST=your_smtp_host
