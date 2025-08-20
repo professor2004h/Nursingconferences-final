@@ -40,15 +40,28 @@ export default function PayPalButtonFixed({
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
   const environment = process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || 'production';
 
+  // Enhanced debugging for production issues
   console.log('🔍 PayPal Button Debug:', {
     clientId: clientId ? `${clientId.substring(0, 10)}...` : 'Missing',
+    clientIdLength: clientId?.length || 0,
     amount,
     currency,
     registrationId,
     environment,
     hasNextPublicPayPalClientId: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
-    nodeEnv: process.env.NODE_ENV
+    nodeEnv: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
   });
+
+  // Additional runtime check for production debugging
+  if (typeof window !== 'undefined') {
+    console.log('🌐 Client-side environment check:', {
+      userAgent: navigator.userAgent.substring(0, 50),
+      location: window.location.href,
+      hasProcessEnv: typeof process !== 'undefined',
+      processEnvKeys: typeof process !== 'undefined' ? Object.keys(process.env || {}).filter(k => k.includes('PAYPAL')) : []
+    });
+  }
 
   // Validate client ID
   if (!clientId) {
