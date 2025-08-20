@@ -438,7 +438,7 @@ function HomePageContent({
                   )}
 
                   <div className="p-3 sm:p-4 md:p-6">
-                    <Link href={`/events/${event.slug.current}`}>
+                    <Link href={`/events/${encodeURIComponent(event.slug.current)}`}>
                       <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-slate-900 mb-2 sm:mb-3 line-clamp-2 leading-tight hover:text-orange-600 transition-colors cursor-pointer">
                         {event.title}
                       </h3>

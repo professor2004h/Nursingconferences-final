@@ -18,6 +18,18 @@ export interface ConferenceEventType {
   registerNowUrl?: string;
   submitAbstractUrl?: string;
   isActive?: boolean;
+  description?: PortableTextBlock[];
+  shortDescription?: string;
+  attendeeCount?: number;
+  topics?: string[];
+  highlights?: string[];
+  keySpeakers?: Array<{
+    name: string;
+    title: string;
+    organization?: string;
+    bio?: string;
+    photoUrl?: string;
+  }>;
 }
 
 export interface ConferencesSectionSettings {
@@ -148,5 +160,70 @@ export async function getConferenceEvents(limit: number = 12): Promise<Conferenc
     }
 
     return [];
+  }
+}
+
+// Get a single conference by slug (for event detail pages)
+export async function getConferenceBySlug(slug: string): Promise<ConferenceEventType | null> {
+  try {
+    // Decode the URL-encoded slug to handle spaces and special characters
+    const decodedSlug = decodeURIComponent(slug);
+
+    console.log('🔍 Looking for conference with slug:', { original: slug, decoded: decodedSlug });
+
+    const query = `*[
+      _type == "conferenceEvent" && slug.current == $slug
+    ][0]{
+      _id,
+      title,
+      slug,
+      date,
+      location,
+      email,
+      registerNowUrl,
+      submitAbstractUrl,
+      description,
+      shortDescription,
+      attendeeCount,
+      topics,
+      highlights,
+      keySpeakers[]{
+        name,
+        title,
+        organization,
+        bio,
+        "photoUrl": photo.asset->url
+      },
+      isActive,
+      "imageUrl": image.asset->url
+    }`;
+
+    // Try with decoded slug first
+    let data = await optimizedFetch<ConferenceEventType>(query, { slug: decodedSlug }, {
+      ttl: 600000,  // 10 minutes cache
+      tags: ['conference-events', `conference-event-${slug}`],
+      useCache: true
+    });
+
+    // If not found with decoded slug, try with original slug
+    if (!data) {
+      console.log('🔄 Trying with original slug:', slug);
+      data = await optimizedFetch<ConferenceEventType>(query, { slug }, {
+        ttl: 600000,
+        tags: ['conference-events', `conference-event-${slug}`],
+        useCache: true
+      });
+    }
+
+    if (data) {
+      console.log('✅ Found conference:', data.title);
+    } else {
+      console.log('❌ Conference not found for slug:', { original: slug, decoded: decodedSlug });
+    }
+
+    return data || null;
+  } catch (error) {
+    console.error('Error fetching conference by slug:', error);
+    return null;
   }
 }

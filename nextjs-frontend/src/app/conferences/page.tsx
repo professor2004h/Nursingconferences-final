@@ -37,7 +37,7 @@ export default async function ConferencesPage() {
           {events && events.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {events.map((event) => (
-                <Link href={`/events/${event.slug.current}`} key={event._id}>
+                <Link href={`/events/${encodeURIComponent(event.slug.current)}`} key={event._id}>
                   <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-slate-200 hover:border-orange-200">
                     {event.imageUrl && (
                       <div className="relative h-56 overflow-hidden">
