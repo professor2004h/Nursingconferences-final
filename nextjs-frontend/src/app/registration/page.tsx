@@ -70,10 +70,8 @@ const countries = [
 function RegistrationPageContent() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [currentRegistrationId, setCurrentRegistrationId] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [showPayPalSection, setShowPayPalSection] = useState(false);
   const [currentPricingPeriod, setCurrentPricingPeriod] = useState<'earlyBird' | 'nextRound' | 'spotRegistration'>('earlyBird');
 
   // Dynamic registration data
@@ -108,6 +106,15 @@ function RegistrationPageContent() {
         clearSelection('sponsorshipType');
       } else if (groupName === 'sponsorshipType' && value) {
         clearSelection('registrationType');
+      }
+
+      // Clear registration ID when selection changes to force re-registration
+      // This fixes the sponsorship reselection bug and ensures PayPal button reappears
+      if (groupName === 'registrationType' || groupName === 'sponsorshipType' || groupName === 'accommodation') {
+        if (currentRegistrationId) {
+          console.log(`🔄 Clearing registration ID due to ${groupName} selection change`);
+          setCurrentRegistrationId(null);
+        }
       }
     },
     allowDeselect: true,
@@ -321,7 +328,6 @@ function RegistrationPageContent() {
   const handlePaymentSuccess = useCallback((paymentData: any) => {
     console.log('✅ Payment successful:', paymentData);
     setPaymentSuccess(true);
-    setShowPayPalSection(false);
 
     // Redirect to success page with payment details
     const successUrl = `/registration/success?` +
@@ -474,7 +480,6 @@ function RegistrationPageContent() {
 
       console.log('✅ Payment amount validated:', currentPrice.totalPrice);
       setCurrentRegistrationId(result.registrationId);
-      setShowPayPalSection(true);
       setIsLoading(false);
 
     } catch (error) {
@@ -1201,9 +1206,9 @@ function RegistrationPageContent() {
           </div>
 
           {/* Payment Details and Payment Method */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             {/* Payment Details */}
-            <div className="bg-white rounded-lg shadow-sm border">
+            <div className="bg-white rounded-lg shadow-sm border h-full">
               <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
                 <h2 className="text-lg font-bold text-white">Payment Details</h2>
               </div>
@@ -1233,34 +1238,97 @@ function RegistrationPageContent() {
               </div>
             </div>
 
-            {/* Debug Information */}
-            <div className="mt-4 p-4 bg-gray-100 rounded-lg text-sm">
-              <h3 className="font-semibold mb-2">Debug Info:</h3>
-              <div>Total Price: {priceCalculation.totalPrice}</div>
-              <div>Current Registration ID: {currentRegistrationId || 'None'}</div>
-              <div>Show PayPal Section: {showPayPalSection ? 'Yes' : 'No'}</div>
-              <div>Selected Currency: {selectedCurrency}</div>
-              <div>PayPal Client ID: {process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? 'Set' : 'Missing'}</div>
-            </div>
+            {/* Complete Payment Section - Always Visible */}
+            <div className="bg-white rounded-lg shadow-sm border h-full">
+              <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
+                <h2 className="text-lg font-bold text-white">Complete Payment</h2>
+              </div>
+              <div className="p-6 flex flex-col justify-center min-h-[200px]">
+                {(() => {
+                  // Check form validation
+                  const isFormValid = formData.firstName && formData.lastName && formData.email &&
+                                     formData.phoneNumber && formData.country && formData.fullPostalAddress;
 
-            {/* Official PayPal Payment Button - Production */}
-            {priceCalculation.totalPrice > 0 && (
-              <div className="mt-8">
-                <div className="bg-white rounded-lg shadow-sm border">
-                  <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
-                    <h2 className="text-lg font-bold text-white">Complete Payment</h2>
-                  </div>
-                  <div className="p-6">
-                    <div className="mb-4 text-center">
-                      <p className="text-gray-600 mb-2">
-                        Please complete your payment to confirm your registration
-                      </p>
-                      <div className="text-2xl font-bold text-blue-600">
-                        {formatPrice(priceCalculation.totalPrice)}
+                  // Check if registration type or sponsorship is selected
+                  const selectedRegistrationType = getSelection('registrationType');
+                  const selectedSponsorType = getSelection('sponsorshipType');
+                  const hasSelection = selectedRegistrationType || selectedSponsorType;
+
+                  // Check if total price is valid
+                  const hasValidPrice = priceCalculation.totalPrice > 0;
+
+                  // Check if registration is saved
+                  const isRegistrationSaved = !!currentRegistrationId;
+
+                  if (!isFormValid) {
+                    return (
+                      <div className="text-center">
+                        <div className="mb-4">
+                          <div className="text-gray-400 text-4xl mb-2">📝</div>
+                          <p className="text-gray-600 mb-2">Complete the form to proceed</p>
+                          <p className="text-sm text-gray-500">Fill in all required fields above</p>
+                        </div>
                       </div>
-                    </div>
+                    );
+                  }
 
-                    {currentRegistrationId ? (
+                  if (!hasSelection) {
+                    return (
+                      <div className="text-center">
+                        <div className="mb-4">
+                          <div className="text-gray-400 text-4xl mb-2">🎯</div>
+                          <p className="text-gray-600 mb-2">Select registration type</p>
+                          <p className="text-sm text-gray-500">Choose a registration type or sponsorship plan</p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (!hasValidPrice) {
+                    return (
+                      <div className="text-center">
+                        <div className="mb-4">
+                          <div className="text-gray-400 text-4xl mb-2">💰</div>
+                          <p className="text-gray-600 mb-2">Invalid price calculation</p>
+                          <p className="text-sm text-gray-500">Please check your selection</p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (!isRegistrationSaved) {
+                    return (
+                      <div className="text-center">
+                        <div className="mb-4 text-center">
+                          <p className="text-gray-600 mb-2">
+                            Please complete your payment to confirm your registration
+                          </p>
+                          <div className="text-2xl font-bold text-blue-600">
+                            {formatPrice(priceCalculation.totalPrice)}
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={isLoading}
+                          className="w-full bg-blue-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {isLoading ? 'Saving Registration...' : 'Save Registration & Continue to Payment'}
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  // All conditions met - show PayPal button
+                  return (
+                    <div>
+                      <div className="mb-4 text-center">
+                        <p className="text-gray-600 mb-2">
+                          Please complete your payment to confirm your registration
+                        </p>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {formatPrice(priceCalculation.totalPrice)}
+                        </div>
+                      </div>
                       <PayPalErrorBoundary>
                         <PayPalButtonFixed
                           amount={priceCalculation.totalPrice}
@@ -1273,125 +1341,20 @@ function RegistrationPageContent() {
                           disabled={isLoading}
                         />
                       </PayPalErrorBoundary>
-                    ) : (
-                      <div className="text-center">
-                        <button
-                          type="submit"
-                          disabled={isLoading}
-                          className="w-full bg-blue-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          {isLoading ? 'Saving Registration...' : 'Save Registration & Continue to Payment'}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
+                  );
+                })()}
               </div>
-            )}
+            </div>
 
           </div>
         </form>
 
-        {/* PayPal Payment Section */}
-        {showPayPalSection && currentRegistrationId && priceCalculation.totalPrice > 0 && (
-          <div className="mt-8 mb-8 w-full max-w-4xl mx-auto relative z-10">
-            <div className="bg-gray-50 p-4 rounded-lg mb-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Complete Your Payment</h2>
-              <p className="text-gray-600 text-sm">
-                Your registration has been saved. Please complete your payment below to confirm your spot.
-              </p>
-            </div>
-            <PayPalErrorBoundary>
-              <PayPalButtonFixed
-                amount={priceCalculation.totalPrice}
-                currency={selectedCurrency}
-                registrationId={currentRegistrationId}
-                registrationData={formData}
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-                onCancel={handlePaymentCancel}
-                disabled={isLoading}
-              />
-            </PayPalErrorBoundary>
-          </div>
-        )}
 
-        {/* Error message when PayPal section should show but amount is 0 */}
-        {showPayPalSection && currentRegistrationId && priceCalculation.totalPrice <= 0 && (
-          <div className="mt-8 mb-8 w-full max-w-4xl mx-auto relative z-10">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-              <div className="flex items-center mb-4">
-                <span className="text-yellow-500 text-2xl mr-3">⚠️</span>
-                <h2 className="text-xl font-bold text-yellow-800">Payment Amount Issue</h2>
-              </div>
-              <p className="text-yellow-700 mb-4">
-                Your registration has been saved, but there's an issue with the payment amount calculation.
-              </p>
-              <div className="bg-white rounded-lg p-4 mb-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Registration Details:</h3>
-                <p className="text-sm text-gray-600">Registration ID: <span className="font-mono">{currentRegistrationId}</span></p>
-                <p className="text-sm text-gray-600">Selected Type: {getSelection('registrationType') || getSelection('sponsorshipType') || 'None'}</p>
-                <p className="text-sm text-gray-600">Calculated Amount: {formatPrice(priceCalculation.totalPrice)}</p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => {
-                    setShowPayPalSection(false);
-                    setCurrentRegistrationId(null);
-                  }}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
-                >
-                  Go Back to Form
-                </button>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  Refresh Page
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* Payment Component */}
-        {showPayment && currentRegistrationId && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="bg-blue-800 text-white px-6 py-4 rounded-t-lg">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold">Complete Payment</h2>
-                  <button
-                    onClick={() => {
-                      setShowPayment(false);
-                      setCurrentRegistrationId(null);
-                    }}
-                    className="text-white hover:text-gray-200 text-2xl"
-                  >
-                    ×
-                  </button>
-                </div>
-                <p className="text-blue-100 text-sm mt-1">
-                  Registration ID: {currentRegistrationId}
-                </p>
-              </div>
 
-              <div className="p-6">
-                <PayPalErrorBoundary>
-                  <PayPalButton
-                    amount={priceCalculation.totalPrice}
-                    currency={selectedCurrency}
-                    registrationId={currentRegistrationId}
-                    registrationData={formData}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                    onCancel={handlePaymentCancel}
-                  />
-                </PayPalErrorBoundary>
-              </div>
-            </div>
-          </div>
-        )}
+
+
 
         {/* Success Message */}
         {paymentSuccess && (
