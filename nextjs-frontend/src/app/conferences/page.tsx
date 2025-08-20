@@ -9,11 +9,13 @@ export default async function ConferencesPage() {
   try {
     events = await getConferenceEvents(50); // Get more events for the dedicated page
     conference = await getConferences();
-    console.log('Fetched events:', events.map(e => ({
-      title: e.title,
-      mainConferenceUrl: e.mainConferenceUrl,
-      slug: e.slug?.current
-    })));
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Fetched events:', events.map(e => ({
+        title: e.title,
+        imageLinkUrl: e.imageLinkUrl,
+        slug: e.slug?.current
+      })));
+    }
   } catch (error) {
     console.error('Error fetching conferences:', error);
     events = [];
@@ -41,7 +43,9 @@ export default async function ConferencesPage() {
           {events && events.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {events.map((event) => {
-                console.log('Rendering event:', event.title, 'mainConferenceUrl:', event.mainConferenceUrl);
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('Rendering event:', event.title, 'imageLinkUrl:', event.imageLinkUrl);
+                }
                 return (
                 <div key={event._id} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-slate-200 hover:border-orange-200">
                   {event.imageUrl && (

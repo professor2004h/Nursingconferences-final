@@ -375,7 +375,9 @@ export async function getSiteSettingsForHeader(): Promise<SiteSettings | null> {
     // Clear any existing cache when fetching for header
     clearSiteSettingsCache();
 
-    console.warn('Header data fetched fresh');
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Header data fetched fresh');
+    }
 
     return siteSettings;
   } catch (error) {
@@ -461,7 +463,9 @@ export async function getSiteSettingsSSR(): Promise<SiteSettings | null> {
 // Function to clear the cache (useful for revalidation)
 export function clearSiteSettingsCache(): void {
   siteSettingsCache = null;
-  console.warn('Site settings cache cleared');
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('Site settings cache cleared');
+  }
 }
 
 // Helper function to get image URL from Sanity asset with quality optimization

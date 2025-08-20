@@ -91,17 +91,12 @@ export default async function DebugConferencesPage() {
                   {event.imageUrl && (
                     <div className="mt-4">
                       <strong>Image Preview:</strong>
-                      <img 
-                        src={event.imageUrl} 
-                        alt={event.title} 
-                        className="mt-2 max-w-xs h-32 object-cover rounded"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
-                        }}
-                      />
-                      <div style={{display: 'none'}} className="mt-2 text-red-500 text-sm">
-                        Failed to load image
+                      <div className="mt-2">
+                        <img
+                          src={event.imageUrl}
+                          alt={event.title}
+                          className="max-w-xs h-32 object-cover rounded"
+                        />
                       </div>
                     </div>
                   )}

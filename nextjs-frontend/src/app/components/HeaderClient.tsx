@@ -18,8 +18,10 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownContentRef = useRef<HTMLDivElement>(null);
 
-  // Debug logging
-  console.log('HeaderClient rendering:', { siteSettings: !!siteSettings, isMenuOpen });
+  // Debug logging (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('HeaderClient rendering:', { siteSettings: !!siteSettings, isMenuOpen });
+  }
 
   // Simple toggle functions without useCallback to avoid React hook issues
   const toggleMenu = () => {

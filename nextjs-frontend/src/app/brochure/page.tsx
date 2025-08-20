@@ -26,14 +26,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-async function getBrochureSettings(baseUrl?: string) {
+async function getBrochureSettings() {
   try {
-    const url = `${baseUrl ?? ''}/api/brochure-settings`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res?.ok) return null;
-    return await res.json();
+    // Import Sanity client directly to avoid dynamic server usage
+    const { getSiteSettings } = await import('../getSiteSettings');
+    const siteSettings = await getSiteSettings();
+    return siteSettings?.brochureSettings || null;
   } catch (e) {
-    console.error('Failed to load brochure settings:', e);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to load brochure settings:', e);
+    }
     return null;
   }
 }
@@ -83,19 +85,16 @@ export default async function BrochurePage() {
   let heroImageUrl: string | undefined = undefined;
   let overlayPercent: number | undefined = 40;
 
-  // Build absolute base URL for the server (handles prod/preview/dev)
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.VERCEL_URL?.startsWith('http') ? process.env.VERCEL_URL : (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-
   try {
-    const data = await getBrochureSettings(baseUrl);
+    const data = await getBrochureSettings();
     if (data) {
       heroImageUrl = data.heroBackgroundImageUrl || data.imageUrl || undefined;
       overlayPercent = typeof data.heroOverlayOpacity === 'number' ? data.heroOverlayOpacity : 40;
     }
   } catch (e) {
-    console.warn('Brochure hero settings fetch failed, using defaults.', e);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Brochure hero settings fetch failed, using defaults.', e);
+    }
   }
 
   return (
