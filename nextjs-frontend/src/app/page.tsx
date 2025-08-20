@@ -550,7 +550,7 @@ function HomePageContent({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 max-w-7xl mx-auto flex-shrink-0 mb-8 lg:mb-12">
               {pastConferences.map((conference) => (
                 <Link
-                  href={`/past-conferences/${conference.slug.current}`}
+                  href={`/past-conferences/${encodeURIComponent(conference.slug.current)}`}
                   key={conference._id}
                   className="block h-full"
                   prefetch={true}

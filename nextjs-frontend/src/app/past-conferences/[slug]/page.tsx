@@ -16,7 +16,8 @@ export async function generateStaticParams() {
   try {
     const conferences = await getPastConferences();
     return conferences.map((conference) => ({
-      slug: conference.slug.current,
+      // Encode the slug to handle spaces and special characters in URLs
+      slug: encodeURIComponent(conference.slug.current),
     }));
   } catch (error) {
     console.error('Error generating static params for past conferences:', error);

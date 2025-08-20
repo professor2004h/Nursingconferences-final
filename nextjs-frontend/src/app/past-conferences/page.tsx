@@ -74,7 +74,7 @@ export default async function PastConferencesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {conferences.map((conference) => (
                 <Link
-                  href={`/past-conferences/${conference.slug.current}`}
+                  href={`/past-conferences/${encodeURIComponent(conference.slug.current)}`}
                   key={conference._id}
                   prefetch={true}
                   className="block h-full"

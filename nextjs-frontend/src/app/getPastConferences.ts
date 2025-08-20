@@ -143,6 +143,11 @@ export async function getPastConferencePreview(slug: string): Promise<{
 // Get a single past conference by slug (OPTIMIZED FOR SPEED)
 export async function getPastConferenceBySlug(slug: string): Promise<PastConferenceType | null> {
   try {
+    // Decode the URL-encoded slug to handle spaces and special characters
+    const decodedSlug = decodeURIComponent(slug);
+
+    console.log('🔍 Looking for past conference with slug:', { original: slug, decoded: decodedSlug });
+
     const query = `*[
       _type == "pastConference" && slug.current == $slug
     ][0]{
@@ -175,12 +180,30 @@ export async function getPastConferenceBySlug(slug: string): Promise<PastConfere
       seo
     }`;
 
-    const data = await client.fetch(query, { slug }, {
+    // Try with decoded slug first
+    let data = await client.fetch(query, { slug: decodedSlug }, {
       next: {
         revalidate: 600,  // OPTIMIZED: 10 minutes instead of 5 seconds
         tags: ['past-conferences', `past-conference-${slug}`]
       }
     });
+
+    // If not found with decoded slug, try with original slug
+    if (!data) {
+      console.log('🔄 Trying with original slug:', slug);
+      data = await client.fetch(query, { slug }, {
+        next: {
+          revalidate: 600,
+          tags: ['past-conferences', `past-conference-${slug}`]
+        }
+      });
+    }
+
+    if (data) {
+      console.log('✅ Found past conference:', data.title);
+    } else {
+      console.log('❌ Past conference not found for slug:', { original: slug, decoded: decodedSlug });
+    }
 
     return data || null;
   } catch (error) {
