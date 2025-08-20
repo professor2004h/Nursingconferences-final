@@ -200,7 +200,7 @@ export default function AbstractSubmissionForm({ settings }: Props) {
             required
             className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm appearance-none"
           >
-            <option value="">🇺🇸 United States</option>
+            <option value="">Select Country</option>
             {countries.map((country) => (
               <option key={country} value={country}>
                 {country}

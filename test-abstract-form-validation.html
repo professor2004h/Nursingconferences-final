@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abstract Form Country Dropdown Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .test-button {
+            background-color: #28a745;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Abstract Form Country Dropdown Test</h1>
+    
+    <div class="test-container">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+        
+        <h3>Manual Tests</h3>
+        <button class="test-button" onclick="testDropdownPlaceholder()">Test Dropdown Placeholder</button>
+        <button class="test-button" onclick="testFormValidation()">Test Form Validation</button>
+        <button class="test-button" onclick="testCountrySelection()">Test Country Selection</button>
+        <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+    </div>
+
+    <div class="test-container">
+        <h2>Sample Abstract Form (for testing)</h2>
+        <form id="test-form">
+            <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="country">Country *</label>
+                <select id="country" name="country" required>
+                    <option value="">Select Country</option>
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Germany">Germany</option>
+                    <option value="France">France</option>
+                    <option value="India">India</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="China">China</option>
+                </select>
+            </div>
+            
+            <button type="submit">Submit Test Form</button>
+        </form>
+        
+        <div id="form-result"></div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        function testDropdownPlaceholder() {
+            clearResults();
+            addResult('🔍 Testing dropdown placeholder text...', 'info');
+            
+            const countrySelect = document.getElementById('country');
+            const firstOption = countrySelect.options[0];
+            
+            if (firstOption.value === '' && firstOption.textContent === 'Select Country') {
+                addResult('✅ Placeholder text is correct: "Select Country"', 'success');
+            } else {
+                addResult(`❌ Placeholder text is incorrect. Expected: "Select Country", Got: "${firstOption.textContent}"`, 'error');
+            }
+            
+            if (firstOption.value === '') {
+                addResult('✅ Placeholder option has empty value', 'success');
+            } else {
+                addResult(`❌ Placeholder option should have empty value. Got: "${firstOption.value}"`, 'error');
+            }
+        }
+
+        function testFormValidation() {
+            clearResults();
+            addResult('🔍 Testing form validation with empty country...', 'info');
+            
+            const form = document.getElementById('test-form');
+            const countrySelect = document.getElementById('country');
+            
+            // Reset form
+            form.reset();
+            
+            // Fill other required fields
+            document.getElementById('firstName').value = 'Test';
+            document.getElementById('lastName').value = 'User';
+            document.getElementById('email').value = 'test@example.com';
+            
+            // Leave country empty (should trigger validation)
+            countrySelect.value = '';
+            
+            // Check if form is valid
+            if (form.checkValidity()) {
+                addResult('❌ Form validation failed - form should be invalid with empty country', 'error');
+            } else {
+                addResult('✅ Form validation working - form is invalid with empty country', 'success');
+            }
+        }
+
+        function testCountrySelection() {
+            clearResults();
+            addResult('🔍 Testing country selection functionality...', 'info');
+            
+            const countrySelect = document.getElementById('country');
+            
+            // Test selecting a country
+            countrySelect.value = 'United States';
+            
+            if (countrySelect.value === 'United States') {
+                addResult('✅ Country selection working - can select "United States"', 'success');
+            } else {
+                addResult('❌ Country selection failed', 'error');
+            }
+            
+            // Test changing selection
+            countrySelect.value = 'Canada';
+            
+            if (countrySelect.value === 'Canada') {
+                addResult('✅ Country selection change working - can change to "Canada"', 'success');
+            } else {
+                addResult('❌ Country selection change failed', 'error');
+            }
+            
+            // Test resetting to placeholder
+            countrySelect.value = '';
+            
+            if (countrySelect.value === '') {
+                addResult('✅ Can reset to placeholder (empty value)', 'success');
+            } else {
+                addResult('❌ Cannot reset to placeholder', 'error');
+            }
+        }
+
+        function runAllTests() {
+            clearResults();
+            addResult('🚀 Running all tests...', 'info');
+            
+            setTimeout(() => {
+                testDropdownPlaceholder();
+                setTimeout(() => {
+                    testFormValidation();
+                    setTimeout(() => {
+                        testCountrySelection();
+                        addResult('🏁 All tests completed!', 'info');
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+
+        // Form submission test
+        document.getElementById('test-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            const resultDiv = document.getElementById('form-result');
+            
+            if (data.country) {
+                resultDiv.innerHTML = `
+                    <div class="test-result success">
+                        ✅ Form submitted successfully!<br>
+                        Selected country: <strong>${data.country}</strong>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Form submission failed - no country selected
+                    </div>
+                `;
+            }
+        });
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>
