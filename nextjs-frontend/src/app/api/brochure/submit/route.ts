@@ -8,7 +8,7 @@ const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DAT
 const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || process.env.SANITY_API_VERSION || '2023-05-03';
 const token = process.env.SANITY_API_TOKEN;
 
-if (!token) {
+if (!token && process.env.NODE_ENV === 'development') {
   console.error('❌ SANITY_API_TOKEN is not set in environment variables');
   console.error('Please add SANITY_API_TOKEN to your .env.local file');
 }

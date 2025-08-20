@@ -14,13 +14,16 @@ if (!dataset) {
   throw new Error("Missing SANITY_DATASET environment variable");
 }
 
-console.log('🔑 Sanity Client Configuration:', {
-  projectId,
-  dataset,
-  apiVersion,
-  hasToken: !!token,
-  tokenLength: token ? token.length : 0
-});
+// Log Sanity configuration only in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔑 Sanity Client Configuration:', {
+    projectId,
+    dataset,
+    apiVersion,
+    hasToken: !!token,
+    tokenLength: token ? token.length : 0
+  });
+}
 
 // Enhanced client configuration for optimal performance
 const baseClientConfig = {

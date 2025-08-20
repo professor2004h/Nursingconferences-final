@@ -22,13 +22,15 @@ export default async function Footer() {
   // Get register button config from footerContent
   const registerButton = siteSettings?.footerContent?.registerButton;
 
-  // Debug logging for Register Button
-  console.log('🔍 Register Button Debug:', {
-    registerButton,
-    url: registerButton?.url,
-    text: registerButton?.text,
-    openInNewTab: registerButton?.openInNewTab
-  });
+  // Debug logging for Register Button (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 Register Button Debug:', {
+      registerButton,
+      url: registerButton?.url,
+      text: registerButton?.text,
+      openInNewTab: registerButton?.openInNewTab
+    });
+  }
 
   return (
     <footer
