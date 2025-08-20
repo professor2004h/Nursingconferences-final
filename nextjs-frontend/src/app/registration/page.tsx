@@ -1338,6 +1338,10 @@ function RegistrationPageContent() {
                           onSuccess={handlePaymentSuccess}
                           onError={handlePaymentError}
                           onCancel={handlePaymentCancel}
+                          onRegistrationIdUpdate={(newId) => {
+                            console.log('🔄 Registration ID updated from PayPal:', newId);
+                            setCurrentRegistrationId(newId);
+                          }}
                           disabled={isLoading}
                         />
                       </PayPalErrorBoundary>

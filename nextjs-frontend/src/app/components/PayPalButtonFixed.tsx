@@ -11,6 +11,7 @@ interface PayPalButtonFixedProps {
   onSuccess: (paymentData: any) => void;
   onError: (error: any) => void;
   onCancel: () => void;
+  onRegistrationIdUpdate?: (newRegistrationId: string) => void;
   disabled?: boolean;
 }
 
@@ -29,12 +30,16 @@ export default function PayPalButtonFixed({
   onSuccess,
   onError,
   onCancel,
+  onRegistrationIdUpdate,
   disabled = false,
 }: PayPalButtonFixedProps) {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>({
     status: 'idle',
     message: '',
   });
+
+  // Track the current registration ID (may change from temp to PayPal order ID)
+  const [currentRegistrationId, setCurrentRegistrationId] = useState<string>(registrationId);
 
   // Get environment variables with runtime fallback
   const [clientId, setClientId] = useState<string | null>(null);
@@ -204,7 +209,7 @@ export default function PayPalButtonFixed({
         body: JSON.stringify({
           amount: amount.toFixed(2),
           currency,
-          registrationId,
+          registrationId: currentRegistrationId,
           registrationData,
         }),
       });
@@ -216,6 +221,19 @@ export default function PayPalButtonFixed({
       }
 
       console.log('✅ PayPal order created:', data.orderId);
+
+      // Update registration ID if it changed (from temp to PayPal order ID)
+      if (data.registrationId && data.registrationId !== currentRegistrationId) {
+        console.log('🔄 Registration ID updated:', {
+          old: currentRegistrationId,
+          new: data.registrationId
+        });
+        setCurrentRegistrationId(data.registrationId);
+        if (onRegistrationIdUpdate) {
+          onRegistrationIdUpdate(data.registrationId);
+        }
+      }
+
       return data.orderId;
     } catch (error) {
       console.error('❌ Error creating PayPal order:', error);
@@ -244,7 +262,7 @@ export default function PayPalButtonFixed({
         },
         body: JSON.stringify({
           orderId: data.orderID,
-          registrationId,
+          registrationId: currentRegistrationId,
         }),
       });
 
@@ -260,7 +278,7 @@ export default function PayPalButtonFixed({
         orderId: data.orderID,
         paymentId: result.transactionId,
         transactionId: result.transactionId,
-        registrationId,
+        registrationId: currentRegistrationId, // Use the current (possibly updated) registration ID
         amount,
         currency,
         status: 'completed',
@@ -369,7 +387,10 @@ export default function PayPalButtonFixed({
                 {currency} {amount.toFixed(2)}
               </p>
               <p className="text-sm text-gray-600 mt-1">
-                Registration ID: {registrationId}
+                Registration ID: {currentRegistrationId}
+                {currentRegistrationId.startsWith('TEMP-') && (
+                  <span className="text-xs text-orange-600 ml-2">(Will be updated with PayPal Order ID)</span>
+                )}
               </p>
             </div>
 

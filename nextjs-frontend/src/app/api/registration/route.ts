@@ -69,30 +69,43 @@ export async function POST(request: NextRequest) {
     }
 
     const registrationData = validationResult.data;
+
+    // Generate a temporary registration ID for free registrations or as fallback
+    // For paid registrations, this will be replaced with PayPal order ID
     let registrationId = generateRegistrationId();
 
-    // Check for duplicate registrationId and regenerate if needed
-    let attempts = 0;
-    const maxAttempts = 5;
+    // For free registrations (totalPrice = 0), use the generated ID
+    // For paid registrations, we'll update this with PayPal order ID later
+    const isFreeRegistration = registrationData.totalPrice === 0;
 
-    while (attempts < maxAttempts) {
-      try {
-        const existingRegistration = await writeClient.fetch(
-          `*[_type == "conferenceRegistration" && registrationId == $registrationId][0]`,
-          { registrationId }
-        );
+    if (!isFreeRegistration) {
+      // For paid registrations, use a temporary ID that will be updated with PayPal order ID
+      registrationId = `TEMP-${registrationId}`;
+      console.log('💳 Paid registration - temporary ID assigned, will be updated with PayPal order ID');
+    } else {
+      // For free registrations, check for duplicate and regenerate if needed
+      let attempts = 0;
+      const maxAttempts = 5;
 
-        if (!existingRegistration) {
-          break; // ID is unique, we can use it
+      while (attempts < maxAttempts) {
+        try {
+          const existingRegistration = await writeClient.fetch(
+            `*[_type == "conferenceRegistration" && registrationId == $registrationId][0]`,
+            { registrationId }
+          );
+
+          if (!existingRegistration) {
+            break; // ID is unique, we can use it
+          }
+
+          // ID already exists, generate a new one
+          registrationId = generateRegistrationId();
+          attempts++;
+          console.log(`⚠️ Registration ID collision detected, regenerating... (attempt ${attempts})`);
+        } catch (error) {
+          console.error('Error checking for duplicate registration ID:', error);
+          break; // Continue with current ID if check fails
         }
-
-        // ID already exists, generate a new one
-        registrationId = generateRegistrationId();
-        attempts++;
-        console.log(`⚠️ Registration ID collision detected, regenerating... (attempt ${attempts})`);
-      } catch (error) {
-        console.error('Error checking for duplicate registration ID:', error);
-        break; // Continue with current ID if check fails
       }
     }
 

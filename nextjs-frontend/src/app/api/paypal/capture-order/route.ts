@@ -154,23 +154,44 @@ export async function POST(request: NextRequest) {
 
 /**
  * Update registration payment status in database
- * This is a placeholder - implement based on your database structure
  */
 async function updateRegistrationPaymentStatus(registrationId: string, paymentData: any) {
   try {
-    // TODO: Implement database update logic
-    // This could be updating Sanity, a SQL database, or other storage
-    console.log('📝 Would update registration payment status:', {
+    const { writeClient } = await import('@/app/sanity/client');
+
+    console.log('📝 Updating registration payment status in Sanity:', {
       registrationId,
       paymentData
     });
 
-    // Example implementation for Sanity:
-    // const client = getSanityClient();
-    // await client.patch(registrationId).set({
-    //   paymentStatus: 'completed',
-    //   paymentData: paymentData
-    // }).commit();
+    // Find the registration by registrationId
+    const registration = await writeClient.fetch(
+      `*[_type == "conferenceRegistration" && registrationId == $registrationId][0]`,
+      { registrationId }
+    );
+
+    if (!registration) {
+      console.error('❌ Registration not found for payment update:', registrationId);
+      throw new Error(`Registration not found: ${registrationId}`);
+    }
+
+    // Update the registration with payment details
+    const updateResult = await writeClient
+      .patch(registration._id)
+      .set({
+        paymentStatus: paymentData.status,
+        paymentMethod: paymentData.paymentMethod,
+        paypalOrderId: paymentData.orderId,
+        paypalTransactionId: paymentData.transactionId,
+        paidAmount: paymentData.amount,
+        paidCurrency: paymentData.currency,
+        paymentCapturedAt: paymentData.capturedAt,
+        updatedAt: new Date().toISOString(),
+      })
+      .commit();
+
+    console.log('✅ Registration payment status updated successfully:', updateResult._id);
+    return updateResult;
 
   } catch (error) {
     console.error('❌ Error updating registration payment status:', error);

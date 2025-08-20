@@ -140,12 +140,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ PayPal production order created successfully:', result.id);
+    const paypalOrderId = result.id;
+    console.log('✅ PayPal production order created successfully:', {
+      orderId: paypalOrderId,
+      status: result.status,
+      originalRegistrationId: registrationId
+    });
+
+    // Update registration with PayPal order ID if it's a temporary ID
+    if (registrationId.startsWith('TEMP-')) {
+      try {
+        console.log('🔄 Updating registration with PayPal order ID...');
+        const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/registration/update-paypal-id`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            tempRegistrationId: registrationId,
+            paypalOrderId: paypalOrderId,
+            paymentStatus: 'pending'
+          }),
+        });
+
+        if (updateResponse.ok) {
+          console.log('✅ Registration updated with PayPal order ID');
+        } else {
+          console.error('⚠️ Failed to update registration with PayPal order ID, but continuing...');
+        }
+      } catch (error) {
+        console.error('⚠️ Error updating registration with PayPal order ID:', error);
+        // Continue anyway - the payment can still proceed
+      }
+    }
 
     return NextResponse.json({
-      orderId: result.id,
+      success: true,
+      orderId: paypalOrderId,
       status: result.status,
+      registrationId: paypalOrderId, // Return PayPal order ID as the new registration ID
+      originalRegistrationId: registrationId, // Keep track of original temp ID
       links: result.links,
+      timestamp: new Date().toISOString()
     });
 
   } catch (error) {
