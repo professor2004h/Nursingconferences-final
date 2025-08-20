@@ -325,10 +325,10 @@ function ContactFormFooter() {
         {/* Fallback if no dynamic data */}
         {!siteSettings?.contactInfo?.email && !siteSettings?.contactInfo?.whatsapp && (
           <a
-            href="mailto:intelliglobalconferences@gmail.com"
+            href="mailto:contactus@intelliglobalconferences.com"
             className="text-slate-700 font-medium hover:text-orange-500 transition-colors text-sm"
           >
-            intelliglobalconferences@gmail.com
+            contactus@intelliglobalconferences.com
           </a>
         )}
       </div>

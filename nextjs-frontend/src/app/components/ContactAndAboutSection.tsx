@@ -120,7 +120,7 @@ export default function ContactAndAboutSection() {
                 <div>
                   <h4 className="font-semibold text-lg text-slate-900 mb-1">Address</h4>
                   <p className="text-slate-600">
-                    {siteSettings?.contactInfo?.address || "NewYork"}
+                    {siteSettings?.contactInfo?.address || "25 5thAve,New York, NY 10003"}
                   </p>
                 </div>
               </div>
@@ -135,10 +135,10 @@ export default function ContactAndAboutSection() {
                 <div className="min-w-0 flex-1">
                   <h4 className="font-semibold text-lg text-slate-900 mb-1">Email</h4>
                   <a
-                    href={`mailto:${siteSettings?.contactInfo?.email || "intelliglobalconferences@gmail.com"}`}
+                    href={`mailto:${siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}`}
                     className="text-orange-600 hover:text-orange-700 transition-colors break-all text-sm sm:text-base"
                   >
-                    {siteSettings?.contactInfo?.email || "intelliglobalconferences@gmail.com"}
+                    {siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}
                   </a>
                 </div>
               </div>

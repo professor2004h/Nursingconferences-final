@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     
     // Get site settings to retrieve the contact email
     const siteSettings = await getSiteSettings();
-    const recipientEmail = siteSettings?.contactInfo?.email || 'intelliglobalconferences@gmail.com';
+    const recipientEmail = siteSettings?.contactInfo?.email || 'contactus@intelliglobalconferences.com';
     
     // Log the contact form submission
     console.log('📧 Processing contact form submission...');

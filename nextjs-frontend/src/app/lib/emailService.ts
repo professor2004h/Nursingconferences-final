@@ -176,7 +176,7 @@ export async function sendEmail(emailData: EmailData): Promise<boolean> {
 // Send contact form notification to admin
 export async function sendContactFormNotification(
   formData: ContactFormData,
-  adminEmail: string = 'intelliglobalconferences@gmail.com'
+  adminEmail: string = 'contactus@intelliglobalconferences.com'
 ): Promise<boolean> {
   try {
     console.log('📧 Sending contact form notification to admin...');
@@ -301,7 +301,7 @@ export async function sendContactFormNotification(
 // Send sponsorship registration notification to admin
 export async function sendSponsorshipNotification(
   sponsorData: SponsorshipNotificationData,
-  adminEmail: string = 'intelliglobalconferences@gmail.com'
+  adminEmail: string = 'contactus@intelliglobalconferences.com'
 ): Promise<boolean> {
   try {
     console.log('📧 Sending sponsorship notification to admin...');
@@ -541,7 +541,7 @@ export async function sendInvoiceEmail(
   siteSettings: any
 ): Promise<boolean> {
   try {
-    const adminEmail = siteSettings?.adminSettings?.adminEmail || 'intelliglobalconferences@gmail.com';
+    const adminEmail = siteSettings?.adminSettings?.adminEmail || 'contactus@intelliglobalconferences.com';
     const emailSubject = siteSettings?.adminSettings?.invoiceEmailSubject || 'Your Sponsorship Invoice';
     
     // Generate email template
@@ -605,7 +605,7 @@ export async function sendPaymentConfirmationEmail(
   siteSettings: any
 ): Promise<boolean> {
   try {
-    const adminEmail = siteSettings?.adminSettings?.adminEmail || 'intelliglobalconferences@gmail.com';
+    const adminEmail = siteSettings?.adminSettings?.adminEmail || 'contactus@intelliglobalconferences.com';
     
     let confirmationTemplate = siteSettings?.adminSettings?.paymentConfirmationTemplate || `
 Dear {{contactName}},
@@ -674,7 +674,7 @@ export async function sendAdminNotificationEmail(
   siteSettings: any
 ): Promise<boolean> {
   try {
-    const adminEmail = siteSettings?.adminSettings?.adminEmail || 'intelliglobalconferences@gmail.com';
+    const adminEmail = siteSettings?.adminSettings?.adminEmail || 'contactus@intelliglobalconferences.com';
     
     const notificationHTML = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

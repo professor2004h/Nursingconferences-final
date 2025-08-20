@@ -65,11 +65,11 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg text-slate-900 mb-1">Email</h4>
-                    <a 
-                      href={`mailto:${siteSettings?.contactInfo?.email || "intelliglobalconferences@gmail.com"}`}
+                    <a
+                      href={`mailto:${siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}`}
                       className="text-orange-600 hover:text-orange-700 transition-colors"
                     >
-                      {siteSettings?.contactInfo?.email || "intelliglobalconferences@gmail.com"}
+                      {siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}
                     </a>
                   </div>
                 </div>
