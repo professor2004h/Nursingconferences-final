@@ -6,7 +6,7 @@ const client = createClient({
   dataset: 'production',
   useCdn: false,
   apiVersion: '2023-05-03',
-  token: process.env.SANITY_API_TOKEN || 'skQOQOdYOGVKbGVkdGVzdA1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqr'
+  token: process.env.SANITY_API_TOKEN
 });
 
 // Sample poster presenters data

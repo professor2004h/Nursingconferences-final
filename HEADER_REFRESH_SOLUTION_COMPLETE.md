@@ -24,7 +24,7 @@ export async function getSiteSettingsForHeader(): Promise<SiteSettings | null> {
 ```typescript
 // Separate client for header requests - bypasses CDN
 export const headerClient = createClient({
-  projectId: "tq1qdk3m",
+  projectId: "n3no08m3",
   dataset: "production",
   useCdn: false, // Disable CDN to ensure fresh data
   perspective: 'published',
