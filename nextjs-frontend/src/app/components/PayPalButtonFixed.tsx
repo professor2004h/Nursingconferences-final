@@ -38,26 +38,49 @@ export default function PayPalButtonFixed({
 
   // Get environment variables
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-  
+  const environment = process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || 'production';
+
   console.log('🔍 PayPal Button Debug:', {
     clientId: clientId ? `${clientId.substring(0, 10)}...` : 'Missing',
     amount,
     currency,
     registrationId,
-    environment: process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT
+    environment,
+    hasNextPublicPayPalClientId: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+    nodeEnv: process.env.NODE_ENV
   });
 
   // Validate client ID
   if (!clientId) {
+    console.error('❌ PayPal Client ID missing. Environment check:', {
+      NEXT_PUBLIC_PAYPAL_CLIENT_ID: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+      NODE_ENV: process.env.NODE_ENV,
+      availableEnvVars: Object.keys(process.env).filter(key => key.includes('PAYPAL'))
+    });
+
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <div className="flex items-center">
           <span className="text-red-500 text-lg mr-2">❌</span>
           <div>
             <h3 className="text-red-800 font-medium">PayPal Configuration Error</h3>
-            <p className="text-red-700 text-sm">
+            <p className="text-red-700 text-sm mb-2">
               PayPal Client ID is missing. Please check environment variables.
             </p>
+            <p className="text-red-600 text-xs">
+              Required: NEXT_PUBLIC_PAYPAL_CLIENT_ID
+            </p>
+            {process.env.NODE_ENV === 'development' && (
+              <details className="mt-2">
+                <summary className="text-red-600 text-xs cursor-pointer">Debug Info</summary>
+                <pre className="text-xs mt-1 bg-red-100 p-2 rounded">
+                  Available PayPal env vars: {JSON.stringify(
+                    Object.keys(process.env).filter(key => key.includes('PAYPAL')),
+                    null, 2
+                  )}
+                </pre>
+              </details>
+            )}
           </div>
         </div>
       </div>

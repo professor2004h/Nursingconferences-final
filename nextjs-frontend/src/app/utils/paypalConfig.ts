@@ -18,13 +18,14 @@ export interface PayPalConfig {
 export function getPayPalConfig(): PayPalConfig {
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
-  const environment = (process.env.PAYPAL_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
+  const environment = (process.env.PAYPAL_ENVIRONMENT || process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || 'production') as 'sandbox' | 'production';
   const baseUrl = environment === 'sandbox'
     ? 'https://api-m.sandbox.paypal.com'
     : 'https://api-m.paypal.com';
 
-  // During build time, allow missing environment variables
-  const isBuildTime = process.env.NODE_ENV === 'production' && !clientId && !clientSecret;
+  // During build time or when environment variables are not available, allow missing credentials
+  const isBuildTime = (process.env.NODE_ENV === 'production' && !clientId && !clientSecret) ||
+                      typeof window !== 'undefined'; // Client-side execution
 
   if (isBuildTime) {
     console.log('⚠️ PayPal configuration created for build time (credentials will be validated at runtime)');
@@ -83,19 +84,27 @@ export function getPayPalConfig(): PayPalConfig {
  */
 export function getClientPayPalConfig() {
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-  const environment = (process.env.PAYPAL_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const environment = (process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || process.env.PAYPAL_ENVIRONMENT || 'production') as 'sandbox' | 'production';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+                  (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
 
   if (!clientId) {
-    const errorMessage = 'Missing NEXT_PUBLIC_PAYPAL_CLIENT_ID environment variable';
+    const errorMessage = 'Missing NEXT_PUBLIC_PAYPAL_CLIENT_ID environment variable. Please check your environment configuration.';
     console.error('❌ Client PayPal Configuration Error:', errorMessage);
+    console.error('💡 Available environment variables:', {
+      NODE_ENV: process.env.NODE_ENV,
+      hasNextPublicPayPalClientId: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+      hasPayPalClientId: !!process.env.PAYPAL_CLIENT_ID,
+      environment: process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT || process.env.PAYPAL_ENVIRONMENT
+    });
     throw new Error(errorMessage);
   }
 
   console.log('✅ Client PayPal Configuration Valid:', {
     environment,
     baseUrl,
-    clientIdLength: clientId.length
+    clientIdLength: clientId.length,
+    clientIdPrefix: clientId.substring(0, 10) + '...'
   });
 
   return {
