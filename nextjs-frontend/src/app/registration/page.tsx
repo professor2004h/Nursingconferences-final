@@ -330,16 +330,16 @@ function RegistrationPageContent() {
     console.log('✅ Payment successful:', paymentData);
     setPaymentSuccess(true);
 
-    // Redirect to success page with payment details
+    // Redirect to success page with correct payment details
     const successUrl = `/registration/success?` +
       `registration_id=${paymentData.registrationId}&` +
-      `payment_id=${paymentData.paymentId}&` +
+      `transaction_id=${paymentData.transactionId}&` +
       `order_id=${paymentData.orderId}&` +
       `amount=${paymentData.amount}&` +
       `currency=${paymentData.currency}&` +
       `payment_method=paypal&` +
       `status=completed&` +
-      `test_mode=true`;
+      `captured_at=${encodeURIComponent(paymentData.paymentData?.capturedAt || new Date().toISOString())}`;
 
     router.push(successUrl);
   }, [router]);

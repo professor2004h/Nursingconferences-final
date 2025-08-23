@@ -8,13 +8,13 @@ export default function RegistrationSuccessPage() {
   const [registrationDetails, setRegistrationDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const paymentId = searchParams?.get('payment_id');
+  const transactionId = searchParams?.get('transaction_id');
   const orderId = searchParams?.get('order_id');
   const registrationId = searchParams?.get('registration_id');
-  const testMode = searchParams?.get('test_mode') === 'true';
-  const paymentMethod = searchParams?.get('payment_method') || 'unknown';
+  const paymentMethod = searchParams?.get('payment_method') || 'PayPal';
   const amount = searchParams?.get('amount');
   const currency = searchParams?.get('currency') || 'USD';
+  const capturedAt = searchParams?.get('captured_at');
 
   useEffect(() => {
     if (registrationId) {
@@ -38,9 +38,26 @@ export default function RegistrationSuccessPage() {
   }, [registrationId]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+    <>
+      {/* Print Styles */}
+      <style jsx global>{`
+        @media print {
+          body { margin: 0; padding: 20px; }
+          .no-print { display: none !important; }
+          .print-only { display: block !important; }
+          .bg-green-600 { background-color: #059669 !important; }
+          .text-white { color: white !important; }
+          .shadow-lg { box-shadow: none !important; }
+          .rounded-lg { border-radius: 0 !important; }
+          .bg-gray-50 { background-color: white !important; }
+          .min-h-screen { min-height: auto !important; }
+          .py-12 { padding-top: 0 !important; padding-bottom: 0 !important; }
+        }
+      `}</style>
+
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           {/* Success Header */}
           <div className="bg-green-600 px-6 py-8 text-center">
             <div className="flex justify-center mb-4">
@@ -64,79 +81,162 @@ export default function RegistrationSuccessPage() {
             ) : (
               <div className="space-y-6">
                 {/* Payment Information */}
-                {paymentId && (
-                  <div className={`border rounded-lg p-4 ${testMode ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200'}`}>
-                    <h3 className={`text-lg font-semibold mb-3 ${testMode ? 'text-orange-900' : 'text-green-900'}`}>
-                      {testMode ? '🧪 Test Payment Confirmed' : '✅ Payment Confirmed'}
+                {transactionId && (
+                  <div className="border rounded-lg p-4 bg-green-50 border-green-200">
+                    <h3 className="text-lg font-semibold mb-3 text-green-900">
+                      ✅ Payment Confirmed
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className={`text-sm ${testMode ? 'text-orange-800' : 'text-green-800'}`}>
-                        <p><strong>Payment ID:</strong> <span className="font-mono">{paymentId}</span></p>
+                      <div className="text-sm text-green-800">
+                        <p><strong>Transaction ID:</strong> <span className="font-mono">{transactionId}</span></p>
                         {orderId && <p><strong>Order ID:</strong> <span className="font-mono">{orderId}</span></p>}
-                        <p><strong>Payment Method:</strong> <span className="capitalize">{paymentMethod}</span></p>
+                        <p><strong>Payment Method:</strong> {paymentMethod}</p>
                       </div>
-                      <div className={`text-sm ${testMode ? 'text-orange-800' : 'text-green-800'}`}>
+                      <div className="text-sm text-green-800">
                         {amount && <p><strong>Amount:</strong> {currency} {amount}</p>}
                         <p><strong>Status:</strong> <span className="text-green-600 font-medium">Completed</span></p>
-                        <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                        <p><strong>Date:</strong> {capturedAt ? new Date(capturedAt).toLocaleString() : new Date().toLocaleString()}</p>
                       </div>
                     </div>
-                    {testMode && (
-                      <div className="mt-3 p-3 bg-orange-100 rounded border border-orange-300">
-                        <p className="text-xs text-orange-700 font-medium">
-                          ⚠️ This is a test payment - no actual charges were made to your account.
-                        </p>
-                      </div>
-                    )}
-                    {paymentMethod === 'paypal' && (
-                      <div className="mt-3 p-3 bg-blue-100 rounded border border-blue-300">
-                        <p className="text-xs text-blue-700 font-medium">
-                          💳 Payment processed securely through PayPal
-                        </p>
-                      </div>
-                    )}
+                    <div className="mt-3 p-3 bg-blue-100 rounded border border-blue-300">
+                      <p className="text-xs text-blue-700 font-medium">
+                        Payment processed securely through PayPal
+                      </p>
+                    </div>
                   </div>
                 )}
 
                 {/* Registration Information */}
                 {registrationDetails && (
-                  <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="border border-gray-200 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Registration Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p><strong>Registration ID:</strong> {registrationDetails.registrationId}</p>
-                        <p><strong>Name:</strong> {registrationDetails.personalDetails?.firstName} {registrationDetails.personalDetails?.lastName}</p>
-                        <p><strong>Email:</strong> {registrationDetails.personalDetails?.email}</p>
-                        <p><strong>Phone:</strong> {registrationDetails.personalDetails?.phoneNumber}</p>
+
+                    {/* Personal Information */}
+                    <div className="mb-6">
+                      <h4 className="text-md font-medium text-gray-800 mb-3">Personal Information</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                          <p><strong>Registration ID:</strong> {registrationDetails.registrationId}</p>
+                          <p><strong>Full Name:</strong> {registrationDetails.personalDetails?.title ? `${registrationDetails.personalDetails.title} ` : ''}{registrationDetails.personalDetails?.firstName} {registrationDetails.personalDetails?.lastName}</p>
+                          <p><strong>Email:</strong> {registrationDetails.personalDetails?.email}</p>
+                          <p><strong>Phone:</strong> {registrationDetails.personalDetails?.phoneNumber}</p>
+                        </div>
+                        <div className="space-y-2">
+                          <p><strong>Country:</strong> {registrationDetails.personalDetails?.country}</p>
+                          <p><strong>Address:</strong> {registrationDetails.personalDetails?.fullPostalAddress}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p><strong>Country:</strong> {registrationDetails.personalDetails?.country}</p>
-                        <p><strong>Registration Type:</strong> {registrationDetails.registrationType}</p>
-                        <p><strong>Participants:</strong> {registrationDetails.numberOfParticipants}</p>
-                        <p><strong>Total Amount:</strong> ${registrationDetails.pricing?.totalPrice}</p>
+                    </div>
+
+                    {/* Registration Information */}
+                    <div className="mb-6">
+                      <h4 className="text-md font-medium text-gray-800 mb-3">Registration Information</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                          {registrationDetails.selectedRegistrationName && (
+                            <p><strong>Registration Type:</strong> {registrationDetails.selectedRegistrationName}</p>
+                          )}
+                          {registrationDetails.sponsorType && (
+                            <p><strong>Sponsorship Type:</strong> {registrationDetails.sponsorType}</p>
+                          )}
+                          <p><strong>Number of Participants:</strong> {registrationDetails.numberOfParticipants}</p>
+                        </div>
+                        <div className="space-y-2">
+                          {registrationDetails.accommodationType && (
+                            <p><strong>Accommodation:</strong> {registrationDetails.accommodationType}</p>
+                          )}
+                          {registrationDetails.accommodationNights && (
+                            <p><strong>Accommodation Nights:</strong> {registrationDetails.accommodationNights}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Summary */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="text-md font-medium text-gray-800 mb-3">Payment Summary</h4>
+                      <div className="text-sm space-y-1">
+                        <div className="flex justify-between">
+                          <span>Registration Fee:</span>
+                          <span>{currency} {registrationDetails.pricing?.registrationFee || 0}</span>
+                        </div>
+                        {registrationDetails.pricing?.accommodationFee > 0 && (
+                          <div className="flex justify-between">
+                            <span>Accommodation Fee:</span>
+                            <span>{currency} {registrationDetails.pricing.accommodationFee}</span>
+                          </div>
+                        )}
+                        <div className="border-t pt-2 mt-2">
+                          <div className="flex justify-between font-semibold">
+                            <span>Total Amount:</span>
+                            <span>{currency} {registrationDetails.pricing?.totalPrice}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Next Steps */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-yellow-900 mb-2">What's Next?</h3>
-                  <ul className="text-sm text-yellow-800 space-y-1">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">What's Next?</h3>
+                  <ul className="text-sm text-blue-800 space-y-2">
                     <li>• You will receive a confirmation email shortly with your registration details</li>
                     <li>• Your registration certificate will be sent via email within 24 hours</li>
                     <li>• Conference materials and schedule will be shared closer to the event date</li>
-                    <li>• For any queries, please contact us at support@nursingconference.com</li>
+                    <li>• For any queries, please contact us at intelliglobalconferences@gmail.com</li>
                   </ul>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 no-print">
                   <button
                     onClick={() => window.print()}
                     className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    Print Registration
+                    Print Registration Receipt
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/registration/receipt-pdf', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            registrationId,
+                            transactionId,
+                            orderId,
+                            amount,
+                            currency,
+                            capturedAt,
+                            registrationDetails
+                          }),
+                        });
+
+                        if (response.ok) {
+                          const blob = await response.blob();
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.style.display = 'none';
+                          a.href = url;
+                          a.download = `Registration_Receipt_${registrationId}.pdf`;
+                          document.body.appendChild(a);
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                          document.body.removeChild(a);
+                        } else {
+                          alert('Failed to generate PDF receipt. Please try again.');
+                        }
+                      } catch (error) {
+                        console.error('Error downloading PDF:', error);
+                        alert('Failed to download PDF receipt. Please try again.');
+                      }
+                    }}
+                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    Download PDF Receipt
                   </button>
                   <a
                     href="/"
@@ -151,5 +251,6 @@ export default function RegistrationSuccessPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
