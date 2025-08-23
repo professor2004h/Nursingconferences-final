@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalButtonFixed from '@/app/components/PayPalButtonFixed';
+import PayPalButtonReliable from '@/app/components/PayPalButtonReliable';
 import PayPalErrorBoundary from '@/app/components/PayPalErrorBoundary';
 import { CurrencyProvider } from '@/app/contexts/CurrencyContext';
 import CurrencySelector from '@/app/components/CurrencySelector';
@@ -345,15 +346,41 @@ function RegistrationPageContent() {
 
   // Handle payment error
   const handlePaymentError = useCallback((error: any) => {
-    console.error('❌ Payment failed:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Payment failed';
-    alert(`Payment failed: ${errorMessage}\nYour registration is saved and you can complete payment later.`);
+    console.error('❌ Payment failed:', {
+      error: error instanceof Error ? error.message : 'Payment failed',
+      stack: error instanceof Error ? error.stack?.substring(0, 500) : undefined,
+      registrationId: currentRegistrationId,
+      amount: calculateTotalPrice().totalPrice
+    });
+
+    // Provide detailed error message to user
+    let userMessage = 'Payment processing failed. ';
+
+    if (error instanceof Error) {
+      if (error.message.includes('network') || error.message.includes('fetch')) {
+        userMessage += 'Please check your internet connection and try again.';
+      } else if (error.message.includes('declined') || error.message.includes('insufficient')) {
+        userMessage += 'Your payment was declined. Please check your payment method or try a different card.';
+      } else if (error.message.includes('timeout')) {
+        userMessage += 'The payment request timed out. Please try again.';
+      } else {
+        userMessage += error.message;
+      }
+    } else {
+      userMessage += 'An unexpected error occurred during payment processing.';
+    }
+
+    userMessage += '\n\nYour registration information has been saved. You can contact us at intelliglobalconferences@gmail.com to complete your payment manually.';
+
+    alert(userMessage);
     setIsLoading(false);
-  }, []);
+  }, [currentRegistrationId, calculateTotalPrice]);
 
   // Handle payment cancellation
   const handlePaymentCancel = useCallback(() => {
     console.log('⚠️ Payment cancelled by user');
+    alert('Payment was cancelled. Your registration information has been saved.\n\nYou can contact us at intelliglobalconferences@gmail.com to complete your payment manually.');
+    setIsLoading(false);
   }, []);
 
 
@@ -483,8 +510,45 @@ function RegistrationPageContent() {
       setIsLoading(false);
 
     } catch (error) {
-      console.error('Registration error:', error);
-      alert(`Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ Registration submission error:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack?.substring(0, 500) : undefined,
+        formData: {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          totalPrice: calculateTotalPrice().totalPrice
+        }
+      });
+
+      // Provide user-friendly error messages
+      let userMessage = 'Registration submission failed. Please try again.';
+
+      if (error instanceof Error) {
+        if (error.message.includes('fetch')) {
+          userMessage = 'Network error: Unable to connect to the server. Please check your internet connection and try again.';
+        } else if (error.message.includes('validation')) {
+          userMessage = 'Please check your form data and ensure all required fields are filled correctly.';
+        } else if (error.message.includes('timeout')) {
+          userMessage = 'Request timeout: The server is taking too long to respond. Please try again.';
+        } else if (error.message.includes('500')) {
+          userMessage = 'Server error: There was an issue processing your registration. Please try again in a few minutes.';
+        } else {
+          userMessage = `Registration failed: ${error.message}`;
+        }
+      }
+
+      alert(userMessage);
+
+      // Additional debugging for development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 Debug info:', {
+          currentRegistrationId,
+          formDataKeys: Object.keys(formData),
+          priceCalculation: calculateTotalPrice(),
+          timestamp: new Date().toISOString()
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -1330,7 +1394,7 @@ function RegistrationPageContent() {
                         </div>
                       </div>
                       <PayPalErrorBoundary>
-                        <PayPalButtonFixed
+                        <PayPalButtonReliable
                           amount={priceCalculation.totalPrice}
                           currency={selectedCurrency}
                           registrationId={currentRegistrationId}

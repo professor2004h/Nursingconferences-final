@@ -52,10 +52,29 @@ function generateRegistrationId(): string {
 export async function POST(request: NextRequest) {
   try {
     console.log('📝 Processing registration submission...');
+    console.log('🔍 Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      hasSanityToken: !!process.env.SANITY_API_TOKEN,
+      sanityProjectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+      hasPayPalClientId: !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+      hasPayPalSecret: !!process.env.PAYPAL_CLIENT_SECRET
+    });
 
-    const body = await request.json();
-    
+    let body;
+    try {
+      body = await request.json();
+      console.log('✅ Request body parsed successfully');
+      console.log('📊 Registration data keys:', Object.keys(body));
+    } catch (parseError) {
+      console.error('❌ Failed to parse request body:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
     // Validate the request data
+    console.log('🔍 Starting validation...');
     const validationResult = registrationSchema.safeParse(body);
     if (!validationResult.success) {
       console.error('❌ Validation failed:', validationResult.error.issues);
@@ -67,6 +86,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    console.log('✅ Validation passed');
 
     const registrationData = validationResult.data;
 
@@ -107,14 +127,14 @@ export async function POST(request: NextRequest) {
           break; // Continue with current ID if check fails
         }
       }
-    }
 
-    if (attempts >= maxAttempts) {
-      console.error('❌ Failed to generate unique registration ID after maximum attempts');
-      return NextResponse.json(
-        { error: 'Unable to generate unique registration ID. Please try again.' },
-        { status: 500 }
-      );
+      if (attempts >= maxAttempts) {
+        console.error('❌ Failed to generate unique registration ID after maximum attempts');
+        return NextResponse.json(
+          { error: 'Unable to generate unique registration ID. Please try again.' },
+          { status: 500 }
+        );
+      }
     }
 
     console.log('✅ Registration data validated:', {
@@ -170,15 +190,40 @@ export async function POST(request: NextRequest) {
     let sanityError = null;
     try {
       console.log('💾 Attempting to save registration to Sanity with write client...');
+      console.log('🔍 Sanity client config check:', {
+        hasToken: !!process.env.SANITY_API_TOKEN,
+        tokenLength: process.env.SANITY_API_TOKEN?.length || 0,
+        projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+        dataset: process.env.NEXT_PUBLIC_SANITY_DATASET
+      });
+      console.log('📄 Registration record structure:', {
+        type: registrationRecord._type,
+        registrationId: registrationRecord.registrationId,
+        hasPersonalDetails: !!registrationRecord.personalDetails,
+        hasPricing: !!registrationRecord.pricing,
+        totalPrice: registrationRecord.pricing?.totalPrice
+      });
+
       result = await writeClient.create(registrationRecord);
       console.log('✅ Registration saved to Sanity successfully:', result._id);
     } catch (error: any) {
       sanityError = error;
-      console.error('❌ Sanity save failed:', error);
+      console.error('❌ Sanity save failed:', {
+        error: error.message,
+        statusCode: error?.statusCode,
+        details: error?.details,
+        stack: error?.stack?.substring(0, 500)
+      });
 
       // Check if it's a permissions error
       if (error?.statusCode === 403) {
         console.error('🔒 Sanity permissions error - API token may be invalid or missing write permissions');
+      } else if (error?.statusCode === 401) {
+        console.error('🔐 Sanity authentication error - API token is invalid');
+      } else if (error?.statusCode === 400) {
+        console.error('📝 Sanity validation error - registration data may be invalid');
+      } else {
+        console.error('🌐 Sanity network/server error');
       }
 
       // Mock response for development/testing when Sanity fails
@@ -206,12 +251,38 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Registration submission error:', error);
-    
+    console.error('❌ Registration submission error:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack?.substring(0, 1000) : undefined,
+      name: error instanceof Error ? error.name : undefined,
+      cause: error instanceof Error ? error.cause : undefined
+    });
+
+    // Provide more specific error information
+    let errorMessage = 'Registration submission failed';
+    let errorDetails = 'An unexpected error occurred during registration processing';
+
+    if (error instanceof Error) {
+      if (error.message.includes('fetch')) {
+        errorMessage = 'Database connection failed';
+        errorDetails = 'Unable to connect to the registration database. Please try again.';
+      } else if (error.message.includes('validation')) {
+        errorMessage = 'Data validation failed';
+        errorDetails = 'The registration data contains invalid information.';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Request timeout';
+        errorDetails = 'The registration request took too long to process. Please try again.';
+      } else {
+        errorDetails = error.message;
+      }
+    }
+
     return NextResponse.json(
-      { 
-        error: 'Registration submission failed',
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
+      {
+        error: errorMessage,
+        message: errorDetails,
+        timestamp: new Date().toISOString(),
+        requestId: `req-${Date.now()}`
       },
       { status: 500 }
     );
