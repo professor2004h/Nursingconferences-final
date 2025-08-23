@@ -1,0 +1,100 @@
+# Optimized Multi-stage Docker build for High-Traffic Next.js Conference Website
+# Designed for horizontal scaling and resource efficiency
+
+FROM node:20-alpine AS base
+
+# Install security updates and required packages
+RUN apk update && apk upgrade && apk add --no-cache \
+    libc6-compat \
+    curl \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Set timezone
+RUN apk add --no-cache tzdata
+ENV TZ=UTC
+
+# Create app user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files
+COPY nextjs-frontend/package.json nextjs-frontend/package-lock.json* ./
+
+# Install dependencies with optimizations
+RUN npm ci --only=production --no-audit --no-fund && \
+    npm cache clean --force
+
+# Development dependencies for build
+FROM base AS build-deps
+WORKDIR /app
+COPY nextjs-frontend/package.json nextjs-frontend/package-lock.json* ./
+RUN npm ci --no-audit --no-fund
+
+# Build stage
+FROM base AS builder
+WORKDIR /app
+
+# Copy dependencies
+COPY --from=build-deps /app/node_modules ./node_modules
+
+# Copy source code
+COPY nextjs-frontend/ ./
+
+# Set build environment variables for optimization
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+# Build the application with optimizations
+RUN npm run build && \
+    npm prune --production
+
+# Verify build output
+RUN ls -la .next/ && ls -la .next/standalone/
+
+# Production runtime stage
+FROM base AS runner
+WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Performance optimizations
+ENV NODE_OPTIONS="--max-old-space-size=1024 --optimize-for-size"
+ENV UV_THREADPOOL_SIZE=16
+
+# Copy public assets
+COPY --from=builder /app/public ./public
+
+# Create .next directory with proper permissions
+RUN mkdir .next && chown nextjs:nodejs .next
+
+# Copy the standalone output with proper ownership
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy startup script
+COPY --chown=nextjs:nodejs scripts/start-optimized.sh ./start.sh
+RUN chmod +x start.sh
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Enhanced health check with better intervals for load balancing
+HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Use dumb-init for proper signal handling in containers
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["./start.sh"]

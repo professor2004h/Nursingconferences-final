@@ -1,0 +1,350 @@
+/* =============================================================================
+   COMPONENT SPECIFIC STYLES
+   ============================================================================= */
+
+/* Registration Form Styles */
+.registration-form {
+  @apply max-w-4xl mx-auto;
+}
+
+.registration-step {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
+}
+
+.step-indicator {
+  @apply flex items-center justify-between mb-8;
+}
+
+.step-indicator-item {
+  @apply flex items-center;
+}
+
+.step-indicator-circle {
+  @apply flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors;
+}
+
+.step-indicator-circle.active {
+  @apply bg-primary-100 text-primary-600 border-2 border-primary-600;
+}
+
+.step-indicator-circle.completed {
+  @apply bg-primary-600 text-white;
+}
+
+.step-indicator-circle.inactive {
+  @apply bg-gray-100 text-gray-400;
+}
+
+.step-indicator-line {
+  @apply w-16 h-1 mx-2 transition-colors;
+}
+
+.step-indicator-line.completed {
+  @apply bg-primary-600;
+}
+
+.step-indicator-line.inactive {
+  @apply bg-gray-200;
+}
+
+/* Payment Section Styles */
+.payment-section {
+  @apply max-w-2xl mx-auto;
+}
+
+.payment-summary {
+  @apply bg-gray-50 rounded-lg p-4 mb-6;
+}
+
+.payment-amount {
+  @apply text-2xl font-bold text-primary-600;
+}
+
+.payment-security-notice {
+  @apply flex items-center text-sm text-gray-600 mt-4;
+}
+
+/* PayPal Button Styles */
+.paypal-container {
+  @apply bg-white rounded-lg border border-gray-200 p-6;
+}
+
+.paypal-header {
+  @apply text-center mb-4;
+}
+
+.paypal-amount {
+  @apply text-2xl font-bold text-primary-600 mb-2;
+}
+
+.paypal-registration-id {
+  @apply text-sm text-gray-600;
+}
+
+.paypal-error {
+  @apply bg-error-50 border border-error-200 rounded-md p-3 mb-4;
+}
+
+.paypal-processing {
+  @apply bg-primary-50 border border-primary-200 rounded-md p-3 mb-4;
+}
+
+.paypal-success {
+  @apply bg-success-50 border border-success-200 rounded-lg p-6 text-center;
+}
+
+.paypal-footer {
+  @apply text-center mt-4;
+}
+
+.paypal-security-text {
+  @apply text-xs text-gray-500;
+}
+
+/* Confirmation Page Styles */
+.confirmation-page {
+  @apply max-w-3xl mx-auto;
+}
+
+.confirmation-header {
+  @apply bg-success-600 text-white px-6 py-8 text-center;
+}
+
+.confirmation-icon {
+  @apply flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-success-500 rounded-full;
+}
+
+.confirmation-title {
+  @apply text-2xl font-bold mb-2;
+}
+
+.confirmation-subtitle {
+  @apply text-success-100;
+}
+
+.confirmation-details {
+  @apply px-6 py-6;
+}
+
+.confirmation-section {
+  @apply rounded-lg p-4 mb-6;
+}
+
+.confirmation-section.registration {
+  @apply bg-gray-50;
+}
+
+.confirmation-section.payment {
+  @apply bg-gray-50;
+}
+
+.confirmation-section.attendee {
+  @apply bg-primary-50;
+}
+
+.confirmation-section.conference {
+  @apply bg-blue-50;
+}
+
+.confirmation-section.next-steps {
+  @apply bg-warning-50 border border-warning-200;
+}
+
+.confirmation-section-title {
+  @apply text-lg font-semibold text-gray-900 mb-3;
+}
+
+.confirmation-detail-row {
+  @apply flex justify-between text-sm;
+}
+
+.confirmation-detail-label {
+  @apply text-gray-600;
+}
+
+.confirmation-detail-value {
+  @apply font-medium;
+}
+
+.confirmation-actions {
+  @apply flex flex-col sm:flex-row gap-4 justify-center;
+}
+
+/* Error Boundary Styles */
+.error-boundary {
+  @apply bg-error-50 border border-error-200 rounded-lg p-6 text-center;
+}
+
+.error-boundary-icon {
+  @apply flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-error-100 rounded-full;
+}
+
+.error-boundary-title {
+  @apply text-lg font-medium text-error-900 mb-2;
+}
+
+.error-boundary-message {
+  @apply text-error-700 mb-4;
+}
+
+.error-boundary-list {
+  @apply text-sm text-error-600 mb-6 text-left max-w-md mx-auto;
+}
+
+.error-boundary-actions {
+  @apply space-y-3;
+}
+
+.error-boundary-details {
+  @apply mt-6 text-left;
+}
+
+.error-boundary-summary {
+  @apply cursor-pointer text-sm font-medium text-gray-700 mb-2;
+}
+
+.error-boundary-code {
+  @apply bg-gray-100 p-3 rounded text-xs font-mono text-gray-800 overflow-auto;
+}
+
+/* Loading Spinner Styles */
+.loading-container {
+  @apply flex justify-center items-center py-12;
+}
+
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-300;
+}
+
+.loading-spinner.sm {
+  @apply h-4 w-4;
+}
+
+.loading-spinner.md {
+  @apply h-8 w-8;
+}
+
+.loading-spinner.lg {
+  @apply h-12 w-12;
+}
+
+.loading-spinner.primary {
+  @apply border-t-primary-600;
+}
+
+.loading-spinner.secondary {
+  @apply border-t-secondary-600;
+}
+
+.loading-spinner.white {
+  @apply border-t-white;
+}
+
+.loading-text {
+  @apply mt-2 text-sm;
+}
+
+/* Form Grid Styles */
+.form-grid {
+  @apply grid grid-cols-1 gap-6;
+}
+
+.form-grid.two-column {
+  @apply md:grid-cols-2;
+}
+
+.form-grid.three-column {
+  @apply md:grid-cols-3;
+}
+
+.form-grid-full {
+  @apply md:col-span-2;
+}
+
+.form-grid-full.three-column {
+  @apply md:col-span-3;
+}
+
+/* Navigation Styles */
+.navigation-buttons {
+  @apply flex justify-between pt-6;
+}
+
+.navigation-button {
+  @apply px-6 py-2 text-sm font-medium rounded-md transition-colors;
+}
+
+.navigation-button.previous {
+  @apply border border-gray-300 text-gray-700 hover:bg-gray-50;
+}
+
+.navigation-button.next {
+  @apply bg-primary-600 text-white hover:bg-primary-700;
+}
+
+.navigation-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .registration-form {
+    @apply px-4;
+  }
+  
+  .registration-step {
+    @apply p-4;
+  }
+  
+  .step-indicator {
+    @apply flex-col space-y-4;
+  }
+  
+  .step-indicator-line {
+    @apply w-1 h-8 mx-0;
+  }
+  
+  .form-grid.two-column,
+  .form-grid.three-column {
+    @apply grid-cols-1;
+  }
+  
+  .navigation-buttons {
+    @apply flex-col space-y-3;
+  }
+  
+  .confirmation-actions {
+    @apply flex-col;
+  }
+  
+  .paypal-container {
+    @apply p-4;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .registration-form,
+  .payment-section,
+  .confirmation-page {
+    @apply shadow-none border-none;
+  }
+  
+  .navigation-buttons,
+  .paypal-container,
+  .error-boundary {
+    @apply hidden;
+  }
+  
+  .confirmation-page {
+    @apply text-black bg-white;
+  }
+  
+  .confirmation-header {
+    @apply bg-white text-black border-b-2 border-black;
+  }
+  
+  .confirmation-section {
+    @apply border border-gray-400 mb-4;
+  }
+}

@@ -1,0 +1,92 @@
+# Optimized Dockerfile for Sanity Backend (CMS)
+# Designed for high-traffic conference registration system
+
+FROM node:20-alpine AS base
+
+# Install security updates and required packages
+RUN apk update && apk upgrade && apk add --no-cache \
+    libc6-compat \
+    curl \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Set timezone
+RUN apk add --no-cache tzdata
+ENV TZ=UTC
+
+# Create app user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 sanity
+
+# Install dependencies
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies with optimizations
+RUN npm ci --only=production --no-audit --no-fund && \
+    npm cache clean --force
+
+# Build dependencies
+FROM base AS build-deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit --no-fund
+
+# Build stage
+FROM base AS builder
+WORKDIR /app
+
+# Copy dependencies
+COPY --from=build-deps /app/node_modules ./node_modules
+
+# Copy source code
+COPY . ./
+
+# Set build environment
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+
+# Build Sanity Studio
+RUN npm run build && \
+    npm prune --production
+
+# Production runtime stage
+FROM base AS runner
+WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
+ENV PORT=3333
+ENV HOSTNAME="0.0.0.0"
+
+# Performance optimizations
+ENV NODE_OPTIONS="--max-old-space-size=512 --optimize-for-size"
+
+# Copy built application
+COPY --from=builder --chown=sanity:nodejs /app/dist ./dist
+COPY --from=builder --chown=sanity:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=sanity:nodejs /app/package.json ./package.json
+
+# Copy server files
+COPY --chown=sanity:nodejs serve.js ./
+COPY --chown=sanity:nodejs express-server.js ./
+
+# Create health check endpoint script
+COPY --chown=sanity:nodejs scripts/sanity-health.js ./health.js
+
+# Switch to non-root user
+USER sanity
+
+# Expose port
+EXPOSE 3333
+
+# Health check for Sanity Studio
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3333/api/health || curl -f http://localhost:3333/ || exit 1
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "serve.js"]

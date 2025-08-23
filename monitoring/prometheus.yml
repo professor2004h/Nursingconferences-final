@@ -1,0 +1,76 @@
+# Prometheus configuration for Conference Registration System
+# Monitors application metrics for auto-scaling decisions
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'conference-monitor'
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "alert_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # NGINX metrics (if nginx-prometheus-exporter is used)
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:9113']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  # Node.js application metrics
+  - job_name: 'conference-app'
+    static_configs:
+      - targets: 
+          - 'app-1:3000'
+          - 'app-2:3000'
+          - 'app-3:3000'
+    scrape_interval: 10s
+    metrics_path: /api/metrics
+    scrape_timeout: 5s
+
+  # Redis metrics (if redis_exporter is used)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 15s
+
+  # Sanity backend metrics
+  - job_name: 'sanity-backend'
+    static_configs:
+      - targets: ['sanity-backend:3333']
+    scrape_interval: 30s
+    metrics_path: /api/health
+
+  # Auto-scaler metrics
+  - job_name: 'autoscaler'
+    static_configs:
+      - targets: ['autoscaler:3001']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Docker container metrics (if cAdvisor is used)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 7d
+    retention.size: 1GB
