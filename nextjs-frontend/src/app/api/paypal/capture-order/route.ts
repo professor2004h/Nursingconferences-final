@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sendPaymentReceiptEmail } from '@/app/services/emailService';
 
 /**
  * PayPal Capture Order API Route - Production Version
@@ -132,6 +133,30 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if database update fails
     }
 
+    // Send payment receipt email (non-blocking)
+    setImmediate(async () => {
+      try {
+        console.log('📧 Initiating payment receipt email for registration:', registrationId);
+        await sendPaymentReceiptEmail(registrationId, {
+          transactionId,
+          orderId,
+          amount: amount || '0',
+          currency: currency || 'USD',
+          capturedAt: new Date().toISOString(),
+          paymentMethod: 'PayPal'
+        });
+        console.log('✅ Payment receipt email process completed for:', registrationId);
+      } catch (emailError) {
+        console.error('⚠️ Failed to send payment receipt email (non-blocking):', {
+          error: emailError instanceof Error ? emailError.message : 'Unknown error',
+          registrationId,
+          transactionId,
+          timestamp: new Date().toISOString()
+        });
+        // Email failure doesn't affect payment success
+      }
+    });
+
     return NextResponse.json({
       success: true,
       orderId,
@@ -149,6 +174,68 @@ export async function POST(request: NextRequest) {
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Send payment receipt email to user
+ */
+async function sendPaymentReceiptEmail(registrationId: string, paymentData: any) {
+  try {
+    console.log('📧 Preparing to send payment receipt email for registration:', registrationId);
+
+    // Import email service
+    const { sendPaymentReceiptEmail: sendEmail } = await import('@/app/services/emailService');
+
+    // Fetch registration details from Sanity
+    const { client } = await import('@/app/sanity/client');
+    const registrationDetails = await client.fetch(
+      `*[_type == "conferenceRegistration" && registrationId == $registrationId][0]{
+        _id,
+        registrationId,
+        personalDetails,
+        selectedRegistrationName,
+        sponsorType,
+        accommodationType,
+        accommodationNights,
+        numberOfParticipants,
+        pricing
+      }`,
+      { registrationId }
+    );
+
+    if (!registrationDetails) {
+      console.error('❌ Registration not found for email sending:', registrationId);
+      throw new Error(`Registration not found: ${registrationId}`);
+    }
+
+    if (!registrationDetails.personalDetails?.email) {
+      console.error('❌ No email address found in registration:', registrationId);
+      throw new Error(`No email address found for registration: ${registrationId}`);
+    }
+
+    // Prepare email data
+    const emailData = {
+      registrationData: registrationDetails,
+      paymentData: paymentData,
+      recipientEmail: registrationDetails.personalDetails.email
+    };
+
+    console.log('📧 Sending payment receipt email to:', registrationDetails.personalDetails.email);
+
+    // Send email
+    const success = await sendEmail(emailData);
+
+    if (success) {
+      console.log('✅ Payment receipt email sent successfully');
+    } else {
+      console.error('❌ Failed to send payment receipt email');
+      throw new Error('Email sending failed');
+    }
+
+  } catch (error) {
+    console.error('❌ Error sending payment receipt email:', error);
+    throw error;
   }
 }
 
