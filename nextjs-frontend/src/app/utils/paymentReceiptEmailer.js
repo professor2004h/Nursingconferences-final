@@ -41,6 +41,15 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_TOKEN, // For authenticated requests
 });
 
+// Sanity write client for uploading PDFs
+const sanityWriteClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'n3no08m3',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2023-05-03',
+  useCdn: false,
+  token: process.env.SANITY_API_TOKEN, // Required for uploads
+});
+
 /**
  * Generate PDF receipt with navy blue branding and gradient background
  */
@@ -188,7 +197,7 @@ async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
     ['Country:', registrationData.country || 'N/A'],
     ['Address:', registrationData.address || 'N/A'],
     ['Registration Type:', registrationData.registrationType || 'Regular Registration'],
-    ['Participants:', registrationData.numberOfParticipants || '1']
+    ['Participants:', String(registrationData.numberOfParticipants || 1)]
   ];
 
   registrationDetails.forEach(([label, value]) => {
@@ -222,6 +231,87 @@ async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
   // Convert to buffer
   const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
   return pdfBuffer;
+}
+
+/**
+ * Upload PDF buffer to Sanity CMS as an asset
+ */
+async function uploadPDFToSanity(pdfBuffer, filename) {
+  try {
+    console.log(`📤 Uploading PDF to Sanity: ${filename}`);
+
+    if (!process.env.SANITY_API_TOKEN) {
+      console.warn('⚠️  SANITY_API_TOKEN not found, cannot upload PDF');
+      return null;
+    }
+
+    // Upload the PDF as an asset
+    const asset = await sanityWriteClient.assets.upload('file', pdfBuffer, {
+      filename: filename,
+      contentType: 'application/pdf'
+    });
+
+    console.log(`✅ PDF uploaded to Sanity successfully: ${asset._id}`);
+    return asset;
+
+  } catch (error) {
+    console.error('❌ Failed to upload PDF to Sanity:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Update registration record with PDF receipt asset
+ */
+async function updateRegistrationWithPDF(registrationId, pdfAsset) {
+  try {
+    console.log(`🔄 Updating registration ${registrationId} with PDF asset...`);
+
+    if (!pdfAsset || !process.env.SANITY_API_TOKEN) {
+      console.warn('⚠️  Cannot update registration: missing PDF asset or API token');
+      return false;
+    }
+
+    // Find the registration document
+    const registration = await sanityWriteClient.fetch(
+      `*[_type == "conferenceRegistration" && (_id == $id || registrationId == $regId)][0]`,
+      { id: registrationId, regId: registrationId }
+    );
+
+    if (!registration) {
+      console.warn(`⚠️  Registration not found: ${registrationId}`);
+      return false;
+    }
+
+    // Update the registration with PDF asset
+    const updateData = {
+      pdfReceipt: {
+        _type: 'file',
+        asset: {
+          _type: 'reference',
+          _ref: pdfAsset._id
+        }
+      },
+      // Also update the registrationTable data
+      'registrationTable.pdfReceiptFile': {
+        _type: 'file',
+        asset: {
+          _type: 'reference',
+          _ref: pdfAsset._id
+        }
+      },
+      lastUpdated: new Date().toISOString()
+    };
+
+    await sanityWriteClient.patch(registration._id).set(updateData).commit();
+
+    console.log(`✅ Registration updated with PDF asset: ${registration._id}`);
+    return true;
+
+  } catch (error) {
+    console.error('❌ Failed to update registration with PDF:', error.message);
+    return false;
+  }
 }
 
 /**
@@ -466,7 +556,7 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Number of Participants:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.numberOfParticipants || '1'}</td>
+                  <td style="padding: 6px 0; color: #333;">${String(registrationData.numberOfParticipants || 1)}</td>
                 </tr>
               </table>
             </div>
@@ -526,7 +616,7 @@ Phone: ${registrationData.phone || 'N/A'}
 Country: ${registrationData.country || 'N/A'}
 Address: ${registrationData.address || 'N/A'}
 Registration Type: ${registrationData.registrationType || 'Regular Registration'}
-Number of Participants: ${registrationData.numberOfParticipants || '1'}
+Number of Participants: ${String(registrationData.numberOfParticipants || 1)}
 
 PAYMENT SUMMARY:
 Registration Fee: ${paymentData.currency || 'USD'} ${paymentData.amount || '0.00'}
@@ -548,14 +638,35 @@ Generated on: ${new Date().toLocaleString()}
     };
 
     const result = await transporter.sendMail(mailOptions);
-    
+
+    // Upload PDF to Sanity CMS after successful email sending
+    let pdfUploaded = false;
+    let pdfAssetId = null;
+
+    if (pdfBuffer && registrationData._id) {
+      const filename = `receipt_${registrationData.registrationId || 'unknown'}_${Date.now()}.pdf`;
+      const pdfAsset = await uploadPDFToSanity(pdfBuffer, filename);
+
+      if (pdfAsset) {
+        const updateSuccess = await updateRegistrationWithPDF(registrationData._id, pdfAsset);
+        pdfUploaded = updateSuccess;
+        pdfAssetId = pdfAsset._id;
+
+        if (updateSuccess) {
+          console.log(`✅ PDF receipt stored in Sanity for registration: ${registrationData._id}`);
+        }
+      }
+    }
+
     return {
       success: true,
       messageId: result.messageId,
       logoUsed: !!footerLogo,
       logoUrl: footerLogo?.url || null,
       pdfGenerated: !!pdfBuffer,
-      pdfSize: pdfBuffer ? pdfBuffer.length : 0
+      pdfSize: pdfBuffer ? pdfBuffer.length : 0,
+      pdfUploaded: pdfUploaded,
+      pdfAssetId: pdfAssetId
     };
 
   } catch (error) {
@@ -724,7 +835,7 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Number of Participants:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.numberOfParticipants || '1'}</td>
+                  <td style="padding: 6px 0; color: #333;">${String(registrationData.numberOfParticipants || 1)}</td>
                 </tr>
               </table>
             </div>
@@ -767,7 +878,7 @@ Phone: ${registrationData.phone || 'N/A'}
 Country: ${registrationData.country || 'N/A'}
 Address: ${registrationData.address || 'N/A'}
 Registration Type: ${registrationData.registrationType || 'Regular Registration'}
-Number of Participants: ${registrationData.numberOfParticipants || '1'}
+Number of Participants: ${String(registrationData.numberOfParticipants || 1)}
 
 CONTACT INFORMATION:
 Email: ${emailConfig.fromEmail}
@@ -786,6 +897,25 @@ Generated on: ${new Date().toLocaleString()}
 
     const result = await transporter.sendMail(mailOptions);
 
+    // Upload PDF to Sanity CMS after successful email sending
+    let pdfUploaded = false;
+    let pdfAssetId = null;
+
+    if (pdfBuffer && registrationData._id) {
+      const filename = `receipt_${registrationData.registrationId || 'unknown'}_${Date.now()}.pdf`;
+      const pdfAsset = await uploadPDFToSanity(pdfBuffer, filename);
+
+      if (pdfAsset) {
+        const updateSuccess = await updateRegistrationWithPDF(registrationData._id, pdfAsset);
+        pdfUploaded = updateSuccess;
+        pdfAssetId = pdfAsset._id;
+
+        if (updateSuccess) {
+          console.log(`✅ PDF receipt stored in Sanity for registration: ${registrationData._id}`);
+        }
+      }
+    }
+
     return {
       success: true,
       messageId: result.messageId,
@@ -793,6 +923,8 @@ Generated on: ${new Date().toLocaleString()}
       logoUrl: footerLogo?.url || null,
       pdfGenerated: !!pdfBuffer,
       pdfSize: pdfBuffer ? pdfBuffer.length : 0,
+      pdfUploaded: pdfUploaded,
+      pdfAssetId: pdfAssetId,
       emailConfig: {
         host: emailConfig.host,
         fromEmail: emailConfig.fromEmail

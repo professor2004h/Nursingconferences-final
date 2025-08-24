@@ -107,22 +107,9 @@ export const conferenceRegistration = defineType({
       ],
     }),
 
-    // Registration Selection (for regular registrations)
-    defineField({
-      name: 'selectedRegistration',
-      title: 'Selected Registration',
-      type: 'string',
-      description: 'Selected registration type ID and period (e.g., typeId-periodId)',
-      hidden: ({ document }) => document?.registrationType === 'sponsorship',
-    }),
-
-    defineField({
-      name: 'selectedRegistrationName',
-      title: 'Registration Type Name',
-      type: 'string',
-      description: 'Display name of the selected registration type',
-      hidden: ({ document }) => document?.registrationType === 'sponsorship',
-    }),
+    // Removed unnecessary fields:
+    // - selectedRegistration (removed as requested)
+    // - selectedRegistrationName (removed as requested)
 
     // Sponsorship Selection (for sponsorship registrations)
     defineField({
@@ -192,7 +179,20 @@ export const conferenceRegistration = defineType({
           name: 'currency',
           title: 'Currency',
           type: 'string',
+          options: {
+            list: [
+              { title: 'US Dollar (USD)', value: 'USD' },
+              { title: 'Euro (EUR)', value: 'EUR' },
+              { title: 'Indian Rupee (INR)', value: 'INR' },
+              { title: 'British Pound (GBP)', value: 'GBP' },
+              { title: 'Canadian Dollar (CAD)', value: 'CAD' },
+              { title: 'Australian Dollar (AUD)', value: 'AUD' },
+              { title: 'Japanese Yen (JPY)', value: 'JPY' },
+            ],
+          },
           initialValue: 'USD',
+          validation: Rule => Rule.required(),
+          description: 'Currency used for payment processing',
         },
         {
           name: 'pricingPeriod',
@@ -220,24 +220,38 @@ export const conferenceRegistration = defineType({
     }),
 
     defineField({
-      name: 'paymentId',
-      title: 'Payment ID',
+      name: 'paypalTransactionId',
+      title: 'PayPal Transaction ID',
       type: 'string',
-      description: 'Payment gateway transaction ID',
+      description: 'PayPal transaction ID from successful payment capture',
+      validation: Rule => Rule.custom((value, context) => {
+        const paymentStatus = context.document?.paymentStatus;
+        if (paymentStatus === 'completed' && !value) {
+          return 'PayPal Transaction ID is required for completed payments';
+        }
+        return true;
+      }),
     }),
 
     defineField({
-      name: 'razorpayOrderId',
-      title: 'Razorpay Order ID',
+      name: 'paypalOrderId',
+      title: 'PayPal Order ID',
       type: 'string',
-      description: 'Razorpay order identifier',
+      description: 'PayPal order identifier from payment processing',
     }),
 
     defineField({
       name: 'paymentMethod',
       title: 'Payment Method',
       type: 'string',
-      description: 'Method used for payment (razorpay, test_payment, etc.)',
+      options: {
+        list: [
+          { title: 'PayPal', value: 'paypal' },
+          { title: 'Test Payment', value: 'test_payment' },
+        ],
+      },
+      initialValue: 'paypal',
+      description: 'Payment method used for transaction',
     }),
 
     defineField({
@@ -284,6 +298,108 @@ export const conferenceRegistration = defineType({
       type: 'boolean',
       description: 'Is this registration active?',
       initialValue: true,
+    }),
+
+    // PDF Receipt Storage
+    defineField({
+      name: 'pdfReceipt',
+      title: 'PDF Receipt',
+      type: 'file',
+      options: {
+        accept: '.pdf',
+      },
+      description: 'Generated PDF receipt for this registration',
+    }),
+
+    // Registration Management Table Data
+    defineField({
+      name: 'registrationTable',
+      title: 'Registration Table Data',
+      type: 'object',
+      description: 'Structured data for registration management table view',
+      fields: [
+        {
+          name: 'paypalTransactionId',
+          title: 'PayPal Transaction ID',
+          type: 'string',
+          description: 'PayPal transaction identifier',
+        },
+        {
+          name: 'registrationType',
+          title: 'Registration Type',
+          type: 'string',
+          description: 'Type of registration',
+        },
+        {
+          name: 'participantName',
+          title: 'Participant Name',
+          type: 'string',
+          description: 'Full name of the participant',
+        },
+        {
+          name: 'phoneNumber',
+          title: 'Phone Number',
+          type: 'string',
+          description: 'Contact phone number',
+        },
+        {
+          name: 'emailAddress',
+          title: 'Email Address',
+          type: 'email',
+          description: 'Contact email address',
+        },
+        {
+          name: 'paymentAmount',
+          title: 'Payment Amount',
+          type: 'number',
+          description: 'Total payment amount',
+        },
+        {
+          name: 'currency',
+          title: 'Currency',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'USD', value: 'USD' },
+              { title: 'EUR', value: 'EUR' },
+              { title: 'INR', value: 'INR' },
+              { title: 'GBP', value: 'GBP' },
+              { title: 'CAD', value: 'CAD' },
+              { title: 'AUD', value: 'AUD' },
+              { title: 'JPY', value: 'JPY' },
+            ],
+          },
+          description: 'Payment currency',
+        },
+        {
+          name: 'paymentStatus',
+          title: 'Payment Status',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Pending', value: 'pending' },
+              { title: 'Successful', value: 'successful' },
+              { title: 'Failed', value: 'failed' },
+            ],
+          },
+          description: 'Current payment status',
+        },
+        {
+          name: 'registrationDate',
+          title: 'Registration Date',
+          type: 'datetime',
+          description: 'Date and time of registration',
+        },
+        {
+          name: 'pdfReceiptFile',
+          title: 'PDF Receipt File',
+          type: 'file',
+          options: {
+            accept: '.pdf',
+          },
+          description: 'PDF receipt file for download',
+        },
+      ],
     }),
   ],
 

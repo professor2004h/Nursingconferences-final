@@ -1,18 +1,90 @@
 import React from 'react'
-import { Card, Stack, Text, Flex, Button, Container, Badge } from '@sanity/ui'
+import { Card, Stack, Text, Flex, Button, Container, Badge, TextInput, Select, Grid, Box } from '@sanity/ui'
+import { SearchIcon, DownloadIcon, FilterIcon, DocumentPdfIcon } from '@sanity/icons'
 import { useClient } from 'sanity'
 import './RegistrationTableView.css'
 
-// Theme-aware table view component for registrations
+// Enhanced registration management table with filtering, sorting, and PDF downloads
 export default function RegistrationTableView() {
   const [registrations, setRegistrations] = React.useState([])
+  const [filteredRegistrations, setFilteredRegistrations] = React.useState([])
   const [loading, setLoading] = React.useState(true)
-  const [filter, setFilter] = React.useState('all') // all, pending, completed, failed
-  const client = useClient({ apiVersion: '2023-01-01' })
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [statusFilter, setStatusFilter] = React.useState('all')
+  const [typeFilter, setTypeFilter] = React.useState('all')
+  const [dateRange, setDateRange] = React.useState({ start: '', end: '' })
+  const [sortField, setSortField] = React.useState('registrationDate')
+  const [sortDirection, setSortDirection] = React.useState('desc')
+  const client = useClient({ apiVersion: '2023-05-03' })
 
   React.useEffect(() => {
     fetchRegistrations()
   }, [])
+
+  // Filter and search functionality
+  React.useEffect(() => {
+    let filtered = [...registrations]
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(reg => {
+        const searchText = [
+          reg.personalDetails?.firstName,
+          reg.personalDetails?.lastName,
+          reg.personalDetails?.email,
+          reg.personalDetails?.phoneNumber,
+          reg.paypalTransactionId,
+          reg.registrationId
+        ].join(' ').toLowerCase()
+        return searchText.includes(searchTerm.toLowerCase())
+      })
+    }
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(reg => {
+        if (statusFilter === 'successful') return reg.paymentStatus === 'completed'
+        return reg.paymentStatus === statusFilter
+      })
+    }
+
+    // Type filter
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter(reg => reg.registrationType === typeFilter)
+    }
+
+    // Date range filter
+    if (dateRange.start || dateRange.end) {
+      filtered = filtered.filter(reg => {
+        const regDate = new Date(reg.registrationDate)
+        const startDate = dateRange.start ? new Date(dateRange.start) : null
+        const endDate = dateRange.end ? new Date(dateRange.end) : null
+
+        if (startDate && regDate < startDate) return false
+        if (endDate && regDate > endDate) return false
+        return true
+      })
+    }
+
+    // Sorting
+    filtered.sort((a, b) => {
+      let aValue = a[sortField]
+      let bValue = b[sortField]
+
+      if (sortField.includes('.')) {
+        const keys = sortField.split('.')
+        aValue = keys.reduce((obj, key) => obj?.[key], a)
+        bValue = keys.reduce((obj, key) => obj?.[key], b)
+      }
+
+      if (sortDirection === 'desc') {
+        return bValue > aValue ? 1 : -1
+      }
+      return aValue > bValue ? 1 : -1
+    })
+
+    setFilteredRegistrations(filtered)
+  }, [registrations, searchTerm, statusFilter, typeFilter, dateRange, sortField, sortDirection])
 
   const fetchRegistrations = async () => {
     try {
@@ -30,15 +102,7 @@ export default function RegistrationTableView() {
           country,
           fullPostalAddress
         },
-        selectedRegistration,
-        selectedRegistrationName,
         sponsorType,
-        accommodationDetails {
-          accommodationType,
-          accommodationNights
-        },
-        accommodationType,
-        accommodationNights,
         numberOfParticipants,
         pricing {
           registrationFee,
@@ -48,12 +112,41 @@ export default function RegistrationTableView() {
           pricingPeriod
         },
         paymentStatus,
-        paymentId,
-        registrationDate
+        paypalTransactionId,
+        paypalOrderId,
+        paymentMethod,
+        paymentDate,
+        registrationDate,
+        pdfReceipt {
+          asset-> {
+            _id,
+            url,
+            originalFilename
+          }
+        },
+        registrationTable {
+          paypalTransactionId,
+          registrationType,
+          participantName,
+          phoneNumber,
+          emailAddress,
+          paymentAmount,
+          currency,
+          paymentStatus,
+          registrationDate,
+          pdfReceiptFile {
+            asset-> {
+              _id,
+              url,
+              originalFilename
+            }
+          }
+        }
       }`
 
       const result = await client.fetch(query)
       setRegistrations(result)
+      setFilteredRegistrations(result)
     } catch (err) {
       console.error('Error fetching registrations:', err)
     } finally {
@@ -62,45 +155,37 @@ export default function RegistrationTableView() {
   }
 
   const exportCSV = () => {
-    const filteredData = getFilteredRegistrations()
-    
-    if (filteredData.length === 0) {
+    if (filteredRegistrations.length === 0) {
       alert('No data to export')
       return
     }
 
     const headers = [
-      'Registration ID',
-      'Name',
-      'Email',
-      'Phone',
-      'Country',
+      'PayPal Transaction ID',
       'Registration Type',
-      'Total Price',
+      'Participant Name',
+      'Phone Number',
+      'Email Address',
+      'Payment Amount',
       'Currency',
       'Payment Status',
-      'Participants',
       'Registration Date',
-      'Accommodation',
-      'Pricing Period'
+      'PDF Receipt Available'
     ]
 
     const csvContent = [
       headers.join(','),
-      ...filteredData.map(reg => [
-        reg.registrationId || '',
+      ...filteredRegistrations.map(reg => [
+        reg.paypalTransactionId || 'N/A',
+        reg.registrationType || 'N/A',
         `"${getFullName(reg)}"`,
-        reg.personalDetails?.email || '',
-        reg.personalDetails?.phoneNumber || '',
-        reg.personalDetails?.country || '',
-        getRegistrationTypeName(reg),
+        reg.personalDetails?.phoneNumber || 'N/A',
+        reg.personalDetails?.email || 'N/A',
         reg.pricing?.totalPrice || 0,
         reg.pricing?.currency || 'USD',
-        reg.paymentStatus || 'pending',
-        reg.numberOfParticipants || 1,
-        reg.registrationDate ? new Date(reg.registrationDate).toLocaleDateString() : '',
-        getAccommodationInfo(reg),
-        reg.pricing?.pricingPeriod || ''
+        reg.paymentStatus === 'completed' ? 'Successful' : (reg.paymentStatus || 'Pending'),
+        reg.registrationDate ? new Date(reg.registrationDate).toLocaleDateString() : 'N/A',
+        (reg.pdfReceipt?.asset?.url || reg.registrationTable?.pdfReceiptFile?.asset?.url) ? 'Yes' : 'No'
       ].join(','))
     ].join('\n')
 
@@ -108,11 +193,41 @@ export default function RegistrationTableView() {
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `registrations_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `registration_table_${new Date().toISOString().split('T')[0]}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const downloadPDF = (registration) => {
+    const pdfUrl = registration.pdfReceipt?.asset?.url || registration.registrationTable?.pdfReceiptFile?.asset?.url
+    if (pdfUrl) {
+      const link = document.createElement('a')
+      link.href = pdfUrl
+      link.download = `receipt_${registration.paypalTransactionId || registration.registrationId}.pdf`
+      link.click()
+    } else {
+      alert('PDF receipt not available for this registration')
+    }
+  }
+
+  const downloadAllPDFs = async () => {
+    const registrationsWithPDF = filteredRegistrations.filter(reg =>
+      reg.pdfReceipt?.asset?.url || reg.registrationTable?.pdfReceiptFile?.asset?.url
+    )
+
+    if (registrationsWithPDF.length === 0) {
+      alert('No PDF receipts available for download')
+      return
+    }
+
+    // Download each PDF with a small delay to avoid overwhelming the browser
+    for (let i = 0; i < registrationsWithPDF.length; i++) {
+      setTimeout(() => {
+        downloadPDF(registrationsWithPDF[i])
+      }, i * 500) // 500ms delay between downloads
+    }
   }
 
   const getFullName = (registration) => {
@@ -333,21 +448,25 @@ export default function RegistrationTableView() {
   const getStatusBadge = (status) => {
     const statusConfig = {
       pending: { tone: 'caution', text: '⏳ Pending' },
-      completed: { tone: 'positive', text: '✅ Completed' },
+      completed: { tone: 'positive', text: '✅ Successful' },
       failed: { tone: 'critical', text: '❌ Failed' },
       refunded: { tone: 'default', text: '🔄 Refunded' }
     }
-    
+
     const config = statusConfig[status] || { tone: 'default', text: '❓ Unknown' }
     return React.createElement(Badge, { tone: config.tone }, config.text)
   }
 
-  const getFilteredRegistrations = () => {
-    if (filter === 'all') return registrations
-    return registrations.filter(reg => reg.paymentStatus === filter)
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
   }
 
-  const filteredRegistrations = getFilteredRegistrations()
+  // Remove old filtering logic as it's now handled in useEffect
 
   if (loading) {
     return React.createElement(Container, { width: 5 },
@@ -361,115 +480,176 @@ export default function RegistrationTableView() {
     React.createElement(Container, { width: 5 },
       React.createElement(Card, { padding: 4 },
         React.createElement(Stack, { space: 4 },
-          // Header with filters
-          React.createElement(Flex, { align: 'center', justify: 'space-between' },
-            React.createElement(Stack, { space: 2 },
-              React.createElement(Text, { size: 4, weight: 'bold' },
-                `📝 Conference Registrations (${filteredRegistrations.length})`
-              ),
-              React.createElement(Flex, { gap: 2 },
-                ['all', 'pending', 'completed', 'failed'].map(status =>
-                  React.createElement(Button, {
-                    key: status,
-                    text: status.charAt(0).toUpperCase() + status.slice(1),
-                    onClick: () => setFilter(status),
-                    mode: filter === status ? 'default' : 'ghost',
-                    tone: filter === status ? 'primary' : 'default'
-                  })
-                )
-              )
+          // Header
+          React.createElement(Text, { size: 4, weight: 'bold' },
+            `📊 Registration Management Table (${filteredRegistrations.length})`
+          ),
+
+          // Filters and Search
+          React.createElement(Grid, { columns: [1, 2, 3], gap: 3 },
+            React.createElement(TextInput, {
+              icon: SearchIcon,
+              placeholder: 'Search by name, email, transaction ID...',
+              value: searchTerm,
+              onChange: (event) => setSearchTerm(event.currentTarget.value)
+            }),
+            React.createElement(Select, {
+              value: statusFilter,
+              onChange: (event) => setStatusFilter(event.currentTarget.value)
+            },
+              React.createElement('option', { value: 'all' }, 'All Status'),
+              React.createElement('option', { value: 'pending' }, 'Pending'),
+              React.createElement('option', { value: 'successful' }, 'Successful'),
+              React.createElement('option', { value: 'failed' }, 'Failed')
             ),
-            React.createElement(Flex, { gap: 2 },
-              React.createElement(Button, {
-                text: 'Refresh',
-                onClick: fetchRegistrations,
-                mode: 'ghost'
-              }),
-              React.createElement(Button, {
-                text: 'Export CSV',
-                onClick: exportCSV,
-                tone: 'primary',
-                disabled: filteredRegistrations.length === 0
-              })
+            React.createElement(Select, {
+              value: typeFilter,
+              onChange: (event) => setTypeFilter(event.currentTarget.value)
+            },
+              React.createElement('option', { value: 'all' }, 'All Types'),
+              React.createElement('option', { value: 'regular' }, 'Regular'),
+              React.createElement('option', { value: 'sponsorship' }, 'Sponsorship')
             )
           ),
+
+          // Date Range Filter
+          React.createElement(Flex, { gap: 2, align: 'center' },
+            React.createElement(Text, { size: 1 }, 'Date Range:'),
+            React.createElement('input', {
+              type: 'date',
+              value: dateRange.start,
+              onChange: (e) => setDateRange(prev => ({ ...prev, start: e.target.value })),
+              style: { padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }
+            }),
+            React.createElement(Text, { size: 1 }, 'to'),
+            React.createElement('input', {
+              type: 'date',
+              value: dateRange.end,
+              onChange: (e) => setDateRange(prev => ({ ...prev, end: e.target.value })),
+              style: { padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }
+            }),
+            React.createElement(Button, {
+              text: 'Clear',
+              mode: 'ghost',
+              onClick: () => setDateRange({ start: '', end: '' })
+            })
+          ),
+
+          // Action Buttons
+          React.createElement(Flex, { gap: 2, justify: 'flex-end' },
+            React.createElement(Button, {
+              text: 'Refresh',
+              onClick: fetchRegistrations,
+              mode: 'ghost'
+            }),
+            React.createElement(Button, {
+              text: 'Export CSV',
+              icon: DownloadIcon,
+              onClick: exportCSV,
+              tone: 'primary',
+              disabled: filteredRegistrations.length === 0
+            }),
+            React.createElement(Button, {
+              text: 'Download All PDFs',
+              icon: DocumentPdfIcon,
+              onClick: downloadAllPDFs,
+              tone: 'positive',
+              disabled: filteredRegistrations.filter(reg =>
+                reg.pdfReceipt?.asset?.url || reg.registrationTable?.pdfReceiptFile?.asset?.url
+              ).length === 0
+            })
+          ),
           
-          // Table
+          // Registration Management Table
           filteredRegistrations.length === 0
             ? React.createElement(Card, { padding: 4, tone: 'transparent' },
                 React.createElement(Text, { align: 'center', muted: true },
-                  filter === 'all' ? 'No registrations yet' : `No ${filter} registrations`
+                  'No registrations found matching the current filters'
                 )
               )
             : React.createElement('div', { className: 'registration-table-wrapper' },
                 React.createElement('table', { className: 'registration-table' },
                   React.createElement('thead', null,
                     React.createElement('tr', null,
-                      React.createElement('th', null, 'ID'),
-                      React.createElement('th', null, 'Name'),
-                      React.createElement('th', null, 'Email'),
-                      React.createElement('th', null, 'Phone'),
-                      React.createElement('th', null, 'Country'),
-                      React.createElement('th', null, 'Address'),
-                      React.createElement('th', null, 'Type'),
-                      React.createElement('th', null, 'Accommodation'),
-                      React.createElement('th', null, 'Reg. Price'),
-                      React.createElement('th', null, 'Acc. Price'),
-                      React.createElement('th', null, 'Total'),
-                      React.createElement('th', null, 'Status'),
-                      React.createElement('th', null, 'Participants'),
-                      React.createElement('th', null, 'Date')
+                      React.createElement('th', {
+                        onClick: () => handleSort('paypalTransactionId'),
+                        style: { cursor: 'pointer' }
+                      }, 'PayPal Transaction ID'),
+                      React.createElement('th', {
+                        onClick: () => handleSort('registrationType'),
+                        style: { cursor: 'pointer' }
+                      }, 'Registration Type'),
+                      React.createElement('th', {
+                        onClick: () => handleSort('personalDetails.firstName'),
+                        style: { cursor: 'pointer' }
+                      }, 'Participant Name'),
+                      React.createElement('th', null, 'Phone Number'),
+                      React.createElement('th', {
+                        onClick: () => handleSort('personalDetails.email'),
+                        style: { cursor: 'pointer' }
+                      }, 'Email Address'),
+                      React.createElement('th', {
+                        onClick: () => handleSort('pricing.totalPrice'),
+                        style: { cursor: 'pointer' }
+                      }, 'Payment Amount'),
+                      React.createElement('th', null, 'Currency'),
+                      React.createElement('th', {
+                        onClick: () => handleSort('paymentStatus'),
+                        style: { cursor: 'pointer' }
+                      }, 'Payment Status'),
+                      React.createElement('th', {
+                        onClick: () => handleSort('registrationDate'),
+                        style: { cursor: 'pointer' }
+                      }, 'Registration Date'),
+                      React.createElement('th', null, 'PDF Receipt')
                     )
                   ),
                   React.createElement('tbody', null,
                     filteredRegistrations.map((registration, index) =>
-                      React.createElement('tr', { 
+                      React.createElement('tr', {
                         key: registration._id,
                         className: index % 2 === 0 ? 'even' : 'odd'
                       },
-                        React.createElement('td', { className: 'registration-id' }, 
-                          registration.registrationId || 'N/A'
+                        React.createElement('td', { className: 'transaction-id' },
+                          registration.paypalTransactionId || 'N/A'
                         ),
-                        React.createElement('td', { className: 'name' }, 
+                        React.createElement('td', { className: 'type' },
+                          registration.registrationType || 'N/A'
+                        ),
+                        React.createElement('td', { className: 'name' },
                           getFullName(registration)
-                        ),
-                        React.createElement('td', { className: 'email' },
-                          registration.personalDetails?.email || 'N/A'
                         ),
                         React.createElement('td', { className: 'phone' },
                           registration.personalDetails?.phoneNumber || 'N/A'
                         ),
-                        React.createElement('td', { className: 'country' },
-                          registration.personalDetails?.country || 'N/A'
+                        React.createElement('td', { className: 'email' },
+                          registration.personalDetails?.email || 'N/A'
                         ),
-                        React.createElement('td', { className: 'address' },
-                          registration.personalDetails?.fullPostalAddress || 'N/A'
+                        React.createElement('td', { className: 'amount' },
+                          registration.pricing?.totalPrice || 0
                         ),
-                        React.createElement('td', { className: 'type' },
-                          getRegistrationTypeName(registration)
-                        ),
-                        React.createElement('td', { className: 'accommodation' },
-                          getAccommodationInfo(registration)
-                        ),
-                        React.createElement('td', { className: 'reg-price' },
-                          getRegistrationPrice(registration)
-                        ),
-                        React.createElement('td', { className: 'acc-price' },
-                          getAccommodationPrice(registration)
-                        ),
-                        React.createElement('td', { className: 'total-price' },
-                          getTotalPrice(registration)
+                        React.createElement('td', { className: 'currency' },
+                          registration.pricing?.currency || 'USD'
                         ),
                         React.createElement('td', { className: 'status' },
                           getStatusBadge(registration.paymentStatus)
                         ),
-                        React.createElement('td', { className: 'participants' }, 
-                          registration.numberOfParticipants || 1
-                        ),
-                        React.createElement('td', { className: 'date' }, 
-                          registration.registrationDate 
+                        React.createElement('td', { className: 'date' },
+                          registration.registrationDate
                             ? new Date(registration.registrationDate).toLocaleDateString()
                             : 'N/A'
+                        ),
+                        React.createElement('td', { className: 'pdf-receipt' },
+                          (registration.pdfReceipt?.asset?.url || registration.registrationTable?.pdfReceiptFile?.asset?.url)
+                            ? React.createElement(Button, {
+                                text: 'Download',
+                                icon: DocumentPdfIcon,
+                                mode: 'ghost',
+                                tone: 'positive',
+                                onClick: () => downloadPDF(registration),
+                                fontSize: 1
+                              })
+                            : React.createElement(Text, { size: 1, muted: true }, 'Not Available')
                         )
                       )
                     )

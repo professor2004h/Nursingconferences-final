@@ -53,7 +53,7 @@ export default (S) =>
       S.listItem().title('Hero Section').schemaType('heroSection').child(S.documentTypeList('heroSection')),
       S.listItem().title('Site Settings').schemaType('siteSettings').child(S.documentTypeList('siteSettings')),
 
-      // Registration System
+      // Registration System - Consolidated
       S.divider(),
       S.listItem()
         .title('Registration System')
@@ -63,9 +63,17 @@ export default (S) =>
             .items([
               S.listItem().title('Registration Settings').schemaType('registrationSettings').child(S.documentTypeList('registrationSettings')),
               S.listItem().title('Registration Types').schemaType('registrationTypes').child(S.documentTypeList('registrationTypes')),
-              // Sponsorship Tiers moved to main section to avoid duplication
               S.listItem().title('Accommodation Options').schemaType('accommodationOptions').child(S.documentTypeList('accommodationOptions')),
               S.listItem().title('Conference Registrations').schemaType('conferenceRegistration').child(S.documentTypeList('conferenceRegistration')),
+              // Enhanced Registration Table View
+              S.listItem()
+                .title('Registrations Table')
+                .id('registrationsTableEnhanced')
+                .icon(UserIcon)
+                .child(
+                  S.component(RegistrationTableView)
+                    .title('Conference Registrations - Enhanced Table View')
+                ),
             ])
         ),
       S.listItem().title('Image Section').schemaType('imageSection').child(S.documentTypeList('imageSection')),
@@ -119,34 +127,7 @@ export default (S) =>
                 )
             ])
         ),
-      // Add Conference Registrations with Table View
-      S.listItem()
-        .title('Conference Registrations')
-        .id('conferenceRegistrations')
-        .icon(UserIcon)
-        .child(
-          S.list()
-            .title('Registration Management')
-            .items([
-              // Custom Interactive Table View with Export
-              S.listItem()
-                .title('Registrations Table')
-                .id('registrationsTable')
-                .child(
-                  S.component(RegistrationTableView)
-                    .title('Conference Registrations - Table View')
-                ),
-              // Traditional Document List View
-              S.listItem()
-                .title('Registrations List')
-                .id('registrationsList')
-                .child(
-                  S.documentTypeList('conferenceRegistration')
-                    .title('Conference Registrations - List View')
-                    .defaultOrdering([{field: 'registrationDate', direction: 'desc'}])
-                )
-            ])
-        ),
+      // Removed duplicate Conference Registrations section - now consolidated in Registration System
       // Add Abstract Submission System
       S.listItem()
         .title('Abstract')
