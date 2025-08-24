@@ -437,7 +437,7 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
       console.warn('⚠️  PDF generation failed, continuing with email only:', pdfError.message);
     }
     
-    // Configure SMTP transporter with enhanced production settings
+    // Configure SMTP transporter with Coolify-optimized production settings
     const smtpConfig = {
       host: process.env.SMTP_HOST || 'smtp.hostinger.com',
       port: parseInt(process.env.SMTP_PORT || '465'),
@@ -448,11 +448,14 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
       },
       tls: {
         rejectUnauthorized: false,
-        ciphers: 'SSLv3'
+        servername: process.env.SMTP_HOST || 'smtp.hostinger.com',
+        ciphers: 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA'
       },
       connectionTimeout: 60000, // 60 seconds
       greetingTimeout: 30000,   // 30 seconds
       socketTimeout: 60000,     // 60 seconds
+      pool: false,              // Disable connection pooling for Coolify
+      maxConnections: 1,        // Single connection for container environments
       debug: process.env.NODE_ENV !== 'production', // Enable debug in development
       logger: process.env.NODE_ENV !== 'production'  // Enable logging in development
     };
@@ -485,26 +488,63 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
 
       // Try alternative SMTP configuration for production
       if (process.env.NODE_ENV === 'production') {
-        console.log('🔄 Trying alternative SMTP configuration for production...');
-        const altConfig = {
-          ...smtpConfig,
-          port: 587,
-          secure: false,
-          tls: {
-            rejectUnauthorized: false,
-            starttls: true
-          }
-        };
+        console.log('🔄 Trying multiple alternative SMTP configurations for Coolify...');
 
-        const altTransporter = nodemailer.createTransport(altConfig);
-        try {
-          await altTransporter.verify();
-          console.log('✅ Alternative SMTP configuration verified');
-          // Use alternative transporter
-          Object.assign(transporter, altTransporter);
-        } catch (altError) {
-          console.error('❌ Alternative SMTP also failed:', altError.message);
-          throw new Error(`SMTP configuration failed: ${verifyError.message}`);
+        const alternativeConfigs = [
+          {
+            name: 'Port 587 with STARTTLS',
+            config: {
+              ...smtpConfig,
+              port: 587,
+              secure: false,
+              tls: {
+                rejectUnauthorized: false,
+                starttls: true,
+                servername: process.env.SMTP_HOST || 'smtp.hostinger.com'
+              }
+            }
+          },
+          {
+            name: 'Coolify-optimized configuration',
+            config: {
+              ...smtpConfig,
+              port: 587,
+              secure: false,
+              pool: false,
+              maxConnections: 1,
+              tls: {
+                rejectUnauthorized: false,
+                servername: process.env.SMTP_HOST || 'smtp.hostinger.com',
+                ciphers: 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA'
+              },
+              connectionTimeout: 30000,
+              greetingTimeout: 15000,
+              socketTimeout: 30000
+            }
+          }
+        ];
+
+        let workingTransporter = null;
+
+        for (const { name, config } of alternativeConfigs) {
+          try {
+            console.log(`🔍 Testing: ${name}`);
+            const altTransporter = nodemailer.createTransport(config);
+            await altTransporter.verify();
+            console.log(`✅ ${name} verified successfully`);
+            workingTransporter = altTransporter;
+            break;
+          } catch (altError) {
+            console.error(`❌ ${name} failed:`, altError.message);
+          }
+        }
+
+        if (workingTransporter) {
+          // Use the working alternative transporter
+          Object.assign(transporter, workingTransporter);
+        } else {
+          console.error('❌ All alternative SMTP configurations failed');
+          throw new Error(`All SMTP configurations failed. Original error: ${verifyError.message}`);
         }
       } else {
         throw verifyError;
@@ -832,7 +872,7 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
       console.warn('⚠️  PDF generation failed, continuing with email only:', pdfError.message);
     }
 
-    // Configure SMTP transporter with enhanced production settings
+    // Configure SMTP transporter with Coolify-optimized production settings
     const smtpConfig = {
       host: emailConfig.host,
       port: emailConfig.port,
@@ -843,11 +883,14 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
       },
       tls: {
         rejectUnauthorized: false,
-        ciphers: 'SSLv3'
+        servername: emailConfig.host,
+        ciphers: 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA'
       },
       connectionTimeout: 60000, // 60 seconds
       greetingTimeout: 30000,   // 30 seconds
       socketTimeout: 60000,     // 60 seconds
+      pool: false,              // Disable connection pooling for Coolify
+      maxConnections: 1,        // Single connection for container environments
       debug: process.env.NODE_ENV !== 'production', // Enable debug in development
       logger: process.env.NODE_ENV !== 'production'  // Enable logging in development
     };
