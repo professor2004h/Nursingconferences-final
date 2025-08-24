@@ -133,23 +133,45 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if database update fails
     }
 
-    // Send payment receipt email with REAL PayPal data (non-blocking)
+    // Send payment receipt email with REAL PayPal data (non-blocking with enhanced error handling)
     setImmediate(async () => {
       try {
         console.log('📧 Initiating REAL payment receipt email for registration:', registrationId);
+        console.log('🔧 Production email delivery system starting...');
 
         // Import the updated payment receipt emailer
         const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
 
-        // Fetch registration data from Sanity
-        const registration = await client.fetch(
-          `*[_type == "conferenceRegistration" && _id == $registrationId][0]`,
-          { registrationId }
-        );
+        // Fetch registration data from Sanity with retry logic
+        let registration = null;
+        let retryCount = 0;
+        const maxRetries = 3;
+
+        while (!registration && retryCount < maxRetries) {
+          try {
+            registration = await client.fetch(
+              `*[_type == "conferenceRegistration" && _id == $registrationId][0]`,
+              { registrationId }
+            );
+
+            if (!registration) {
+              retryCount++;
+              console.log(`⚠️ Registration not found, retry ${retryCount}/${maxRetries}...`);
+              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
+            }
+          } catch (fetchError) {
+            retryCount++;
+            console.error(`❌ Error fetching registration (attempt ${retryCount}):`, fetchError);
+            if (retryCount >= maxRetries) throw fetchError;
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+          }
+        }
 
         if (!registration) {
-          throw new Error(`Registration not found: ${registrationId}`);
+          throw new Error(`Registration not found after ${maxRetries} attempts: ${registrationId}`);
         }
+
+        console.log('✅ Registration data retrieved successfully');
 
         // Prepare REAL payment data from PayPal response
         const realPaymentData = {
@@ -185,13 +207,42 @@ export async function POST(request: NextRequest) {
         );
 
         console.log('✅ REAL payment receipt email sent successfully for:', registrationId);
+        console.log('📊 Email delivery metrics:', {
+          registrationId,
+          transactionId,
+          recipientEmail: registration.personalDetails?.email,
+          deliveryTime: new Date().toISOString(),
+          environment: process.env.NODE_ENV
+        });
+
       } catch (emailError) {
         console.error('⚠️ Failed to send REAL payment receipt email (non-blocking):', {
           error: emailError instanceof Error ? emailError.message : 'Unknown error',
+          stack: emailError instanceof Error ? emailError.stack : undefined,
           registrationId,
           transactionId,
-          timestamp: new Date().toISOString()
+          recipientEmail: registration?.personalDetails?.email,
+          timestamp: new Date().toISOString(),
+          environment: process.env.NODE_ENV,
+          smtpConfig: {
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            user: process.env.SMTP_USER,
+            hasPassword: !!process.env.SMTP_PASS
+          }
         });
+
+        // Log specific error types for better debugging
+        if (emailError instanceof Error) {
+          if (emailError.message.includes('SMTP')) {
+            console.error('🔧 SMTP Configuration Issue - Check environment variables and network connectivity');
+          } else if (emailError.message.includes('authentication')) {
+            console.error('🔐 Authentication Issue - Verify SMTP credentials');
+          } else if (emailError.message.includes('timeout')) {
+            console.error('⏱️ Timeout Issue - Check network connectivity and SMTP server availability');
+          }
+        }
+
         // Email failure doesn't affect payment success
       }
     });

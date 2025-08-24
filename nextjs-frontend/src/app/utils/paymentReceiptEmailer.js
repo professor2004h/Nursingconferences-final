@@ -437,8 +437,8 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
       console.warn('⚠️  PDF generation failed, continuing with email only:', pdfError.message);
     }
     
-    // Configure SMTP transporter
-    const transporter = nodemailer.createTransport({
+    // Configure SMTP transporter with enhanced production settings
+    const smtpConfig = {
       host: process.env.SMTP_HOST || 'smtp.hostinger.com',
       port: parseInt(process.env.SMTP_PORT || '465'),
       secure: process.env.SMTP_SECURE === 'true' || true,
@@ -447,9 +447,69 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
         pass: process.env.SMTP_PASS,
       },
       tls: {
-        rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+        ciphers: 'SSLv3'
+      },
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000,   // 30 seconds
+      socketTimeout: 60000,     // 60 seconds
+      debug: process.env.NODE_ENV !== 'production', // Enable debug in development
+      logger: process.env.NODE_ENV !== 'production'  // Enable logging in development
+    };
+
+    console.log('📧 SMTP Configuration:', {
+      host: smtpConfig.host,
+      port: smtpConfig.port,
+      secure: smtpConfig.secure,
+      user: smtpConfig.auth.user,
+      hasPassword: !!smtpConfig.auth.pass,
+      environment: process.env.NODE_ENV
     });
+
+    const transporter = nodemailer.createTransport(smtpConfig);
+
+    // Verify SMTP connection before sending
+    try {
+      console.log('🔍 Verifying SMTP connection...');
+      await transporter.verify();
+      console.log('✅ SMTP connection verified successfully');
+    } catch (verifyError) {
+      console.error('❌ SMTP verification failed:', verifyError.message);
+      console.error('📧 SMTP Config Debug:', {
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        secure: smtpConfig.secure,
+        user: smtpConfig.auth.user,
+        hasPassword: !!smtpConfig.auth.pass
+      });
+
+      // Try alternative SMTP configuration for production
+      if (process.env.NODE_ENV === 'production') {
+        console.log('🔄 Trying alternative SMTP configuration for production...');
+        const altConfig = {
+          ...smtpConfig,
+          port: 587,
+          secure: false,
+          tls: {
+            rejectUnauthorized: false,
+            starttls: true
+          }
+        };
+
+        const altTransporter = nodemailer.createTransport(altConfig);
+        try {
+          await altTransporter.verify();
+          console.log('✅ Alternative SMTP configuration verified');
+          // Use alternative transporter
+          Object.assign(transporter, altTransporter);
+        } catch (altError) {
+          console.error('❌ Alternative SMTP also failed:', altError.message);
+          throw new Error(`SMTP configuration failed: ${verifyError.message}`);
+        }
+      } else {
+        throw verifyError;
+      }
+    }
 
     const mailOptions = {
       from: `"Intelli Global Conferences" <${process.env.SMTP_USER || 'contactus@intelliglobalconferences.com'}>`,
@@ -463,19 +523,82 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Payment Receipt</title>
           <style>
+            /* Enhanced print styles for consistent PDF and print formatting */
             @media print {
-              body { margin: 0; }
-              .no-print { display: none; }
+              * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+
+              body {
+                margin: 0;
+                padding: 0;
+                background: white !important;
+                font-family: Arial, sans-serif !important;
+              }
+
+              .no-print {
+                display: none !important;
+              }
+
+              /* Ensure header gradient prints correctly */
+              .header-gradient {
+                background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%) !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+
+              /* Maintain professional spacing and layout */
+              .receipt-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+              }
+
+              /* Ensure text colors print correctly */
+              .text-white {
+                color: white !important;
+              }
+
+              .text-navy {
+                color: #0f172a !important;
+              }
+
+              .text-blue {
+                color: #1e3a8a !important;
+              }
+
+              /* Page break controls */
+              .receipt-section {
+                page-break-inside: avoid;
+              }
+
+              /* Footer positioning */
+              .receipt-footer {
+                position: fixed;
+                bottom: 20px;
+                width: 100%;
+              }
+            }
+
+            /* Screen styles for consistency */
+            @media screen {
+              .header-gradient {
+                background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+              }
             }
           </style>
         </head>
         <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f5f5f5;">
           
           <!-- Receipt Container -->
-          <div id="receipt" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            
+          <div id="receipt" class="receipt-container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+
             <!-- Header with Navy Blue Branding -->
-            <div style="background: linear-gradient(135deg, ${BRAND_COLORS.navyBlue} 0%, ${BRAND_COLORS.blueAccent} 50%, ${BRAND_COLORS.navyBlue} 100%); color: white; padding: 30px 20px; text-align: left;">
+            <div class="header-gradient receipt-section" style="background: linear-gradient(135deg, ${BRAND_COLORS.navyBlue} 0%, ${BRAND_COLORS.blueAccent} 50%, ${BRAND_COLORS.navyBlue} 100%); color: white; padding: 30px 20px; text-align: left;">
               ${footerLogo ? `
                 <img src="${footerLogo.url}" alt="${footerLogo.alt}"
                      style="height: 60px; width: auto; max-width: 300px; object-fit: contain; margin-bottom: 10px; display: block;
@@ -709,8 +832,8 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
       console.warn('⚠️  PDF generation failed, continuing with email only:', pdfError.message);
     }
 
-    // Configure SMTP transporter with dynamic settings
-    const transporter = nodemailer.createTransport({
+    // Configure SMTP transporter with enhanced production settings
+    const smtpConfig = {
       host: emailConfig.host,
       port: emailConfig.port,
       secure: emailConfig.secure,
@@ -719,9 +842,60 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
         pass: emailConfig.pass,
       },
       tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        ciphers: 'SSLv3'
+      },
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000,   // 30 seconds
+      socketTimeout: 60000,     // 60 seconds
+      debug: process.env.NODE_ENV !== 'production', // Enable debug in development
+      logger: process.env.NODE_ENV !== 'production'  // Enable logging in development
+    };
+
+    const transporter = nodemailer.createTransport(smtpConfig);
+
+    // Verify SMTP connection before sending
+    try {
+      console.log('🔍 Verifying SMTP connection...');
+      await transporter.verify();
+      console.log('✅ SMTP connection verified successfully');
+    } catch (verifyError) {
+      console.error('❌ SMTP verification failed:', verifyError.message);
+      console.error('📧 SMTP Config Debug:', {
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        secure: smtpConfig.secure,
+        user: smtpConfig.auth.user,
+        hasPassword: !!smtpConfig.auth.pass
+      });
+
+      // Try alternative SMTP configuration for production
+      if (process.env.NODE_ENV === 'production') {
+        console.log('🔄 Trying alternative SMTP configuration for production...');
+        const altConfig = {
+          ...smtpConfig,
+          port: 587,
+          secure: false,
+          tls: {
+            rejectUnauthorized: false,
+            starttls: true
+          }
+        };
+
+        const altTransporter = nodemailer.createTransport(altConfig);
+        try {
+          await altTransporter.verify();
+          console.log('✅ Alternative SMTP configuration verified');
+          // Use alternative transporter
+          Object.assign(transporter, altTransporter);
+        } catch (altError) {
+          console.error('❌ Alternative SMTP also failed:', altError.message);
+          throw new Error(`SMTP configuration failed: ${verifyError.message}`);
+        }
+      } else {
+        throw verifyError;
       }
-    });
+    }
 
     console.log('📧 Using email configuration:', {
       host: emailConfig.host,
@@ -742,9 +916,72 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Payment Receipt</title>
           <style>
+            /* Enhanced print styles for consistent PDF and print formatting */
             @media print {
-              body { margin: 0; }
-              .no-print { display: none; }
+              * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+
+              body {
+                margin: 0;
+                padding: 0;
+                background: white !important;
+                font-family: Arial, sans-serif !important;
+              }
+
+              .no-print {
+                display: none !important;
+              }
+
+              /* Ensure header gradient prints correctly */
+              .header-gradient {
+                background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%) !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+
+              /* Maintain professional spacing and layout */
+              .receipt-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+              }
+
+              /* Ensure text colors print correctly */
+              .text-white {
+                color: white !important;
+              }
+
+              .text-navy {
+                color: #0f172a !important;
+              }
+
+              .text-blue {
+                color: #1e3a8a !important;
+              }
+
+              /* Page break controls */
+              .receipt-section {
+                page-break-inside: avoid;
+              }
+
+              /* Footer positioning */
+              .receipt-footer {
+                position: fixed;
+                bottom: 20px;
+                width: 100%;
+              }
+            }
+
+            /* Screen styles for consistency */
+            @media screen {
+              .header-gradient {
+                background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+              }
             }
           </style>
         </head>
