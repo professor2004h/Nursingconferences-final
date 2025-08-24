@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Creating transporter...');
     const transporter = nodemailer.createTransport({
       host: emailConfig.host,
-      port: parseInt(emailConfig.port || '587'),
-      secure: false, // Use STARTTLS
+      port: parseInt(emailConfig.port || '465'),
+      secure: true, // Use SSL
       auth: {
         user: emailConfig.user,
         pass: emailConfig.pass,
@@ -65,9 +65,30 @@ export async function POST(request: NextRequest) {
       console.log('✅ SMTP connection verified');
     } catch (verifyError) {
       console.error('❌ SMTP connection failed:', verifyError);
+
+      // Detailed error analysis
+      const errorDetails = {
+        message: verifyError instanceof Error ? verifyError.message : 'Unknown error',
+        code: (verifyError as any)?.code,
+        command: (verifyError as any)?.command,
+        response: (verifyError as any)?.response,
+        responseCode: (verifyError as any)?.responseCode,
+        stack: verifyError instanceof Error ? verifyError.stack?.substring(0, 500) : undefined
+      };
+
+      console.error('❌ Detailed SMTP error:', errorDetails);
+
       return NextResponse.json({
         error: 'SMTP connection failed',
-        details: verifyError instanceof Error ? verifyError.message : 'Unknown error'
+        details: errorDetails,
+        suggestions: [
+          'Check if email account exists and is active',
+          'Verify username and password are correct',
+          'Ensure SMTP is enabled for the account',
+          'Try different port (465 for SSL, 587 for STARTTLS)',
+          'Check if 2FA is enabled (may need app password)',
+          'Verify Hostinger SMTP settings'
+        ]
       }, { status: 500 });
     }
     
