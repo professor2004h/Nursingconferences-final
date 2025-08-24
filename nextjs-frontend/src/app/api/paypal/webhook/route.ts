@@ -110,7 +110,7 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
   try {
     const capture = webhookEvent.resource;
     const customId = capture.custom_id; // This should be our registration ID
-    
+
     console.log('✅ Payment capture completed:', {
       captureId: capture.id,
       amount: capture.amount.value,
@@ -134,6 +134,66 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
         .commit();
 
       console.log('✅ Registration updated with payment completion:', customId);
+
+      // Send REAL payment receipt email (non-blocking)
+      setImmediate(async () => {
+        try {
+          console.log('📧 Sending REAL payment receipt from webhook for:', customId);
+
+          // Import the payment receipt emailer
+          const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
+
+          // Fetch registration data from Sanity
+          const registration = await client.fetch(
+            `*[_type == "conferenceRegistration" && _id == $registrationId][0]`,
+            { registrationId: customId }
+          );
+
+          if (!registration) {
+            throw new Error(`Registration not found: ${customId}`);
+          }
+
+          // Prepare REAL payment data from webhook
+          const realPaymentData = {
+            transactionId: capture.id,
+            orderId: webhookEvent.resource.supplementary_data?.related_ids?.order_id || 'N/A',
+            amount: capture.amount.value,
+            currency: capture.amount.currency_code,
+            paymentMethod: 'PayPal',
+            paymentDate: new Date().toISOString(),
+            status: capture.status,
+            capturedAt: new Date().toISOString(),
+            paypalCaptureId: capture.id,
+            paypalStatus: capture.status
+          };
+
+          // Prepare registration data
+          const realRegistrationData = {
+            registrationId: registration._id,
+            fullName: `${registration.firstName || ''} ${registration.lastName || ''}`.trim(),
+            email: registration.email,
+            phone: registration.phoneNumber || 'N/A',
+            country: registration.country || 'N/A',
+            address: registration.address || 'N/A',
+            registrationType: registration.registrationType || 'Regular Registration',
+            numberOfParticipants: '1'
+          };
+
+          await sendPaymentReceiptEmailWithRealData(
+            realPaymentData,
+            realRegistrationData,
+            registration.email
+          );
+
+          console.log('✅ REAL payment receipt email sent from webhook for:', customId);
+        } catch (emailError) {
+          console.error('⚠️ Failed to send REAL payment receipt from webhook:', {
+            error: emailError instanceof Error ? emailError.message : 'Unknown error',
+            registrationId: customId,
+            timestamp: new Date().toISOString()
+          });
+        }
+      });
     }
   } catch (error) {
     console.error('❌ Error handling payment capture completed:', error);

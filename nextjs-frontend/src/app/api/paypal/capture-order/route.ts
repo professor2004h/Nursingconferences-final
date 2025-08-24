@@ -133,21 +133,60 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if database update fails
     }
 
-    // Send payment receipt email (non-blocking)
+    // Send payment receipt email with REAL PayPal data (non-blocking)
     setImmediate(async () => {
       try {
-        console.log('📧 Initiating payment receipt email for registration:', registrationId);
-        await sendPaymentReceiptEmail(registrationId, {
-          transactionId,
-          orderId,
-          amount: amount || '0',
-          currency: currency || 'USD',
+        console.log('📧 Initiating REAL payment receipt email for registration:', registrationId);
+
+        // Import the updated payment receipt emailer
+        const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
+
+        // Fetch registration data from Sanity
+        const registration = await client.fetch(
+          `*[_type == "conferenceRegistration" && _id == $registrationId][0]`,
+          { registrationId }
+        );
+
+        if (!registration) {
+          throw new Error(`Registration not found: ${registrationId}`);
+        }
+
+        // Prepare REAL payment data from PayPal response
+        const realPaymentData = {
+          transactionId: transactionId || capture?.id || 'N/A',
+          orderId: orderId || result.id || 'N/A',
+          amount: amount || capture?.amount?.value || '0',
+          currency: currency || capture?.amount?.currency_code || 'USD',
+          paymentMethod: 'PayPal',
+          paymentDate: new Date().toISOString(),
+          status: status || capture?.status || 'COMPLETED',
           capturedAt: new Date().toISOString(),
-          paymentMethod: 'PayPal'
-        });
-        console.log('✅ Payment receipt email process completed for:', registrationId);
+          paypalOrderId: result.id,
+          paypalCaptureId: capture?.id,
+          paypalStatus: capture?.status
+        };
+
+        // Prepare registration data
+        const realRegistrationData = {
+          registrationId: registration._id,
+          fullName: `${registration.firstName || ''} ${registration.lastName || ''}`.trim(),
+          email: registration.email,
+          phone: registration.phoneNumber || 'N/A',
+          country: registration.country || 'N/A',
+          address: registration.address || 'N/A',
+          registrationType: registration.registrationType || 'Regular Registration',
+          numberOfParticipants: '1'
+        };
+
+        await sendPaymentReceiptEmailWithRealData(
+          realPaymentData,
+          realRegistrationData,
+          registration.email
+        );
+
+        console.log('✅ REAL payment receipt email sent successfully for:', registrationId);
       } catch (emailError) {
-        console.error('⚠️ Failed to send payment receipt email (non-blocking):', {
+        console.error('⚠️ Failed to send REAL payment receipt email (non-blocking):', {
           error: emailError instanceof Error ? emailError.message : 'Unknown error',
           registrationId,
           transactionId,

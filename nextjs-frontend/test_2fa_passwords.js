@@ -9,7 +9,7 @@ async function test2FAPasswords() {
   console.log('🔐 Testing 2FA Password Options for Hostinger SMTP');
   console.log('=' .repeat(60));
   
-  const smtpServer = 'smtp.hostinger.com';
+  const smtpServer = 'smtp.hostinger.com'; // Confirmed from Hostinger screenshots
   const senderEmail = 'accounts@intelliglobalconferences.com';
   const receiverEmail = 'professor2004h@gmail.com';
   
