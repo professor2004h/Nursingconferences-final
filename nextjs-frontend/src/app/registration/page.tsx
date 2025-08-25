@@ -7,6 +7,7 @@ import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalButtonFixed from '@/app/components/PayPalButtonFixed';
 import PayPalButtonReliable from '@/app/components/PayPalButtonReliable';
 import PayPalErrorBoundary from '@/app/components/PayPalErrorBoundary';
+import RazorpayButton from '@/app/components/RazorpayButton';
 import { CurrencyProvider } from '@/app/contexts/CurrencyContext';
 import CurrencySelector from '@/app/components/CurrencySelector';
 import { useCurrencyPricing } from '@/app/hooks/useCurrencyPricing';
@@ -337,7 +338,7 @@ function RegistrationPageContent() {
       `order_id=${paymentData.orderId}&` +
       `amount=${paymentData.amount}&` +
       `currency=${paymentData.currency}&` +
-      `payment_method=paypal&` +
+      `payment_method=${paymentData.paymentMethod || 'paypal'}&` +
       `status=completed&` +
       `captured_at=${encodeURIComponent(paymentData.paymentData?.capturedAt || new Date().toISOString())}`;
 
@@ -1382,10 +1383,10 @@ function RegistrationPageContent() {
                     );
                   }
 
-                  // All conditions met - show PayPal button
+                  // All conditions met - show payment options
                   return (
                     <div>
-                      <div className="mb-4 text-center">
+                      <div className="mb-6 text-center">
                         <p className="text-gray-600 mb-2">
                           Please complete your payment to confirm your registration
                         </p>
@@ -1393,22 +1394,77 @@ function RegistrationPageContent() {
                           {formatPrice(priceCalculation.totalPrice)}
                         </div>
                       </div>
-                      <PayPalErrorBoundary>
-                        <PayPalButtonReliable
-                          amount={priceCalculation.totalPrice}
-                          currency={selectedCurrency}
-                          registrationId={currentRegistrationId}
-                          registrationData={formData}
-                          onSuccess={handlePaymentSuccess}
-                          onError={handlePaymentError}
-                          onCancel={handlePaymentCancel}
-                          onRegistrationIdUpdate={(newId) => {
-                            console.log('🔄 Registration ID updated from PayPal:', newId);
-                            setCurrentRegistrationId(newId);
-                          }}
-                          disabled={isLoading}
-                        />
-                      </PayPalErrorBoundary>
+
+                      {/* Payment Options Header */}
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-gray-800 text-center mb-3">
+                          Choose Your Payment Method
+                        </h3>
+                        <p className="text-sm text-gray-600 text-center">
+                          Select your preferred payment option below
+                        </p>
+                      </div>
+
+                      {/* Payment Buttons Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* PayPal Payment Option */}
+                        <div className="space-y-2">
+                          <div className="text-center">
+                            <h4 className="font-medium text-gray-700 mb-2">PayPal</h4>
+                            <p className="text-xs text-gray-500 mb-3">
+                              Pay securely with PayPal, credit cards, or debit cards
+                            </p>
+                          </div>
+                          <PayPalErrorBoundary>
+                            <PayPalButtonReliable
+                              amount={priceCalculation.totalPrice}
+                              currency={selectedCurrency}
+                              registrationId={currentRegistrationId}
+                              registrationData={formData}
+                              onSuccess={handlePaymentSuccess}
+                              onError={handlePaymentError}
+                              onCancel={handlePaymentCancel}
+                              onRegistrationIdUpdate={(newId) => {
+                                console.log('🔄 Registration ID updated from PayPal:', newId);
+                                setCurrentRegistrationId(newId);
+                              }}
+                              disabled={isLoading}
+                            />
+                          </PayPalErrorBoundary>
+                        </div>
+
+                        {/* Razorpay Payment Option */}
+                        <div className="space-y-2">
+                          <div className="text-center">
+                            <h4 className="font-medium text-gray-700 mb-2">Razorpay</h4>
+                            <p className="text-xs text-gray-500 mb-3">
+                              Pay with UPI, cards, net banking, and wallets
+                            </p>
+                          </div>
+                          <RazorpayButton
+                            amount={priceCalculation.totalPrice}
+                            currency={selectedCurrency}
+                            registrationId={currentRegistrationId}
+                            registrationData={formData}
+                            onSuccess={handlePaymentSuccess}
+                            onError={handlePaymentError}
+                            onCancel={handlePaymentCancel}
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Security Notice */}
+                      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                        <div className="flex items-center justify-center">
+                          <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                          <p className="text-xs text-green-700 text-center">
+                            Your payment is secured with 256-bit SSL encryption
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   );
                 })()}
