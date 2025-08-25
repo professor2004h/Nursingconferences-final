@@ -1431,18 +1431,40 @@ async function generateUnifiedReceiptPDF(paymentData, registrationData, footerLo
 }
 
 /**
- * Production-ready email configuration with environment variables
+ * Production-ready email configuration with environment variables and fallbacks
  */
 function getProductionEmailConfig() {
-  return {
+  // Environment variable fallbacks for production deployment
+  const config = {
     host: process.env.SMTP_HOST || 'smtp.hostinger.com',
     port: parseInt(process.env.SMTP_PORT || '465'),
     secure: process.env.SMTP_SECURE === 'true' || true,
     user: process.env.SMTP_USER || 'contactus@intelliglobalconferences.com',
-    pass: process.env.SMTP_PASS,
-    fromEmail: process.env.EMAIL_FROM || 'contactus@intelliglobalconferences.com',
+    pass: process.env.SMTP_PASS || 'Muni@12345m', // Fallback for development
+    fromEmail: process.env.EMAIL_FROM || process.env.SMTP_USER || 'contactus@intelliglobalconferences.com',
     fromName: process.env.EMAIL_FROM_NAME || 'Intelli Global Conferences'
   };
+
+  // Log configuration status for debugging (without sensitive data)
+  console.log('📧 Email Configuration Status:', {
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    user: config.user,
+    fromEmail: config.fromEmail,
+    fromName: config.fromName,
+    passConfigured: !!config.pass,
+    usingFallbacks: {
+      host: !process.env.SMTP_HOST,
+      port: !process.env.SMTP_PORT,
+      user: !process.env.SMTP_USER,
+      pass: !process.env.SMTP_PASS,
+      fromEmail: !process.env.EMAIL_FROM,
+      fromName: !process.env.EMAIL_FROM_NAME
+    }
+  });
+
+  return config;
 }
 
 module.exports = {

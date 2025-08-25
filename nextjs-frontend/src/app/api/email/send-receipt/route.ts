@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendPaymentReceiptEmail } from '@/app/services/emailService';
 import { client } from '@/app/sanity/client';
 
 /**
@@ -93,18 +92,41 @@ export async function POST(request: NextRequest) {
       recipientEmail: recipientEmail
     };
 
-    console.log('📧 Sending payment receipt email:', {
+    console.log('📧 Sending payment receipt email using UNIFIED SYSTEM:', {
       registrationId,
       recipient: recipientEmail,
       isTestEmail: !!testEmail,
       transactionId: finalPaymentData.transactionId
     });
-    
-    // Send email
-    const success = await sendPaymentReceiptEmail(emailData);
-    
-    if (success) {
-      console.log('✅ Payment receipt email sent successfully');
+
+    // Import and use the UNIFIED email system
+    const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
+
+    // Prepare registration data for unified system
+    const unifiedRegistrationData = {
+      _id: registrationDetails._id,
+      registrationId: registrationDetails.registrationId,
+      fullName: `${registrationDetails.personalDetails?.title || ''} ${registrationDetails.personalDetails?.firstName || ''} ${registrationDetails.personalDetails?.lastName || ''}`.trim(),
+      email: registrationDetails.personalDetails?.email,
+      phoneNumber: registrationDetails.personalDetails?.phoneNumber,
+      country: registrationDetails.personalDetails?.country,
+      address: registrationDetails.personalDetails?.fullPostalAddress,
+      registrationType: registrationDetails.selectedRegistrationName || registrationDetails.registrationType || 'regular',
+      sponsorType: registrationDetails.sponsorType,
+      numberOfParticipants: registrationDetails.numberOfParticipants || 1,
+      personalDetails: registrationDetails.personalDetails,
+      pricing: registrationDetails.pricing
+    };
+
+    // Send email using unified system
+    const emailResult = await sendPaymentReceiptEmailWithRealData(
+      finalPaymentData,
+      unifiedRegistrationData,
+      recipientEmail
+    );
+
+    if (emailResult.success) {
+      console.log('✅ Payment receipt email sent successfully using UNIFIED SYSTEM');
       return NextResponse.json({
         success: true,
         message: 'Payment receipt email sent successfully',
@@ -113,15 +135,20 @@ export async function POST(request: NextRequest) {
           recipient: recipientEmail,
           transactionId: finalPaymentData.transactionId,
           isTestEmail: !!testEmail,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          pdfGenerated: emailResult.pdfGenerated,
+          pdfSize: emailResult.pdfSize,
+          pdfUploaded: emailResult.pdfUploaded,
+          pdfAssetId: emailResult.pdfAssetId,
+          messageId: emailResult.messageId
         }
       });
     } else {
-      console.error('❌ Failed to send payment receipt email');
+      console.error('❌ Failed to send payment receipt email using UNIFIED SYSTEM:', emailResult.error);
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to send payment receipt email',
-          details: 'Email service may not be configured or authentication failed'
+          details: emailResult.error || 'Email service may not be configured or authentication failed'
         },
         { status: 500 }
       );
