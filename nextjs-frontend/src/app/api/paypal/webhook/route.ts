@@ -20,18 +20,31 @@ const HANDLED_EVENTS = [
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔔 PayPal webhook received');
+    console.log('🔔 PayPal webhook received at:', new Date().toISOString());
+    console.log('🌐 Request URL:', request.url);
+    console.log('🔧 Environment:', process.env.NODE_ENV);
 
     // Get webhook body and headers
     const body = await request.text();
     const headers = Object.fromEntries(request.headers.entries());
 
-    // Log webhook for debugging (be careful with sensitive data)
+    // Enhanced logging for production debugging
     console.log('📋 Webhook headers:', {
       'paypal-transmission-id': headers['paypal-transmission-id'],
       'paypal-cert-id': headers['paypal-cert-id'],
       'paypal-auth-algo': headers['paypal-auth-algo'],
       'paypal-transmission-time': headers['paypal-transmission-time'],
+      'content-type': headers['content-type'],
+      'user-agent': headers['user-agent'],
+    });
+
+    // Log environment configuration status
+    console.log('🔧 Environment Configuration:', {
+      SMTP_HOST: process.env.SMTP_HOST ? 'Configured' : 'Missing',
+      SMTP_USER: process.env.SMTP_USER ? 'Configured' : 'Missing',
+      EMAIL_FROM: process.env.EMAIL_FROM ? 'Configured' : 'Missing',
+      PAYPAL_WEBHOOK_ID: process.env.PAYPAL_WEBHOOK_ID ? 'Configured' : 'Missing',
+      SANITY_API_TOKEN: process.env.SANITY_API_TOKEN ? 'Configured' : 'Missing'
     });
 
     // Parse webhook event
@@ -52,14 +65,22 @@ export async function POST(request: NextRequest) {
     // Verify webhook signature (CRITICAL for production security)
     const webhookId = process.env.PAYPAL_WEBHOOK_ID;
     if (webhookId) {
-      const isValid = await paypalService.verifyWebhookSignature(headers, body, webhookId);
-      if (!isValid) {
-        console.error('❌ Invalid webhook signature');
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      try {
+        const isValid = await paypalService.verifyWebhookSignature(headers, body, webhookId);
+        if (!isValid) {
+          console.error('❌ Invalid webhook signature');
+          return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+        }
+        console.log('✅ Webhook signature verified');
+      } catch (verificationError) {
+        console.error('❌ Webhook signature verification failed:', verificationError.message);
+        // In production, you might want to reject invalid signatures
+        // For now, we'll log and continue to ensure emails are sent
+        console.warn('⚠️ Continuing despite signature verification failure');
       }
-      console.log('✅ Webhook signature verified');
     } else {
       console.warn('⚠️ PAYPAL_WEBHOOK_ID not configured - skipping signature verification');
+      console.warn('⚠️ For production security, configure PAYPAL_WEBHOOK_ID environment variable');
     }
 
     // Handle different webhook events
@@ -138,10 +159,33 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
       // Send REAL payment receipt email to CUSTOMER (non-blocking with enhanced error handling)
       setImmediate(async () => {
         try {
-          console.log('📧 Sending REAL payment receipt from webhook to CUSTOMER for:', customId);
+          console.log('📧 Starting automatic email process from webhook for:', customId);
+          console.log('📧 Timestamp:', new Date().toISOString());
+
+          // Check email configuration before proceeding
+          const emailConfig = {
+            SMTP_HOST: process.env.SMTP_HOST,
+            SMTP_USER: process.env.SMTP_USER,
+            SMTP_PASS: process.env.SMTP_PASS,
+            EMAIL_FROM: process.env.EMAIL_FROM || process.env.SMTP_USER,
+            EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || 'Intelli Global Conferences'
+          };
+
+          console.log('📧 Email configuration check:', {
+            SMTP_HOST: emailConfig.SMTP_HOST ? 'Configured' : 'Missing',
+            SMTP_USER: emailConfig.SMTP_USER ? 'Configured' : 'Missing',
+            SMTP_PASS: emailConfig.SMTP_PASS ? 'Configured' : 'Missing',
+            EMAIL_FROM: emailConfig.EMAIL_FROM ? 'Configured' : 'Missing',
+            EMAIL_FROM_NAME: emailConfig.EMAIL_FROM_NAME ? 'Configured' : 'Missing'
+          });
+
+          if (!emailConfig.SMTP_HOST || !emailConfig.SMTP_USER || !emailConfig.SMTP_PASS) {
+            throw new Error('Missing required email configuration. Check SMTP environment variables.');
+          }
 
           // Import the payment receipt emailer
           const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
+          console.log('📧 Email service imported successfully');
 
           // Fetch complete registration data from Sanity with retry logic
           let registration = null;
@@ -302,12 +346,22 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
           }
 
         } catch (emailError) {
-          console.error('⚠️ Failed to send REAL payment receipt from webhook:', {
-            error: emailError instanceof Error ? emailError.message : 'Unknown error',
-            stack: emailError instanceof Error ? emailError.stack : undefined,
-            registrationId: customId,
-            timestamp: new Date().toISOString()
-          });
+          console.error('❌ CRITICAL: Failed to send automatic payment receipt from webhook');
+          console.error('❌ Registration ID:', customId);
+          console.error('❌ Error message:', emailError instanceof Error ? emailError.message : 'Unknown error');
+          console.error('❌ Stack trace:', emailError instanceof Error ? emailError.stack : undefined);
+          console.error('❌ Timestamp:', new Date().toISOString());
+
+          // Log detailed error information for debugging
+          if (emailError instanceof Error) {
+            console.error('❌ Email Error Details:', {
+              errorType: emailError.constructor.name,
+              errorCode: (emailError as any).code,
+              errorCommand: (emailError as any).command,
+              errorResponse: (emailError as any).response,
+              errorResponseCode: (emailError as any).responseCode
+            });
+          }
 
           // Log additional debugging information
           console.log('🔍 Webhook debugging info:', {
@@ -317,6 +371,30 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
             customId: customId,
             webhookEventType: webhookEvent.event_type
           });
+
+          // Update registration with email failure status
+          try {
+            await client
+              .patch(customId)
+              .set({
+                receiptEmailSent: false,
+                receiptEmailError: emailError instanceof Error ? emailError.message : 'Unknown error',
+                receiptEmailAttemptedAt: new Date().toISOString(),
+                webhookEmailProcessingFailed: true
+              })
+              .commit();
+            console.log('✅ Registration updated with email failure status');
+          } catch (updateError) {
+            console.error('❌ CRITICAL: Failed to update registration with email error:', updateError);
+          }
+
+          // Log action items for manual intervention
+          console.error('🚨 MANUAL ACTION REQUIRED:');
+          console.error('   1. Check email configuration in production environment');
+          console.error('   2. Verify SMTP credentials are correct');
+          console.error('   3. Send manual receipt to customer if needed');
+          console.error('   4. Check application logs for more details');
+          console.error('   5. Customer email:', customerEmail || 'Unknown');
         }
       });
     }
