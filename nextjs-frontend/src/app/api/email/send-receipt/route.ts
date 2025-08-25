@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
       paymentMethod: 'PayPal'
     };
 
-    // Use test email if provided, otherwise use registration email
-    const recipientEmail = testEmail || registrationDetails.personalDetails?.email;
+    // Use customer's actual email from registration (testEmail only for development/testing)
+    const recipientEmail = registrationDetails.personalDetails?.email || testEmail;
     
     if (!recipientEmail) {
       console.error('❌ No email address available for registration:', registrationId);
@@ -95,7 +95,9 @@ export async function POST(request: NextRequest) {
     console.log('📧 Sending payment receipt email using UNIFIED SYSTEM:', {
       registrationId,
       recipient: recipientEmail,
-      isTestEmail: !!testEmail,
+      customerEmail: registrationDetails.personalDetails?.email,
+      isUsingCustomerEmail: recipientEmail === registrationDetails.personalDetails?.email,
+      isTestEmailProvided: !!testEmail,
       transactionId: finalPaymentData.transactionId
     });
 
@@ -133,8 +135,9 @@ export async function POST(request: NextRequest) {
         details: {
           registrationId,
           recipient: recipientEmail,
+          customerEmail: registrationDetails.personalDetails?.email,
+          isUsingCustomerEmail: recipientEmail === registrationDetails.personalDetails?.email,
           transactionId: finalPaymentData.transactionId,
-          isTestEmail: !!testEmail,
           timestamp: new Date().toISOString(),
           pdfGenerated: emailResult.pdfGenerated,
           pdfSize: emailResult.pdfSize,

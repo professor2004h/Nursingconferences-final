@@ -252,8 +252,8 @@ export default function RegistrationSuccessPage() {
                             orderId,
                             amount,
                             currency,
-                            capturedAt,
-                            testEmail: 'professor2004h@gmail.com' // For testing - remove in production
+                            capturedAt
+                            // Removed testEmail - will use customer's actual email from registration
                           }),
                         });
 
