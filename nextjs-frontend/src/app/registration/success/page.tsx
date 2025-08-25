@@ -199,7 +199,8 @@ export default function RegistrationSuccessPage() {
                   <button
                     onClick={async () => {
                       try {
-                        const response = await fetch('/api/registration/receipt-pdf', {
+                        // Use the unified email receipt system instead of the old PDF route
+                        const response = await fetch('/api/email/send-receipt', {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/json',
@@ -211,32 +212,29 @@ export default function RegistrationSuccessPage() {
                             amount,
                             currency,
                             capturedAt,
-                            registrationDetails
+                            testEmail: 'professor2004h@gmail.com' // For testing - remove in production
                           }),
                         });
 
                         if (response.ok) {
-                          const blob = await response.blob();
-                          const url = window.URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.style.display = 'none';
-                          a.href = url;
-                          a.download = `Registration_Receipt_${registrationId}.pdf`;
-                          document.body.appendChild(a);
-                          a.click();
-                          window.URL.revokeObjectURL(url);
-                          document.body.removeChild(a);
+                          const result = await response.json();
+                          if (result.success) {
+                            alert('✅ Payment receipt email sent successfully! Please check your email inbox.');
+                          } else {
+                            throw new Error(result.error || 'Failed to send receipt email');
+                          }
                         } else {
-                          alert('Failed to generate PDF receipt. Please try again.');
+                          const errorData = await response.json();
+                          throw new Error(errorData.error || 'Failed to send receipt email');
                         }
                       } catch (error) {
-                        console.error('Error downloading PDF:', error);
-                        alert('Failed to download PDF receipt. Please try again.');
+                        console.error('Error sending receipt email:', error);
+                        alert('Failed to send receipt email. Please try again.');
                       }
                     }}
                     className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    Download PDF Receipt
+                    Email PDF Receipt
                   </button>
                   <a
                     href="/"

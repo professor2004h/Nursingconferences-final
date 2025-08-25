@@ -135,7 +135,7 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
 
       console.log('✅ Registration updated with payment completion:', customId);
 
-      // Send REAL payment receipt email (non-blocking)
+      // Send REAL payment receipt email (non-blocking with enhanced error handling)
       setImmediate(async () => {
         try {
           console.log('📧 Sending REAL payment receipt from webhook for:', customId);
@@ -143,54 +143,147 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
           // Import the payment receipt emailer
           const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
 
-          // Fetch registration data from Sanity
-          const registration = await client.fetch(
-            `*[_type == "conferenceRegistration" && _id == $registrationId][0]`,
-            { registrationId: customId }
-          );
+          // Fetch complete registration data from Sanity with retry logic
+          let registration = null;
+          let retryCount = 0;
+          const maxRetries = 3;
+
+          while (!registration && retryCount < maxRetries) {
+            try {
+              registration = await client.fetch(
+                `*[_type == "conferenceRegistration" && _id == $registrationId][0]{
+                  _id,
+                  registrationId,
+                  personalDetails,
+                  selectedRegistrationName,
+                  sponsorType,
+                  accommodationType,
+                  accommodationNights,
+                  numberOfParticipants,
+                  pricing,
+                  paymentStatus,
+                  registrationDate,
+                  paypalOrderId,
+                  paymentId,
+                  paymentAmount,
+                  paymentCurrency
+                }`,
+                { registrationId: customId }
+              );
+
+              if (registration) {
+                console.log('✅ Registration data fetched successfully');
+                break;
+              }
+            } catch (fetchError) {
+              console.warn(`⚠️ Retry ${retryCount + 1}/${maxRetries} failed:`, fetchError.message);
+            }
+
+            retryCount++;
+            if (retryCount < maxRetries) {
+              // Exponential backoff: 1s, 2s, 4s
+              await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+            }
+          }
 
           if (!registration) {
-            throw new Error(`Registration not found: ${customId}`);
+            throw new Error(`Registration not found after ${maxRetries} retries: ${customId}`);
           }
 
           // Prepare REAL payment data from webhook
           const realPaymentData = {
             transactionId: capture.id,
-            orderId: webhookEvent.resource.supplementary_data?.related_ids?.order_id || 'N/A',
-            amount: capture.amount.value,
+            orderId: webhookEvent.resource.supplementary_data?.related_ids?.order_id || capture.supplementary_data?.related_ids?.order_id || 'N/A',
+            amount: parseFloat(capture.amount.value),
             currency: capture.amount.currency_code,
             paymentMethod: 'PayPal',
             paymentDate: new Date().toISOString(),
-            status: capture.status,
+            status: capture.status === 'COMPLETED' ? 'Completed' : capture.status,
             capturedAt: new Date().toISOString(),
             paypalCaptureId: capture.id,
             paypalStatus: capture.status
           };
 
-          // Prepare registration data
+          // Prepare enhanced registration data with proper field mapping
+          const personalDetails = registration.personalDetails || {};
           const realRegistrationData = {
-            registrationId: registration._id,
-            fullName: `${registration.firstName || ''} ${registration.lastName || ''}`.trim(),
-            email: registration.email,
-            phone: registration.phoneNumber || 'N/A',
-            country: registration.country || 'N/A',
-            address: registration.address || 'N/A',
-            registrationType: registration.registrationType || 'Regular Registration',
-            numberOfParticipants: '1'
+            _id: registration._id, // Required for PDF storage
+            registrationId: registration.registrationId || registration._id,
+
+            // Personal details with fallback handling
+            fullName: personalDetails.firstName && personalDetails.lastName
+              ? `${personalDetails.title || ''} ${personalDetails.firstName} ${personalDetails.lastName}`.trim()
+              : registration.fullName || 'N/A',
+            email: personalDetails.email || registration.email,
+            phoneNumber: personalDetails.phoneNumber || registration.phoneNumber,
+            phone: personalDetails.phoneNumber || registration.phoneNumber,
+            country: personalDetails.country || registration.country,
+            address: personalDetails.fullPostalAddress || registration.address,
+
+            // Registration details
+            registrationType: registration.selectedRegistrationName || registration.registrationType || 'Regular Registration',
+            sponsorType: registration.sponsorType,
+            numberOfParticipants: registration.numberOfParticipants || 1,
+
+            // Accommodation details
+            accommodationType: registration.accommodationType,
+            accommodationNights: registration.accommodationNights,
+
+            // Pricing information
+            pricing: registration.pricing,
+
+            // Conference details
+            conferenceTitle: 'International Nursing Conference 2025',
+            conferenceDate: '2025-03-15 to 2025-03-17',
+            conferenceLocation: 'New York Convention Center, New York, USA',
+
+            // Additional fields for PDF storage
+            personalDetails: registration.personalDetails
           };
 
-          await sendPaymentReceiptEmailWithRealData(
+          // Get recipient email with fallback
+          const recipientEmail = realRegistrationData.email || personalDetails.email;
+
+          if (!recipientEmail) {
+            throw new Error('No email address found for registration');
+          }
+
+          console.log('📧 Sending payment receipt to:', recipientEmail);
+          console.log('💰 Payment amount:', `${realPaymentData.currency} ${realPaymentData.amount}`);
+
+          const emailResult = await sendPaymentReceiptEmailWithRealData(
             realPaymentData,
             realRegistrationData,
-            registration.email
+            recipientEmail
           );
 
-          console.log('✅ REAL payment receipt email sent from webhook for:', customId);
+          if (emailResult.success) {
+            console.log('✅ REAL payment receipt email sent from webhook:', {
+              registrationId: customId,
+              recipient: recipientEmail,
+              messageId: emailResult.messageId,
+              pdfGenerated: emailResult.pdfGenerated,
+              pdfUploaded: emailResult.pdfUploaded
+            });
+          } else {
+            console.error('❌ Failed to send payment receipt email:', emailResult.error);
+          }
+
         } catch (emailError) {
           console.error('⚠️ Failed to send REAL payment receipt from webhook:', {
             error: emailError instanceof Error ? emailError.message : 'Unknown error',
+            stack: emailError instanceof Error ? emailError.stack : undefined,
             registrationId: customId,
             timestamp: new Date().toISOString()
+          });
+
+          // Log additional debugging information
+          console.log('🔍 Webhook debugging info:', {
+            captureId: capture.id,
+            captureStatus: capture.status,
+            captureAmount: capture.amount,
+            customId: customId,
+            webhookEventType: webhookEvent.event_type
           });
         }
       });

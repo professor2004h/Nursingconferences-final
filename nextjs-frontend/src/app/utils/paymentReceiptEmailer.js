@@ -51,7 +51,8 @@ const sanityWriteClient = createClient({
 });
 
 /**
- * Generate PDF receipt with navy blue branding and gradient background
+ * SINGLE PAGE PDF LAYOUT - Matching Reference Image Design
+ * Optimized for single-page layout with compact spacing and essential information
  */
 async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
   if (!jsPDF) {
@@ -62,41 +63,61 @@ async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
 
-  // Convert hex colors to RGB for jsPDF - EXACT match to email header colors
-  const navyRGB = [15, 23, 42];      // #0f172a (exact dark navy blue from email)
-  const blueRGB = [30, 58, 138];     // #1e3a8a (exact blue accent from email)
-  const whiteRGB = [255, 255, 255];  // #ffffff
-  const grayRGB = [102, 102, 102];   // #666666
-  const darkGrayRGB = [51, 51, 51];  // #333333
+  // Single-page optimized layout constants matching reference image
+  const LAYOUT = {
+    margins: {
+      left: 20,
+      right: 20,
+      top: 15,
+      bottom: 20
+    },
+    spacing: {
+      sectionGap: 12,      // Reduced for single-page layout
+      lineHeight: 8,       // Compact line spacing
+      headerGap: 10,       // Reduced header spacing
+      fieldGap: 6          // Space between label and value
+    },
+    header: {
+      height: 50,          // Matching reference image header
+      titleY: 25,          // Company name position
+      subtitleY: 40        // "Registration Receipt" position
+    }
+  };
 
-  // Create EXACT navy blue gradient header background matching email header
-  // Header height optimized for compact layout (38px)
-  const headerHeight = 38;
-  const leftMargin = 12; // Consistent compact left margin
+  // Colors matching reference image
+  const colors = {
+    headerBg: [66, 103, 178],    // Blue header background from reference
+    headerText: [255, 255, 255], // White text on header
+    sectionHeader: [66, 103, 178], // Blue section headers
+    labelText: [102, 102, 102],  // Gray labels
+    valueText: [51, 51, 51],     // Dark text for values
+    footerText: [102, 102, 102]  // Light gray footer
+  };
 
-  // Base dark navy blue background (exact match to email)
-  doc.setFillColor(...navyRGB);
-  doc.rect(0, 0, pageWidth, headerHeight, 'F');
+  // Remove old constants that are no longer needed
+  // All layout now uses LAYOUT and colors objects
 
-  // Add gradient effect with exact same colors as email header
-  for (let i = 0; i < headerHeight; i += 1) {
-    const ratio = i / headerHeight;
-    const r = Math.round(navyRGB[0] + (blueRGB[0] - navyRGB[0]) * ratio);
-    const g = Math.round(navyRGB[1] + (blueRGB[1] - navyRGB[1]) * ratio);
-    const b = Math.round(navyRGB[2] + (blueRGB[2] - navyRGB[2]) * ratio);
+  // HEADER SECTION - Clean Logo-Only Design Matching Reference Image
+  // Navy blue gradient background (matching original design: #0f172a to #1e3a8a)
+  const navyDark = [15, 23, 42];   // #0f172a
+  const navyLight = [30, 58, 138]; // #1e3a8a
+
+  // Create navy blue gradient background
+  for (let i = 0; i < LAYOUT.header.height; i += 1) {
+    const ratio = i / LAYOUT.header.height;
+    const r = Math.round(navyDark[0] + (navyLight[0] - navyDark[0]) * ratio);
+    const g = Math.round(navyDark[1] + (navyLight[1] - navyDark[1]) * ratio);
+    const b = Math.round(navyDark[2] + (navyLight[2] - navyDark[2]) * ratio);
     doc.setFillColor(r, g, b);
     doc.rect(0, i, pageWidth, 1, 'F');
   }
 
-  // Header layout matching email header EXACTLY - logo and text positioned independently
-  doc.setTextColor(...whiteRGB);
-
+  // Add high-quality logo only (no text in header)
   if (footerLogo?.url) {
     try {
-      // HIGH QUALITY logo URL for crisp PDF display - enhanced parameters
+      // HIGH QUALITY logo URL for crisp PDF display
       let optimizedLogoUrl = footerLogo.url;
       if (footerLogo.url.includes('cdn.sanity.io')) {
-        // Maximum quality parameters for crisp logo display
         optimizedLogoUrl = `${footerLogo.url}?w=800&h=300&q=100&fit=max&fm=png`;
       }
 
@@ -105,128 +126,194 @@ async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
       const logoArrayBuffer = await logoResponse.arrayBuffer();
       const logoBase64 = Buffer.from(logoArrayBuffer).toString('base64');
 
-      // Determine image format from URL or content type
-      let imageFormat = 'PNG'; // Default to PNG for better quality
+      // Determine image format
+      let imageFormat = 'PNG';
       if (footerLogo.url.toLowerCase().includes('.png')) {
         imageFormat = 'PNG';
       } else if (footerLogo.url.toLowerCase().includes('.jpg') || footerLogo.url.toLowerCase().includes('.jpeg')) {
         imageFormat = 'JPEG';
       }
 
-      // Position ENLARGED logo prominently on the left side of header
-      const logoX = leftMargin; // Left margin 12px
-      const logoHeight = 24; // Enlarged for prominence (fits well in 38px header)
-      const logoWidth = 72; // Maintain aspect ratio with larger size
-      const logoY = (headerHeight - logoHeight) / 2; // Vertically centered
+      // Position logo in header with original dimensions and proper sizing
+      const logoWidth = 72;  // Original width for proper aspect ratio
+      const logoHeight = 24; // Original height for proper aspect ratio
+      const logoX = LAYOUT.margins.left;
+      const logoY = (LAYOUT.header.height - logoHeight) / 2;
 
-      // Add the HIGH QUALITY enlarged logo image to PDF
       const logoDataUrl = `data:image/${imageFormat.toLowerCase()};base64,${logoBase64}`;
       doc.addImage(logoDataUrl, imageFormat, logoX, logoY, logoWidth, logoHeight);
-
-      console.log('✅ HIGH QUALITY enlarged logo image embedded in PDF successfully');
+      console.log('✅ HIGH QUALITY logo embedded in PDF successfully');
     } catch (logoError) {
-      console.warn('⚠️  Failed to embed logo image, using text fallback:', logoError.message);
-      // Fallback to company name if logo loading fails
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Intelli Global Conferences', leftMargin, headerHeight / 2 + 3);
+      console.log('⚠️ Logo embedding failed:', logoError.message);
     }
-  } else {
-    // No logo available - use company name
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Intelli Global Conferences', leftMargin, headerHeight / 2 + 3);
   }
 
-  // NO "Registration Receipt" text in header - removed for cleaner look
+  // Conference title - matching reference image positioning
+  let yPos = LAYOUT.header.height + LAYOUT.spacing.sectionGap;
 
-  // Conference title - positioned below the compact 38px header
-  doc.setTextColor(...darkGrayRGB);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('International Nursing Conference 2025', 20, headerHeight + 20);
-
-  let yPos = headerHeight + 40; // Start content below compact header
-
-  // Payment Information Section
+  doc.setTextColor(...colors.valueText);
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...blueRGB);
-  doc.text('Payment Information', 20, yPos);
-  yPos += 15;
+  doc.text('International Nursing Conference 2025', LAYOUT.margins.left, yPos);
 
-  doc.setFontSize(10);
+  yPos += LAYOUT.spacing.sectionGap;
+
+  // PAYMENT INFORMATION SECTION - Matching Reference Image
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colors.sectionHeader);
+  doc.text('Payment Information', LAYOUT.margins.left, yPos);
+  yPos += LAYOUT.spacing.headerGap;
+
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...grayRGB);
 
-  // Payment details
+  // Payment details - essential information only for single page
   const paymentDetails = [
     ['Transaction ID:', paymentData.transactionId || 'N/A'],
     ['Order ID:', paymentData.orderId || 'N/A'],
     ['Amount:', `${paymentData.currency || 'USD'} ${paymentData.amount || '0.00'}`],
     ['Payment Method:', paymentData.paymentMethod || 'PayPal'],
-    ['Payment Date:', paymentData.paymentDate || new Date().toLocaleString()],
+    ['Payment Date:', paymentData.paymentDate ? new Date(paymentData.paymentDate).toLocaleDateString() : new Date().toLocaleDateString()],
     ['Status:', paymentData.status || 'Completed']
   ];
 
   paymentDetails.forEach(([label, value]) => {
-    doc.setTextColor(...grayRGB);
-    doc.text(label, 20, yPos);
-    doc.setTextColor(...darkGrayRGB);
-    doc.text(value, 80, yPos);
-    yPos += 12;
+    doc.setTextColor(...colors.labelText);
+    doc.text(label, LAYOUT.margins.left, yPos);
+    doc.setTextColor(...colors.valueText);
+    doc.text(value, LAYOUT.margins.left + 55, yPos);
+    yPos += LAYOUT.spacing.lineHeight;
   });
 
-  yPos += 10;
+  yPos += LAYOUT.spacing.sectionGap;
 
-  // Registration Details Section
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...blueRGB);
-  doc.text('Registration Details', 20, yPos);
-  yPos += 15;
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-
-  const registrationDetails = [
-    ['Registration ID:', registrationData.registrationId || 'N/A'],
-    ['Full Name:', registrationData.fullName || 'N/A'],
-    ['Email:', registrationData.email || 'N/A'],
-    ['Phone:', registrationData.phone || 'N/A'],
-    ['Country:', registrationData.country || 'N/A'],
-    ['Address:', registrationData.address || 'N/A'],
-    ['Registration Type:', registrationData.registrationType || 'Regular Registration'],
-    ['Participants:', String(registrationData.numberOfParticipants || 1)]
-  ];
-
-  registrationDetails.forEach(([label, value]) => {
-    doc.setTextColor(...grayRGB);
-    doc.text(label, 20, yPos);
-    doc.setTextColor(...darkGrayRGB);
-    doc.text(value, 80, yPos);
-    yPos += 12;
-  });
-
-  yPos += 20; // Extra spacing before contact info
-
-  // Contact Information
+  // REGISTRATION DETAILS SECTION - Matching Reference Image
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...blueRGB);
-  doc.text('Contact Information', 20, yPos);
-  yPos += 15;
+  doc.setTextColor(...colors.sectionHeader);
+  doc.text('Registration Details', LAYOUT.margins.left, yPos);
+  yPos += LAYOUT.spacing.headerGap;
 
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...darkGrayRGB);
-  doc.text('Email: contactus@intelliglobalconferences.com', 20, yPos);
 
-  // Footer
+  // Registration details - essential information only for single page
+  const registrationDetails = [];
+
+  // Registration ID
+  registrationDetails.push(['Registration ID:', registrationData.registrationId || 'N/A']);
+
+  // Full name with multiple field support
+  const fullName = registrationData.fullName ||
+    (registrationData.personalDetails ?
+      `${registrationData.personalDetails.title || ''} ${registrationData.personalDetails.firstName || ''} ${registrationData.personalDetails.lastName || ''}`.trim()
+      : 'N/A');
+  registrationDetails.push(['Full Name:', fullName]);
+
+  // Email
+  const email = registrationData.email || registrationData.personalDetails?.email;
+  if (email) {
+    registrationDetails.push(['Email:', email]);
+  }
+
+  // Phone
+  const phone = registrationData.phoneNumber || registrationData.phone || registrationData.personalDetails?.phoneNumber;
+  if (phone) {
+    registrationDetails.push(['Phone:', phone]);
+  }
+
+  // Country
+  const country = registrationData.country || registrationData.personalDetails?.country;
+  if (country) {
+    registrationDetails.push(['Country:', country]);
+  }
+
+  // Address - simplified for single page layout
+  const address = registrationData.address || registrationData.personalDetails?.fullPostalAddress;
+  if (address) {
+    // Truncate long addresses for single page layout
+    const shortAddress = address.length > 50 ? address.substring(0, 47) + '...' : address;
+    registrationDetails.push(['Address:', shortAddress]);
+  }
+
+  // Additional details - only essential ones for single page
+  if (registrationData.sponsorType) {
+    registrationDetails.push(['Sponsorship Type:', registrationData.sponsorType]);
+  }
+
+  const participantCount = String(registrationData.numberOfParticipants || '1');
+  registrationDetails.push(['Number of Participants:', participantCount]);
+
+  // Render registration details with compact spacing
+  registrationDetails.forEach(([label, value]) => {
+    doc.setTextColor(...colors.labelText);
+    doc.text(label, LAYOUT.margins.left, yPos);
+    doc.setTextColor(...colors.valueText);
+    doc.text(value, LAYOUT.margins.left + 55, yPos);
+    yPos += LAYOUT.spacing.lineHeight;
+  });
+
+  yPos += LAYOUT.spacing.sectionGap;
+
+  // PAYMENT SUMMARY SECTION - Matching Reference Image
+  if (registrationData.pricing || paymentData.amount) {
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.sectionHeader);
+    doc.text('Payment Summary', LAYOUT.margins.left, yPos);
+    yPos += LAYOUT.spacing.headerGap;
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+
+    const pricing = registrationData.pricing;
+    const currency = pricing?.currency || paymentData.currency || 'USD';
+
+    if (pricing && pricing.registrationFee) {
+      // Registration fee
+      doc.setTextColor(...colors.labelText);
+      doc.text('Registration Fee:', LAYOUT.margins.left, yPos);
+      doc.setTextColor(...colors.valueText);
+      doc.text(`${currency} ${pricing.registrationFee}`, LAYOUT.margins.left + 55, yPos);
+      yPos += LAYOUT.spacing.lineHeight;
+    }
+
+    // Total amount with emphasis
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.labelText);
+    doc.text('Total Amount:', LAYOUT.margins.left, yPos);
+    doc.setTextColor(...colors.valueText);
+    doc.text(`${currency} ${pricing?.totalPrice || paymentData.amount || '0.00'}`, LAYOUT.margins.left + 55, yPos);
+    yPos += LAYOUT.spacing.lineHeight;
+
+    yPos += LAYOUT.spacing.sectionGap;
+  }
+
+  // CONTACT INFORMATION SECTION - Matching Reference Image
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...colors.sectionHeader);
+  doc.text('Contact Information', LAYOUT.margins.left, yPos);
+  yPos += LAYOUT.spacing.headerGap;
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...colors.valueText);
+
+  // Essential contact information with correct email
+  doc.text('Email: contactus@intelliglobalconferences.com', LAYOUT.margins.left, yPos);
+  yPos += LAYOUT.spacing.lineHeight + 2;
+
+  // Footer section - matching reference image style
+  yPos += LAYOUT.spacing.sectionGap;
+
   doc.setFontSize(8);
-  doc.setTextColor(...grayRGB);
-  doc.text('© 2025 International Nursing Conference 2025', 20, pageHeight - 20);
-  doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, pageHeight - 10);
+  doc.setTextColor(...colors.footerText);
+  doc.text('Thank you for registering for the International Nursing Conference 2025', LAYOUT.margins.left, yPos);
+  yPos += LAYOUT.spacing.lineHeight;
+
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, LAYOUT.margins.left, yPos);
 
   // Convert to buffer
   const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
