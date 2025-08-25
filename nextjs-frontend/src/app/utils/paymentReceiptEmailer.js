@@ -239,7 +239,7 @@ async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
 
   // Additional details - only essential ones for single page
   if (registrationData.sponsorType) {
-    registrationDetails.push(['Sponsorship Type:', registrationData.sponsorType]);
+    registrationDetails.push(['Registration Type:', registrationData.sponsorType]);
   }
 
   const participantCount = String(registrationData.numberOfParticipants || '1');
