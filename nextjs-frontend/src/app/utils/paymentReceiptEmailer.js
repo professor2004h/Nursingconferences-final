@@ -237,9 +237,10 @@ async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
     registrationDetails.push(['Address:', shortAddress]);
   }
 
-  // Additional details - only essential ones for single page
-  if (registrationData.sponsorType) {
-    registrationDetails.push(['Registration Type:', registrationData.sponsorType]);
+  // Dynamic Registration Type display based on registration category
+  const registrationType = getRegistrationTypeDisplay(registrationData);
+  if (registrationType) {
+    registrationDetails.push(['Registration Type:', registrationType]);
   }
 
   const participantCount = String(registrationData.numberOfParticipants || '1');
@@ -819,10 +820,11 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
                   <td style="padding: 6px 0; color: #666;">Address:</td>
                   <td style="padding: 6px 0; color: #333;">${registrationData.address || 'N/A'}</td>
                 </tr>
+                ${getRegistrationTypeDisplay(registrationData) ? `
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Registration Type:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.registrationType || 'Regular Registration'}</td>
-                </tr>
+                  <td style="padding: 6px 0; color: #333;">${getRegistrationTypeDisplay(registrationData)}</td>
+                </tr>` : ''}
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Number of Participants:</td>
                   <td style="padding: 6px 0; color: #333;">${String(registrationData.numberOfParticipants || 1)}</td>
@@ -884,7 +886,7 @@ Email: ${registrationData.email || recipientEmail}
 Phone: ${registrationData.phone || 'N/A'}
 Country: ${registrationData.country || 'N/A'}
 Address: ${registrationData.address || 'N/A'}
-Registration Type: ${registrationData.registrationType || 'Regular Registration'}
+${getRegistrationTypeDisplay(registrationData) ? `Registration Type: ${getRegistrationTypeDisplay(registrationData)}` : ''}
 Number of Participants: ${String(registrationData.numberOfParticipants || 1)}
 
 PAYMENT SUMMARY:
@@ -1235,10 +1237,11 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
                   <td style="padding: 6px 0; color: #666;">Address:</td>
                   <td style="padding: 6px 0; color: #333;">${registrationData.address || 'N/A'}</td>
                 </tr>
+                ${getRegistrationTypeDisplay(registrationData) ? `
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Registration Type:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.registrationType || 'Regular Registration'}</td>
-                </tr>
+                  <td style="padding: 6px 0; color: #333;">${getRegistrationTypeDisplay(registrationData)}</td>
+                </tr>` : ''}
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Number of Participants:</td>
                   <td style="padding: 6px 0; color: #333;">${String(registrationData.numberOfParticipants || 1)}</td>
@@ -1283,7 +1286,7 @@ Email: ${registrationData.email || recipientEmail}
 Phone: ${registrationData.phone || 'N/A'}
 Country: ${registrationData.country || 'N/A'}
 Address: ${registrationData.address || 'N/A'}
-Registration Type: ${registrationData.registrationType || 'Regular Registration'}
+${getRegistrationTypeDisplay(registrationData) ? `Registration Type: ${getRegistrationTypeDisplay(registrationData)}` : ''}
 Number of Participants: ${String(registrationData.numberOfParticipants || 1)}
 
 CONTACT INFORMATION:
@@ -1382,6 +1385,32 @@ Generated on: ${new Date().toLocaleString()}
  * UNIFIED PDF GENERATION SERVICE
  * Ensures consistency across all PDF generation methods (email, print, download)
  */
+
+/**
+ * Determine registration type display based on registration category
+ * @param {Object} registrationData - Registration information
+ * @returns {string|null} - Registration type display string or null if none
+ */
+function getRegistrationTypeDisplay(registrationData) {
+  // Check for sponsorship registration first
+  if (registrationData.sponsorType) {
+    return `Sponsorship - ${registrationData.sponsorType}`;
+  }
+
+  // Check for regular registration type
+  if (registrationData.registrationType) {
+    const regType = registrationData.registrationType.toLowerCase();
+    if (regType === 'regular' || regType === 'standard' || regType === 'normal') {
+      return 'Regular';
+    }
+    // For other registration types, display as-is with proper capitalization
+    return registrationData.registrationType.charAt(0).toUpperCase() +
+           registrationData.registrationType.slice(1).toLowerCase();
+  }
+
+  // No registration type information available
+  return null;
+}
 
 /**
  * Generate PDF receipt with unified formatting
