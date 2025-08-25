@@ -135,10 +135,10 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
 
       console.log('✅ Registration updated with payment completion:', customId);
 
-      // Send REAL payment receipt email (non-blocking with enhanced error handling)
+      // Send REAL payment receipt email to CUSTOMER (non-blocking with enhanced error handling)
       setImmediate(async () => {
         try {
-          console.log('📧 Sending REAL payment receipt from webhook for:', customId);
+          console.log('📧 Sending REAL payment receipt from webhook to CUSTOMER for:', customId);
 
           // Import the payment receipt emailer
           const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
@@ -241,32 +241,64 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
             personalDetails: registration.personalDetails
           };
 
-          // Get recipient email with fallback
-          const recipientEmail = realRegistrationData.email || personalDetails.email;
+          // Get CUSTOMER email address with multiple fallbacks
+          const customerEmail = realRegistrationData.email ||
+                               personalDetails?.email ||
+                               registration.personalDetails?.email ||
+                               registration.email;
 
-          if (!recipientEmail) {
-            throw new Error('No email address found for registration');
+          if (!customerEmail) {
+            console.error('❌ No customer email address found for registration:', customId);
+            throw new Error('No customer email address found for registration');
           }
 
-          console.log('📧 Sending payment receipt to:', recipientEmail);
+          console.log('📧 Sending payment receipt to CUSTOMER:', customerEmail);
           console.log('💰 Payment amount:', `${realPaymentData.currency} ${realPaymentData.amount}`);
+          console.log('🎯 Registration ID:', realRegistrationData.registrationId);
+          console.log('👤 Customer Name:', realRegistrationData.fullName);
 
+          // Send receipt to CUSTOMER with PDF storage in Sanity
           const emailResult = await sendPaymentReceiptEmailWithRealData(
             realPaymentData,
             realRegistrationData,
-            recipientEmail
+            customerEmail
           );
 
           if (emailResult.success) {
-            console.log('✅ REAL payment receipt email sent from webhook:', {
-              registrationId: customId,
-              recipient: recipientEmail,
-              messageId: emailResult.messageId,
-              pdfGenerated: emailResult.pdfGenerated,
-              pdfUploaded: emailResult.pdfUploaded
-            });
+            console.log('✅ REAL payment receipt sent successfully to CUSTOMER from webhook');
+            console.log('📧 Customer email:', customerEmail);
+            console.log('📄 PDF generated:', emailResult.pdfGenerated);
+            console.log('📊 PDF size:', emailResult.pdfSize ? `${(emailResult.pdfSize / 1024).toFixed(2)} KB` : 'N/A');
+            console.log('💾 PDF stored in Sanity:', emailResult.pdfUploaded);
+            console.log('🆔 PDF Asset ID:', emailResult.pdfAssetId || 'N/A');
+            console.log('🔗 Email Message ID:', emailResult.messageId);
+            console.log('🎯 Registration updated with payment completion');
+
+            // Update registration with email sent status
+            await client
+              .patch(customId)
+              .set({
+                receiptEmailSent: true,
+                receiptEmailSentAt: new Date().toISOString(),
+                receiptEmailRecipient: customerEmail,
+                pdfReceiptGenerated: emailResult.pdfGenerated,
+                pdfReceiptStoredInSanity: emailResult.pdfUploaded
+              })
+              .commit();
+
+            console.log('✅ Registration updated with receipt delivery status');
           } else {
-            console.error('❌ Failed to send payment receipt email:', emailResult.error);
+            console.error('❌ Failed to send payment receipt to CUSTOMER from webhook:', emailResult.error);
+
+            // Update registration with email failure status
+            await client
+              .patch(customId)
+              .set({
+                receiptEmailSent: false,
+                receiptEmailError: emailResult.error,
+                receiptEmailAttemptedAt: new Date().toISOString()
+              })
+              .commit();
           }
 
         } catch (emailError) {
