@@ -480,16 +480,35 @@ async function getEmailConfig() {
     const siteSettings = await getSiteSettings();
     const emailSettings = siteSettings?.adminSettings?.emailSettings;
 
-    // Use Sanity settings if available, otherwise fall back to environment variables
-    return {
-      host: emailSettings?.smtpHost || process.env.SMTP_HOST || 'smtp.hostinger.com',
-      port: parseInt(emailSettings?.smtpPort || process.env.SMTP_PORT || '465'),
-      secure: emailSettings?.smtpSecure !== false && (process.env.SMTP_SECURE === 'true' || true),
-      user: emailSettings?.smtpUser || process.env.SMTP_USER || 'contactus@intelliglobalconferences.com',
+    // PRODUCTION: Prioritize environment variables for production deployment
+    const productionConfig = {
+      host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: process.env.SMTP_SECURE === 'true' || true,
+      user: process.env.SMTP_USER || 'contactus@intelliglobalconferences.com',
       pass: process.env.SMTP_PASS, // Always from environment for security
-      fromEmail: emailSettings?.fromEmail || process.env.EMAIL_FROM || 'contactus@intelliglobalconferences.com',
-      fromName: emailSettings?.fromName || process.env.EMAIL_FROM_NAME || 'Intelli Global Conferences'
+      fromEmail: process.env.EMAIL_FROM || 'contactus@intelliglobalconferences.com',
+      fromName: process.env.EMAIL_FROM_NAME || 'Intelli Global Conferences'
     };
+
+    // Use Sanity settings as fallback only if environment variables are not set
+    if (!process.env.SMTP_HOST && emailSettings?.smtpHost) {
+      productionConfig.host = emailSettings.smtpHost;
+    }
+    if (!process.env.SMTP_PORT && emailSettings?.smtpPort) {
+      productionConfig.port = parseInt(emailSettings.smtpPort);
+    }
+    if (!process.env.SMTP_USER && emailSettings?.smtpUser) {
+      productionConfig.user = emailSettings.smtpUser;
+    }
+    if (!process.env.EMAIL_FROM && emailSettings?.fromEmail) {
+      productionConfig.fromEmail = emailSettings.fromEmail;
+    }
+    if (!process.env.EMAIL_FROM_NAME && emailSettings?.fromName) {
+      productionConfig.fromName = emailSettings.fromName;
+    }
+
+    return productionConfig;
   } catch (error) {
     console.error('⚠️  Failed to fetch email config from Sanity, using environment defaults:', error.message);
     return {
@@ -1359,11 +1378,51 @@ Generated on: ${new Date().toLocaleString()}
   }
 }
 
+/**
+ * UNIFIED PDF GENERATION SERVICE
+ * Ensures consistency across all PDF generation methods (email, print, download)
+ */
+
+/**
+ * Generate PDF receipt with unified formatting
+ * This is the SINGLE source of truth for all PDF generation
+ * @param {Object} paymentData - Payment information
+ * @param {Object} registrationData - Registration information
+ * @param {Object} footerLogo - Logo data from Sanity (optional)
+ * @returns {Buffer} PDF buffer
+ */
+async function generateUnifiedReceiptPDF(paymentData, registrationData, footerLogo = null) {
+  // If no logo provided, fetch it
+  if (!footerLogo) {
+    footerLogo = await getFooterLogo();
+  }
+
+  // Use the existing generateReceiptPDF function which has the correct layout
+  return await generateReceiptPDF(paymentData, registrationData, footerLogo);
+}
+
+/**
+ * Production-ready email configuration with environment variables
+ */
+function getProductionEmailConfig() {
+  return {
+    host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+    port: parseInt(process.env.SMTP_PORT || '465'),
+    secure: process.env.SMTP_SECURE === 'true' || true,
+    user: process.env.SMTP_USER || 'contactus@intelliglobalconferences.com',
+    pass: process.env.SMTP_PASS,
+    fromEmail: process.env.EMAIL_FROM || 'contactus@intelliglobalconferences.com',
+    fromName: process.env.EMAIL_FROM_NAME || 'Intelli Global Conferences'
+  };
+}
+
 module.exports = {
   sendPaymentReceiptEmail,
   sendPaymentReceiptEmailWithRealData,
   getFooterLogo,
   getSiteSettings,
   getEmailConfig,
-  generateReceiptPDF
+  generateReceiptPDF,
+  generateUnifiedReceiptPDF, // NEW: Unified PDF generation
+  getProductionEmailConfig // NEW: Production email config
 };

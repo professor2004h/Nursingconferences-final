@@ -189,12 +189,53 @@ export default function RegistrationSuccessPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6 no-print">
+                <div className="flex flex-col sm:flex-row gap-3 pt-6 no-print">
                   <button
                     onClick={() => window.print()}
                     className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     Print Registration Receipt
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        // Download PDF using the UNIFIED PDF generation system
+                        const response = await fetch('/api/registration/receipt-pdf', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            registrationId,
+                            transactionId,
+                            orderId,
+                            amount,
+                            currency,
+                            capturedAt
+                          }),
+                        });
+
+                        if (response.ok) {
+                          const blob = await response.blob();
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `Registration_Receipt_${registrationId}.pdf`;
+                          document.body.appendChild(a);
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                          document.body.removeChild(a);
+                        } else {
+                          alert('Failed to download PDF. Please try again.');
+                        }
+                      } catch (error) {
+                        console.error('Error downloading PDF:', error);
+                        alert('Failed to download PDF. Please try again.');
+                      }
+                    }}
+                    className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    Download PDF Receipt
                   </button>
                   <button
                     onClick={async () => {
