@@ -851,9 +851,29 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
   try {
     console.log('🚀 Sending payment receipt with REAL dynamic data...');
 
+    // Enhanced validation and logging
+    console.log('📋 Input validation:', {
+      hasPaymentData: !!paymentData,
+      hasRegistrationData: !!registrationData,
+      hasRecipientEmail: !!recipientEmail,
+      registrationId: registrationData?._id || registrationData?.registrationId,
+      transactionId: paymentData?.transactionId
+    });
+
+    // Validate required data
+    if (!paymentData || !registrationData || !recipientEmail) {
+      throw new Error('Missing required data: paymentData, registrationData, or recipientEmail');
+    }
+
     // Validate that we have real payment data (not test values)
     if (!paymentData.transactionId || paymentData.transactionId.includes('test') || paymentData.transactionId.includes('TEST')) {
       console.warn('⚠️  Warning: Payment data appears to be test data');
+    }
+
+    // Ensure registration data has required _id field for PDF storage
+    if (!registrationData._id) {
+      console.warn('⚠️  Warning: Registration data missing _id field - PDF storage may fail');
+      console.log('📋 Available registration fields:', Object.keys(registrationData));
     }
 
     // Fetch dynamic content from Sanity CMS
@@ -1181,19 +1201,51 @@ Generated on: ${new Date().toLocaleString()}
     let pdfUploaded = false;
     let pdfAssetId = null;
 
+    console.log('📤 Starting PDF upload to Sanity...');
+    console.log('📋 PDF upload conditions:', {
+      hasPdfBuffer: !!pdfBuffer,
+      pdfBufferSize: pdfBuffer ? pdfBuffer.length : 0,
+      hasRegistrationId: !!registrationData._id,
+      registrationId: registrationData._id,
+      hasSanityToken: !!process.env.SANITY_API_TOKEN
+    });
+
     if (pdfBuffer && registrationData._id) {
-      const filename = `receipt_${registrationData.registrationId || 'unknown'}_${Date.now()}.pdf`;
-      const pdfAsset = await uploadPDFToSanity(pdfBuffer, filename);
+      try {
+        const filename = `receipt_${registrationData.registrationId || registrationData._id || 'unknown'}_${Date.now()}.pdf`;
+        console.log(`📤 Uploading PDF: ${filename}`);
 
-      if (pdfAsset) {
-        const updateSuccess = await updateRegistrationWithPDF(registrationData._id, pdfAsset);
-        pdfUploaded = updateSuccess;
-        pdfAssetId = pdfAsset._id;
+        const pdfAsset = await uploadPDFToSanity(pdfBuffer, filename);
 
-        if (updateSuccess) {
-          console.log(`✅ PDF receipt stored in Sanity for registration: ${registrationData._id}`);
+        if (pdfAsset) {
+          console.log(`✅ PDF uploaded successfully: ${pdfAsset._id}`);
+
+          const updateSuccess = await updateRegistrationWithPDF(registrationData._id, pdfAsset);
+          pdfUploaded = updateSuccess;
+          pdfAssetId = pdfAsset._id;
+
+          if (updateSuccess) {
+            console.log(`✅ PDF receipt stored in Sanity for registration: ${registrationData._id}`);
+          } else {
+            console.error(`❌ Failed to link PDF to registration: ${registrationData._id}`);
+          }
+        } else {
+          console.error('❌ PDF upload to Sanity failed');
         }
+      } catch (pdfUploadError) {
+        console.error('❌ PDF upload process failed:', pdfUploadError.message);
+        console.error('📋 PDF upload error details:', {
+          error: pdfUploadError.message,
+          stack: pdfUploadError.stack,
+          registrationId: registrationData._id,
+          hasSanityToken: !!process.env.SANITY_API_TOKEN
+        });
       }
+    } else {
+      const reasons = [];
+      if (!pdfBuffer) reasons.push('No PDF buffer generated');
+      if (!registrationData._id) reasons.push('Missing registration _id');
+      console.warn(`⚠️  Skipping PDF upload: ${reasons.join(', ')}`);
     }
 
     return {

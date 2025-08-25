@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
         // Import the updated payment receipt emailer
         const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
 
-        // Fetch registration data from Sanity with retry logic
+        // Fetch registration data from Sanity with retry logic and complete field structure
         let registration = null;
         let retryCount = 0;
         const maxRetries = 3;
@@ -150,7 +150,22 @@ export async function POST(request: NextRequest) {
         while (!registration && retryCount < maxRetries) {
           try {
             registration = await client.fetch(
-              `*[_type == "conferenceRegistration" && _id == $registrationId][0]`,
+              `*[_type == "conferenceRegistration" && _id == $registrationId][0]{
+                _id,
+                registrationId,
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                country,
+                address,
+                registrationType,
+                personalDetails,
+                pricing,
+                paymentStatus,
+                registrationDate,
+                pdfReceipt
+              }`,
               { registrationId }
             );
 
@@ -172,6 +187,12 @@ export async function POST(request: NextRequest) {
         }
 
         console.log('✅ Registration data retrieved successfully');
+        console.log('📋 Registration fields:', {
+          _id: registration._id,
+          registrationId: registration.registrationId,
+          email: registration.email || registration.personalDetails?.email,
+          hasPersonalDetails: !!registration.personalDetails
+        });
 
         // Prepare REAL payment data from PayPal response
         const realPaymentData = {
@@ -188,22 +209,41 @@ export async function POST(request: NextRequest) {
           paypalStatus: capture?.status
         };
 
-        // Prepare registration data
+        // Prepare registration data with correct structure for email system
         const realRegistrationData = {
-          registrationId: registration._id,
-          fullName: `${registration.firstName || ''} ${registration.lastName || ''}`.trim(),
-          email: registration.email,
-          phone: registration.phoneNumber || 'N/A',
-          country: registration.country || 'N/A',
-          address: registration.address || 'N/A',
+          _id: registration._id, // CRITICAL: Required for PDF storage
+          registrationId: registration.registrationId || registration._id,
+          fullName: `${registration.firstName || registration.personalDetails?.firstName || ''} ${registration.lastName || registration.personalDetails?.lastName || ''}`.trim(),
+          email: registration.email || registration.personalDetails?.email,
+          phone: registration.phoneNumber || registration.personalDetails?.phoneNumber || 'N/A',
+          country: registration.country || registration.personalDetails?.country || 'N/A',
+          address: registration.address || registration.personalDetails?.fullPostalAddress || 'N/A',
           registrationType: registration.registrationType || 'Regular Registration',
-          numberOfParticipants: '1'
+          numberOfParticipants: '1',
+          // Include original registration object for fallback
+          originalRegistration: registration
         };
+
+        console.log('📋 Prepared registration data:', {
+          _id: realRegistrationData._id,
+          registrationId: realRegistrationData.registrationId,
+          email: realRegistrationData.email,
+          fullName: realRegistrationData.fullName
+        });
+
+        // Use the correct email field
+        const recipientEmail = realRegistrationData.email;
+
+        if (!recipientEmail) {
+          throw new Error('No email address found for registration');
+        }
+
+        console.log('📧 Sending payment receipt to:', recipientEmail);
 
         await sendPaymentReceiptEmailWithRealData(
           realPaymentData,
           realRegistrationData,
-          registration.email
+          recipientEmail
         );
 
         console.log('✅ REAL payment receipt email sent successfully for:', registrationId);
