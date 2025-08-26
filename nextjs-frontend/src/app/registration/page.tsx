@@ -1405,8 +1405,8 @@ function RegistrationPageContent() {
                         </p>
                       </div>
 
-                      {/* Payment Buttons Grid - Side by side on all devices */}
-                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                      {/* Payment Buttons Grid - Rows on mobile, side by side on larger screens */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         {/* PayPal Payment Option */}
                         <div className="space-y-2">
                           <div className="text-center">
