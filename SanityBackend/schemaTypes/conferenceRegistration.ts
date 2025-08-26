@@ -247,11 +247,140 @@ export const conferenceRegistration = defineType({
       options: {
         list: [
           { title: 'PayPal', value: 'paypal' },
+          { title: 'Razorpay', value: 'razorpay' },
           { title: 'Test Payment', value: 'test_payment' },
         ],
       },
       initialValue: 'paypal',
       description: 'Payment method used for transaction',
+    }),
+
+    // Razorpay-specific fields
+    defineField({
+      name: 'paymentId',
+      title: 'Payment ID (Razorpay)',
+      type: 'string',
+      description: 'Razorpay payment ID from successful payment capture',
+    }),
+
+    defineField({
+      name: 'paymentOrderId',
+      title: 'Payment Order ID (Razorpay)',
+      type: 'string',
+      description: 'Razorpay order ID from payment processing',
+    }),
+
+    defineField({
+      name: 'paymentSignature',
+      title: 'Payment Signature (Razorpay)',
+      type: 'string',
+      description: 'Razorpay payment signature for verification',
+    }),
+
+    defineField({
+      name: 'paymentAmount',
+      title: 'Payment Amount',
+      type: 'number',
+      description: 'Actual payment amount processed',
+    }),
+
+    defineField({
+      name: 'paymentCurrency',
+      title: 'Payment Currency',
+      type: 'string',
+      description: 'Currency used for the payment transaction',
+    }),
+
+    defineField({
+      name: 'paymentCapturedAt',
+      title: 'Payment Captured At',
+      type: 'datetime',
+      description: 'When the payment was captured/completed',
+    }),
+
+    defineField({
+      name: 'razorpayPaymentData',
+      title: 'Razorpay Payment Data',
+      type: 'object',
+      description: 'Complete Razorpay payment information',
+      fields: [
+        {
+          name: 'orderId',
+          title: 'Order ID',
+          type: 'string',
+        },
+        {
+          name: 'paymentId',
+          title: 'Payment ID',
+          type: 'string',
+        },
+        {
+          name: 'signature',
+          title: 'Signature',
+          type: 'string',
+        },
+        {
+          name: 'amount',
+          title: 'Amount',
+          type: 'number',
+        },
+        {
+          name: 'currency',
+          title: 'Currency',
+          type: 'string',
+        },
+        {
+          name: 'verifiedAt',
+          title: 'Verified At',
+          type: 'datetime',
+        },
+      ],
+    }),
+
+    defineField({
+      name: 'receiptEmailSent',
+      title: 'Receipt Email Sent',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Whether payment receipt email was sent',
+    }),
+
+    defineField({
+      name: 'receiptEmailSentAt',
+      title: 'Receipt Email Sent At',
+      type: 'datetime',
+      description: 'When the receipt email was sent',
+    }),
+
+    defineField({
+      name: 'receiptEmailRecipient',
+      title: 'Receipt Email Recipient',
+      type: 'email',
+      description: 'Email address where receipt was sent',
+    }),
+
+    defineField({
+      name: 'pdfReceiptGenerated',
+      title: 'PDF Receipt Generated',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Whether PDF receipt was generated',
+    }),
+
+    defineField({
+      name: 'pdfReceiptStoredInSanity',
+      title: 'PDF Receipt Stored in Sanity',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Whether PDF receipt was uploaded to Sanity',
+    }),
+
+    defineField({
+      name: 'webhookProcessed',
+      title: 'Webhook Processed',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Whether payment webhook was processed successfully',
     }),
 
     defineField({

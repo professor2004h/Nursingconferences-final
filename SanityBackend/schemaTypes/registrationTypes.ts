@@ -114,6 +114,31 @@ export const registrationTypes = defineType({
       validation: Rule => Rule.required().min(0),
     }),
 
+    // INR Pricing
+    defineField({
+      name: 'earlyBirdPriceINR',
+      title: 'Early Bird Registration Price (INR)',
+      type: 'number',
+      description: 'Price in INR during the early bird registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'nextRoundPriceINR',
+      title: 'Next Round Registration Price (INR)',
+      type: 'number',
+      description: 'Price in INR during the mid-term registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
+    defineField({
+      name: 'onSpotPriceINR',
+      title: 'OnSpot Registration Price (INR)',
+      type: 'number',
+      description: 'Price in INR during the final/spot registration period',
+      validation: Rule => Rule.required().min(0),
+    }),
+
     defineField({
       name: 'benefits',
       title: 'Registration Benefits',

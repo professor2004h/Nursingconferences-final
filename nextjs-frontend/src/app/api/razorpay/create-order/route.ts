@@ -17,8 +17,12 @@ interface CreateOrderRequest {
 export async function POST(request: NextRequest) {
   try {
     console.log('🔷 Razorpay order creation requested...');
-    
+    console.log('🔷 Request URL:', request.url);
+    console.log('🔷 Request method:', request.method);
+
     const body: CreateOrderRequest = await request.json();
+    console.log('🔷 Request body received:', JSON.stringify(body, null, 2));
+
     const { amount, currency, registrationId, customerEmail, customerName } = body;
     
     // Validate required fields
@@ -39,13 +43,27 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Initialize Razorpay with live credentials
+    // Initialize Razorpay with environment credentials
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret) {
+      console.error('❌ Missing Razorpay credentials in environment variables');
+      return NextResponse.json(
+        { error: 'Razorpay credentials not configured' },
+        { status: 500 }
+      );
+    }
+
     const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_R9VnwrQgZO91tz',
-      key_secret: process.env.RAZORPAY_KEY_SECRET || 'onO6rsu0Bg20oIgjUygqJTEl',
+      key_id: keyId,
+      key_secret: keySecret,
     });
-    
-    console.log('🔷 Razorpay instance created with live credentials');
+
+    console.log('🔷 Razorpay instance created with credentials:', {
+      keyId: keyId.substring(0, 12) + '...',
+      environment: keyId.includes('test') ? 'TEST' : 'LIVE'
+    });
     console.log('📊 Order details:', {
       amount,
       currency,
@@ -54,14 +72,29 @@ export async function POST(request: NextRequest) {
       customerName: customerName || 'Not provided'
     });
     
+    // Validate currency support for Razorpay
+    const supportedCurrencies = ['USD', 'EUR', 'GBP', 'INR'];
+    if (!supportedCurrencies.includes(currency.toUpperCase())) {
+      console.error(`❌ Unsupported currency for Razorpay: ${currency}`);
+      return NextResponse.json(
+        { error: `Currency ${currency} is not supported. Supported currencies: ${supportedCurrencies.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
     // Convert amount to smallest currency unit (paise for INR, cents for USD)
     const amountInSmallestUnit = Math.round(amount * 100);
     
     // Create order options
+    // Generate a short receipt (max 40 chars) - use last 8 chars of regId + timestamp
+    const shortRegId = registrationId.slice(-8);
+    const shortTimestamp = Date.now().toString().slice(-6);
+    const receipt = `rcpt_${shortRegId}_${shortTimestamp}`;
+
     const orderOptions = {
       amount: amountInSmallestUnit,
       currency: currency.toUpperCase(),
-      receipt: `receipt_${registrationId}_${Date.now()}`,
+      receipt: receipt,
       payment_capture: 1, // Auto capture payment
       notes: {
         registrationId,
@@ -77,7 +110,9 @@ export async function POST(request: NextRequest) {
     });
     
     // Create order with Razorpay
+    console.log('🔷 Calling Razorpay API with options:', orderOptions);
     const order = await razorpay.orders.create(orderOptions);
+    console.log('🔷 Raw Razorpay API response:', order);
     
     console.log('✅ Razorpay order created successfully:', {
       orderId: order.id,
@@ -98,7 +133,7 @@ export async function POST(request: NextRequest) {
         status: order.status,
         created_at: order.created_at
       },
-      razorpayKeyId: process.env.RAZORPAY_KEY_ID || 'rzp_live_R9VnwrQgZO91tz',
+      razorpayKeyId: keyId,
       registrationId,
       customerDetails: {
         email: customerEmail,
@@ -108,9 +143,20 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error('❌ Razorpay order creation failed:', error);
-    
+    console.error('❌ Error type:', typeof error);
+    console.error('❌ Error constructor:', error?.constructor?.name);
+
+    // Log the full error object for debugging
+    if (error && typeof error === 'object') {
+      console.error('❌ Error properties:', Object.keys(error));
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
+    }
+
     // Handle specific Razorpay errors
     if (error instanceof Error) {
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error stack:', error.stack);
+
       if (error.message.includes('Invalid key')) {
         return NextResponse.json(
           { error: 'Invalid Razorpay credentials' },
@@ -128,11 +174,13 @@ export async function POST(request: NextRequest) {
         );
       }
     }
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to create Razorpay order',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        errorType: typeof error,
+        errorConstructor: error?.constructor?.name
       },
       { status: 500 }
     );
@@ -152,7 +200,8 @@ export async function GET(request: NextRequest) {
     },
     credentials: {
       keyId: process.env.RAZORPAY_KEY_ID ? 'Configured' : 'Missing',
-      keySecret: process.env.RAZORPAY_KEY_SECRET ? 'Configured' : 'Missing'
+      keySecret: process.env.RAZORPAY_KEY_SECRET ? 'Configured' : 'Missing',
+      environment: process.env.RAZORPAY_KEY_ID?.includes('test') ? 'TEST' : 'LIVE'
     }
   });
 }

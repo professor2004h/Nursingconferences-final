@@ -81,6 +81,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate currency support for PayPal (PayPal does not support INR)
+    const supportedCurrencies = ['USD', 'EUR', 'GBP'];
+    if (!supportedCurrencies.includes(currency.toUpperCase())) {
+      console.error(`❌ Unsupported currency for PayPal: ${currency}`);
+      return NextResponse.json(
+        {
+          error: `Currency ${currency} is not supported by PayPal. Supported currencies: ${supportedCurrencies.join(', ')}`,
+          note: currency.toUpperCase() === 'INR' ? 'For INR payments, please use Razorpay payment option.' : undefined
+        },
+        { status: 400 }
+      );
+    }
+
     // Get PayPal access token
     const accessToken = await getPayPalAccessToken();
     if (!accessToken) {

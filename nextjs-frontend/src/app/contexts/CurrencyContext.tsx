@@ -21,7 +21,7 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedCurrency = localStorage.getItem('selectedCurrency') as Currency;
-      if (savedCurrency && ['USD', 'EUR', 'GBP'].includes(savedCurrency)) {
+      if (savedCurrency && ['USD', 'EUR', 'GBP', 'INR'].includes(savedCurrency)) {
         setSelectedCurrency(savedCurrency);
       }
     }

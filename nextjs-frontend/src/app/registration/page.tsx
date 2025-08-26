@@ -1270,10 +1270,10 @@ function RegistrationPageContent() {
             </div>
           </div>
 
-          {/* Payment Details and Payment Method */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          {/* Payment Details and Payment Method - Vertical Stack Layout */}
+          <div className="space-y-6">
             {/* Payment Details */}
-            <div className="bg-white rounded-lg shadow-sm border h-full">
+            <div className="bg-white rounded-lg shadow-sm border">
               <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
                 <h2 className="text-lg font-bold text-white">Payment Details</h2>
               </div>
@@ -1304,11 +1304,11 @@ function RegistrationPageContent() {
             </div>
 
             {/* Complete Payment Section - Always Visible */}
-            <div className="bg-white rounded-lg shadow-sm border h-full">
+            <div className="bg-white rounded-lg shadow-sm border">
               <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
                 <h2 className="text-lg font-bold text-white">Complete Payment</h2>
               </div>
-              <div className="p-6 flex flex-col justify-center min-h-[200px]">
+              <div className="p-6">
                 {(() => {
                   // Check form validation
                   const isFormValid = formData.firstName && formData.lastName && formData.email &&
@@ -1405,13 +1405,13 @@ function RegistrationPageContent() {
                         </p>
                       </div>
 
-                      {/* Payment Buttons Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Payment Buttons Grid - Side by side on all devices */}
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         {/* PayPal Payment Option */}
                         <div className="space-y-2">
                           <div className="text-center">
-                            <h4 className="font-medium text-gray-700 mb-2">PayPal</h4>
-                            <p className="text-xs text-gray-500 mb-3">
+                            <h4 className="font-medium text-gray-700 mb-1 text-sm sm:text-base">PayPal</h4>
+                            <p className="text-xs text-gray-500 mb-2 sm:mb-3 px-1">
                               Pay securely with PayPal, credit cards, or debit cards
                             </p>
                           </div>
@@ -1436,8 +1436,8 @@ function RegistrationPageContent() {
                         {/* Razorpay Payment Option */}
                         <div className="space-y-2">
                           <div className="text-center">
-                            <h4 className="font-medium text-gray-700 mb-2">Razorpay</h4>
-                            <p className="text-xs text-gray-500 mb-3">
+                            <h4 className="font-medium text-gray-700 mb-1 text-sm sm:text-base">Razorpay</h4>
+                            <p className="text-xs text-gray-500 mb-2 sm:mb-3 px-1">
                               Pay with UPI, cards, net banking, and wallets
                             </p>
                           </div>

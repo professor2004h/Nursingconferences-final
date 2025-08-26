@@ -1,6 +1,6 @@
 // Currency types and interfaces for multi-currency support
 
-export type Currency = 'USD' | 'EUR' | 'GBP';
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'INR';
 
 export interface CurrencyInfo {
   code: Currency;
@@ -28,6 +28,12 @@ export const CURRENCIES: Record<Currency, CurrencyInfo> = {
     name: 'British Pound',
     locale: 'en-GB',
   },
+  INR: {
+    code: 'INR',
+    symbol: '₹',
+    name: 'Indian Rupee',
+    locale: 'en-IN',
+  },
 };
 
 export const DEFAULT_CURRENCY: Currency = 'USD';
@@ -37,6 +43,7 @@ export interface MultiCurrencyPrice {
   USD: number;
   EUR: number;
   GBP: number;
+  INR: number;
 }
 
 export interface RegistrationTypeMultiCurrency {
@@ -49,16 +56,19 @@ export interface RegistrationTypeMultiCurrency {
   earlyBirdPrice: number;
   earlyBirdPriceEUR: number;
   earlyBirdPriceGBP: number;
-  
+  earlyBirdPriceINR?: number;
+
   // Next Round Pricing
   nextRoundPrice: number;
   nextRoundPriceEUR: number;
   nextRoundPriceGBP: number;
-  
+  nextRoundPriceINR?: number;
+
   // OnSpot Pricing
   onSpotPrice: number;
   onSpotPriceEUR: number;
   onSpotPriceGBP: number;
+  onSpotPriceINR?: number;
   
   benefits?: string[];
   isActive: boolean;
@@ -73,6 +83,7 @@ export interface SponsorshipTierMultiCurrency {
   price: number;
   priceEUR: number;
   priceGBP: number;
+  priceINR?: number;
   order: number;
   featured: boolean;
   description?: string;
@@ -96,6 +107,7 @@ export interface AccommodationOptionMultiCurrency {
     pricePerNight: number;
     pricePerNightEUR: number;
     pricePerNightGBP: number;
+    pricePerNightINR?: number;
     roomDescription?: string;
     maxGuests: number;
     isAvailable: boolean;
@@ -162,6 +174,9 @@ export function getPricingFieldName(period: string, currency: Currency): string 
   return currency === 'USD' ? baseField : `${baseField}${currency}`;
 }
 
+// USD to INR conversion rate (approximate)
+const USD_TO_INR_RATE = 83.0;
+
 // Extract multi-currency prices from registration type
 export function extractRegistrationPrices(
   registrationType: RegistrationTypeMultiCurrency,
@@ -173,21 +188,24 @@ export function extractRegistrationPrices(
         USD: registrationType.earlyBirdPrice,
         EUR: registrationType.earlyBirdPriceEUR,
         GBP: registrationType.earlyBirdPriceGBP,
+        INR: registrationType.earlyBirdPriceINR || Math.round(registrationType.earlyBirdPrice * USD_TO_INR_RATE),
       };
     case 'nextRound':
       return {
         USD: registrationType.nextRoundPrice,
         EUR: registrationType.nextRoundPriceEUR,
         GBP: registrationType.nextRoundPriceGBP,
+        INR: registrationType.nextRoundPriceINR || Math.round(registrationType.nextRoundPrice * USD_TO_INR_RATE),
       };
     case 'onSpot':
       return {
         USD: registrationType.onSpotPrice,
         EUR: registrationType.onSpotPriceEUR,
         GBP: registrationType.onSpotPriceGBP,
+        INR: registrationType.onSpotPriceINR || Math.round(registrationType.onSpotPrice * USD_TO_INR_RATE),
       };
     default:
-      return { USD: 0, EUR: 0, GBP: 0 };
+      return { USD: 0, EUR: 0, GBP: 0, INR: 0 };
   }
 }
 
@@ -199,6 +217,7 @@ export function extractSponsorshipPrices(
     USD: sponsorshipTier.price,
     EUR: sponsorshipTier.priceEUR,
     GBP: sponsorshipTier.priceGBP,
+    INR: sponsorshipTier.priceINR || Math.round(sponsorshipTier.price * USD_TO_INR_RATE),
   };
 }
 
@@ -210,5 +229,6 @@ export function extractAccommodationPrices(
     USD: roomOption.pricePerNight,
     EUR: roomOption.pricePerNightEUR,
     GBP: roomOption.pricePerNightGBP,
+    INR: roomOption.pricePerNightINR || Math.round(roomOption.pricePerNight * USD_TO_INR_RATE),
   };
 }
