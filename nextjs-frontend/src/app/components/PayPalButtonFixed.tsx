@@ -388,9 +388,6 @@ export default function PayPalButtonFixed({
               </p>
               <p className="text-sm text-gray-600 mt-1">
                 Registration ID: {currentRegistrationId}
-                {currentRegistrationId.startsWith('TEMP-') && (
-                  <span className="text-xs text-orange-600 ml-2">(Will be updated with PayPal Order ID)</span>
-                )}
               </p>
             </div>
 

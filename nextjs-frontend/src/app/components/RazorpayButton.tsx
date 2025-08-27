@@ -15,6 +15,7 @@ interface RazorpayButtonProps {
   onSuccess: (paymentData: any) => void;
   onError: (error: any) => void;
   onCancel?: () => void;
+  onRegistrationIdUpdate?: (newRegistrationId: string) => void;
   disabled?: boolean;
   className?: string;
 }
@@ -34,11 +35,13 @@ const RazorpayButton: React.FC<RazorpayButtonProps> = ({
   onSuccess,
   onError,
   onCancel,
+  onRegistrationIdUpdate,
   disabled = false,
   className = ''
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [currentRegistrationId, setCurrentRegistrationId] = useState<string>(registrationId);
 
   console.log('🔷 RazorpayButton component mounted/re-rendered');
 
@@ -140,7 +143,8 @@ const RazorpayButton: React.FC<RazorpayButtonProps> = ({
         body: JSON.stringify({
           amount,
           currency,
-          registrationId,
+          registrationId: currentRegistrationId,
+          registrationData: registrationData,
           customerEmail: registrationData.email,
           customerName: `${registrationData.title || 'Dr.'} ${registrationData.firstName} ${registrationData.lastName}`.trim()
         }),
@@ -153,6 +157,13 @@ const RazorpayButton: React.FC<RazorpayButtonProps> = ({
 
       const orderData = await orderResponse.json();
       console.log('✅ Razorpay order created:', orderData.order.id);
+
+      // Update registration ID if Razorpay provided a new one (similar to PayPal)
+      if (orderData.registrationId && orderData.registrationId !== currentRegistrationId) {
+        console.log('🔄 Updating registration ID from Razorpay:', orderData.registrationId);
+        setCurrentRegistrationId(orderData.registrationId);
+        onRegistrationIdUpdate?.(orderData.registrationId);
+      }
 
       // Configure Razorpay options using official format
       const options = {
@@ -177,7 +188,7 @@ const RazorpayButton: React.FC<RazorpayButtonProps> = ({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                registrationId,
+                registrationId: currentRegistrationId,
                 amount,
                 currency
               }),
@@ -191,19 +202,20 @@ const RazorpayButton: React.FC<RazorpayButtonProps> = ({
             const verifyData = await verifyResponse.json();
             console.log('✅ Razorpay payment verified successfully');
 
-            // Call success callback with payment data
+            // Call success callback with payment data (matching PayPal format)
             onSuccess({
+              registrationId: currentRegistrationId,
               transactionId: response.razorpay_payment_id,
               orderId: response.razorpay_order_id,
               amount: amount,
               currency: currency,
-              registrationId: registrationId,
               paymentMethod: 'razorpay',
               paymentData: {
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id,
                 razorpaySignature: response.razorpay_signature,
-                capturedAt: new Date().toISOString()
+                capturedAt: new Date().toISOString(),
+                verificationData: verifyData
               }
             });
 
@@ -218,7 +230,7 @@ const RazorpayButton: React.FC<RazorpayButtonProps> = ({
           contact: registrationData.phoneNumber
         },
         notes: {
-          registrationId: registrationId,
+          registrationId: currentRegistrationId,
           purpose: 'Conference Registration'
         },
         theme: {
@@ -248,8 +260,21 @@ const RazorpayButton: React.FC<RazorpayButtonProps> = ({
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Razorpay Button - Styled to match PayPal button appearance */}
-      <div className="w-full">
+      {/* Razorpay Payment Information Display - Matching PayPal format */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="mb-4 text-center">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Complete Payment
+          </h3>
+          <p className="text-2xl font-bold text-blue-600">
+            {currency} {amount.toFixed(2)}
+          </p>
+          <p className="text-sm text-gray-600 mt-1">
+            Registration ID: {currentRegistrationId}
+          </p>
+        </div>
+
+        {/* Razorpay Button - Styled to match PayPal button appearance */}
         <button
           id="rzp-button1"
           onClick={handlePayment}

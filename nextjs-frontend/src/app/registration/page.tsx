@@ -1438,7 +1438,7 @@ function RegistrationPageContent() {
                           <div className="text-center">
                             <h4 className="font-medium text-gray-700 mb-1 text-sm sm:text-base">Razorpay</h4>
                             <p className="text-xs text-gray-500 mb-2 sm:mb-3 px-1">
-                              Pay with UPI, cards, net banking, and wallets
+                              Pay with UPI, credit cards, or debit cards, net banking, and wallets
                             </p>
                           </div>
                           <RazorpayButton
@@ -1449,6 +1449,10 @@ function RegistrationPageContent() {
                             onSuccess={handlePaymentSuccess}
                             onError={handlePaymentError}
                             onCancel={handlePaymentCancel}
+                            onRegistrationIdUpdate={(newId) => {
+                              console.log('🔷 Registration ID updated from Razorpay:', newId);
+                              setCurrentRegistrationId(newId);
+                            }}
                             disabled={isLoading}
                           />
                         </div>

@@ -10,6 +10,7 @@ interface CreateOrderRequest {
   amount: number;
   currency: string;
   registrationId: string;
+  registrationData?: any;
   customerEmail: string;
   customerName: string;
 }
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     const body: CreateOrderRequest = await request.json();
     console.log('🔷 Request body received:', JSON.stringify(body, null, 2));
 
-    const { amount, currency, registrationId, customerEmail, customerName } = body;
+    const { amount, currency, registrationId, registrationData, customerEmail, customerName } = body;
     
     // Validate required fields
     if (!amount || !currency || !registrationId || !customerEmail) {
@@ -121,7 +122,36 @@ export async function POST(request: NextRequest) {
       status: order.status,
       receipt: order.receipt
     });
-    
+
+    // Update registration with Razorpay order ID if it's a temporary ID (similar to PayPal)
+    let finalRegistrationId = registrationId;
+    if (registrationId.startsWith('TEMP-')) {
+      try {
+        console.log('🔄 Updating registration with Razorpay order ID...');
+        const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/registration/update-razorpay-id`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            tempRegistrationId: registrationId,
+            razorpayOrderId: order.id,
+            paymentStatus: 'pending'
+          }),
+        });
+
+        if (updateResponse.ok) {
+          console.log('✅ Registration updated with Razorpay order ID');
+          finalRegistrationId = order.id;
+        } else {
+          console.error('⚠️ Failed to update registration with Razorpay order ID, but continuing...');
+        }
+      } catch (updateError) {
+        console.error('⚠️ Error updating registration with Razorpay order ID:', updateError);
+        // Continue with original registration ID
+      }
+    }
+
     // Return order details for frontend
     return NextResponse.json({
       success: true,
@@ -134,7 +164,7 @@ export async function POST(request: NextRequest) {
         created_at: order.created_at
       },
       razorpayKeyId: keyId,
-      registrationId,
+      registrationId: finalRegistrationId, // Return the updated registration ID
       customerDetails: {
         email: customerEmail,
         name: customerName || 'Conference Participant'

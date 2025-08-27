@@ -67,10 +67,37 @@ export async function POST(request: NextRequest) {
     
     console.log('✅ Razorpay payment signature verified successfully');
     
-    // Update registration in Sanity with payment details
+    // Find and update registration in Sanity with payment details
     try {
+      // First, find the registration by registrationId
+      const registration = await client.fetch(
+        `*[_type == "conferenceRegistration" && registrationId == $regId][0]{
+          _id,
+          registrationId,
+          personalDetails,
+          paymentStatus
+        }`,
+        { regId: registrationId }
+      );
+
+      if (!registration) {
+        console.error('❌ Registration not found for ID:', registrationId);
+        return NextResponse.json(
+          { error: 'Registration not found' },
+          { status: 404 }
+        );
+      }
+
+      if (registration.paymentStatus === 'completed') {
+        console.log('⚠️ Payment already completed for registration:', registrationId);
+        return NextResponse.json(
+          { error: 'Payment already completed for this registration' },
+          { status: 400 }
+        );
+      }
+
       const updateResult = await client
-        .patch(registrationId)
+        .patch(registration._id)
         .set({
           paymentStatus: 'completed',
           paymentMethod: 'razorpay',
@@ -106,9 +133,9 @@ export async function POST(request: NextRequest) {
       // Import the unified email system
       const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
       
-      // Get registration details from Sanity
-      const registration = await client.fetch(`
-        *[_type == "conferenceRegistration" && _id == "${registrationId}"][0] {
+      // Get registration details from Sanity (use the same registration we found earlier)
+      const registrationForEmail = await client.fetch(`
+        *[_type == "conferenceRegistration" && registrationId == $regId][0] {
           _id,
           registrationId,
           personalDetails,
@@ -120,9 +147,9 @@ export async function POST(request: NextRequest) {
           numberOfParticipants,
           pricing
         }
-      `);
-      
-      if (!registration) {
+      `, { regId: registrationId });
+
+      if (!registrationForEmail) {
         console.error('❌ Registration not found for receipt email:', registrationId);
         throw new Error('Registration not found');
       }
@@ -144,23 +171,23 @@ export async function POST(request: NextRequest) {
       
       // Prepare registration data for receipt system
       const registrationData = {
-        _id: registration._id,
-        registrationId: registration.registrationId,
-        fullName: `${registration.personalDetails?.title || 'Dr.'} ${registration.personalDetails?.firstName || ''} ${registration.personalDetails?.lastName || ''}`.trim(),
-        email: registration.personalDetails?.email,
-        phoneNumber: registration.personalDetails?.phoneNumber,
-        country: registration.personalDetails?.country,
-        address: registration.personalDetails?.fullPostalAddress,
-        registrationType: registration.selectedRegistrationName || registration.registrationType || 'regular',
-        sponsorType: registration.sponsorType,
-        numberOfParticipants: registration.numberOfParticipants || 1,
-        accommodationType: registration.accommodationType,
-        accommodationNights: registration.accommodationNights,
-        personalDetails: registration.personalDetails,
-        pricing: registration.pricing
+        _id: registrationForEmail._id,
+        registrationId: registrationForEmail.registrationId,
+        fullName: `${registrationForEmail.personalDetails?.title || 'Dr.'} ${registrationForEmail.personalDetails?.firstName || ''} ${registrationForEmail.personalDetails?.lastName || ''}`.trim(),
+        email: registrationForEmail.personalDetails?.email,
+        phoneNumber: registrationForEmail.personalDetails?.phoneNumber,
+        country: registrationForEmail.personalDetails?.country,
+        address: registrationForEmail.personalDetails?.fullPostalAddress,
+        registrationType: registrationForEmail.selectedRegistrationName || registrationForEmail.registrationType || 'regular',
+        sponsorType: registrationForEmail.sponsorType,
+        numberOfParticipants: registrationForEmail.numberOfParticipants || 1,
+        accommodationType: registrationForEmail.accommodationType,
+        accommodationNights: registrationForEmail.accommodationNights,
+        personalDetails: registrationForEmail.personalDetails,
+        pricing: registrationForEmail.pricing
       };
-      
-      const customerEmail = registration.personalDetails?.email;
+
+      const customerEmail = registrationForEmail.personalDetails?.email;
       
       if (customerEmail) {
         console.log('📧 Sending Razorpay payment receipt to customer:', customerEmail);
