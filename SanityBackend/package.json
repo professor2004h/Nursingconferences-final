@@ -20,14 +20,15 @@
     "@icons/material": "^0.4.1",
     "@sanity/color-input": "^4.0.0",
     "@sanity/table": "^1.1.4",
-    "@sanity/vision": "^4.5.0",
+    "@sanity/vision": "^4.6.0",
+    "date-fns": "^2.30.0",
     "esbuild": "^0.25.9",
     "express": "^4.18.2",
     "node-html-parser": "^7.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
-    "sanity": "^4.5.0",
+    "sanity": "^4.6.0",
     "styled-components": "^6.1.15"
   },
   "devDependencies": {
