@@ -5,6 +5,16 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { type SiteSettings } from '../getSiteSettings';
 
+interface PosterPresentersSettings {
+  showPosterPresenters: boolean;
+  navigationLabel: string;
+}
+
+interface ExhibitorsSettings {
+  showExhibitors: boolean;
+  navigationLabel: string;
+}
+
 interface HeaderClientProps {
   siteSettings: SiteSettings | null;
 }
@@ -15,6 +25,8 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const [isMobileMoreExpanded, setIsMobileMoreExpanded] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [posterPresentersSettings, setPosterPresentersSettings] = useState<PosterPresentersSettings | null>(null);
+  const [exhibitorsSettings, setExhibitorsSettings] = useState<ExhibitorsSettings | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownContentRef = useRef<HTMLDivElement>(null);
 
@@ -132,13 +144,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       >
         Media Partners
       </Link>
-      <Link
-        href="/exhibitors"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={handleDropdownLinkClick}
-      >
-        Exhibitors
-      </Link>
+      {exhibitorsSettings?.showExhibitors && (
+        <Link
+          href="/exhibitors"
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+          onClick={handleDropdownLinkClick}
+        >
+          {exhibitorsSettings.navigationLabel || 'Exhibitors'}
+        </Link>
+      )}
       <Link
         href="/speaker-guidelines"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
@@ -146,13 +160,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       >
         Speaker Guidelines
       </Link>
-      <Link
-        href="/poster-presenters"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={handleDropdownLinkClick}
-      >
-        Poster Presenters
-      </Link>
+      {posterPresentersSettings?.showPosterPresenters && (
+        <Link
+          href="/poster-presenters"
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+          onClick={handleDropdownLinkClick}
+        >
+          {posterPresentersSettings.navigationLabel || 'Poster Presenters'}
+        </Link>
+      )}
       <Link
         href="/past-conference-gallery"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
@@ -243,6 +259,46 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
     };
+  }, []);
+
+  // Fetch poster presenters settings
+  useEffect(() => {
+    const fetchPosterPresentersSettings = async () => {
+      try {
+        const response = await fetch('/api/poster-presenters-settings');
+        const settings = await response.json();
+        setPosterPresentersSettings(settings);
+      } catch (error) {
+        console.error('Error fetching poster presenters settings:', error);
+        // Default to showing poster presenters if fetch fails
+        setPosterPresentersSettings({
+          showPosterPresenters: true,
+          navigationLabel: 'Poster Presenters'
+        });
+      }
+    };
+
+    fetchPosterPresentersSettings();
+  }, []);
+
+  // Fetch exhibitors settings
+  useEffect(() => {
+    const fetchExhibitorsSettings = async () => {
+      try {
+        const response = await fetch('/api/exhibitors-settings');
+        const settings = await response.json();
+        setExhibitorsSettings(settings);
+      } catch (error) {
+        console.error('Error fetching exhibitors settings:', error);
+        // Default to showing exhibitors if fetch fails
+        setExhibitorsSettings({
+          showExhibitors: true,
+          navigationLabel: 'Exhibitors'
+        });
+      }
+    };
+
+    fetchExhibitorsSettings();
   }, []);
 
   return (
@@ -486,13 +542,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                 >
                   Media Partners
                 </Link>
-                <Link
-                  href="/exhibitors"
-                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                  onClick={closeMenu}
-                >
-                  Exhibitors
-                </Link>
+                {exhibitorsSettings?.showExhibitors && (
+                  <Link
+                    href="/exhibitors"
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={closeMenu}
+                  >
+                    {exhibitorsSettings.navigationLabel || 'Exhibitors'}
+                  </Link>
+                )}
                 <Link
                   href="/speaker-guidelines"
                   className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
@@ -500,13 +558,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                 >
                   Speaker Guidelines
                 </Link>
-                <Link
-                  href="/poster-presenters"
-                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                  onClick={closeMenu}
-                >
-                  Poster Presenters
-                </Link>
+                {posterPresentersSettings?.showPosterPresenters && (
+                  <Link
+                    href="/poster-presenters"
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={closeMenu}
+                  >
+                    {posterPresentersSettings.navigationLabel || 'Poster Presenters'}
+                  </Link>
+                )}
                 <Link
                   href="/past-conference-gallery"
                   className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"

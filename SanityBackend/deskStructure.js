@@ -18,32 +18,15 @@ export default (S) =>
           S.list()
             .title('Conferences Management')
             .items([
-              // Master Conference Settings (Singleton)
+              // Conferences Redirect Configuration (Singleton)
               S.listItem()
-                .title('Conference Section Settings')
-                .id('conferencesSectionSettings')
+                .title('Conferences Redirect')
+                .id('conferencesRedirect')
                 .child(
                   S.document()
-                    .schemaType('conferencesSectionSettings')
-                    .documentId('conferencesSectionSettings')
-                    .title('Conference Section Settings')
-                ),
-              // Individual Conference Events
-              S.listItem()
-                .title('Conference Events')
-                .id('conferenceEvents')
-                .child(
-                  S.documentTypeList('conferenceEvent')
-                    .title('Conference Events')
-                    .defaultOrdering([{field: 'date', direction: 'desc'}])
-                ),
-              // Legacy Conferences Section (for backward compatibility)
-              S.listItem()
-                .title('Legacy Conference Content')
-                .id('legacyConferences')
-                .child(
-                  S.documentTypeList('conferences')
-                    .title('Legacy Conference Section Content')
+                    .schemaType('conferenceEvent')
+                    .documentId('conferenceEvent')
+                    .title('Conferences Redirect Configuration')
                 ),
             ])
         ),
@@ -64,7 +47,7 @@ export default (S) =>
               S.listItem().title('Registration Settings').schemaType('registrationSettings').child(S.documentTypeList('registrationSettings')),
               S.listItem().title('Registration Types').schemaType('registrationTypes').child(S.documentTypeList('registrationTypes')),
               S.listItem().title('Accommodation Options').schemaType('accommodationOptions').child(S.documentTypeList('accommodationOptions')),
-              S.listItem().title('Conference Registrations').schemaType('conferenceRegistration').child(S.documentTypeList('conferenceRegistration')),
+
               // Enhanced Registration Table View
               S.listItem()
                 .title('Registrations Table')
@@ -80,7 +63,7 @@ export default (S) =>
       S.listItem().title('Sponsorship Tiers').schemaType('sponsorshipTiers').child(S.documentTypeList('sponsorshipTiers')),
       S.listItem().title('Sponsor Registration').schemaType('sponsorRegistration').child(S.documentTypeList('sponsorRegistration')),
       S.listItem().title('Payment Transaction').schemaType('paymentTransaction').child(S.documentTypeList('paymentTransaction')),
-      S.listItem().title('Past Conferences Section Styling').schemaType('pastConferencesSection').child(S.documentTypeList('pastConferencesSection')),
+
       S.listItem().title('Journal Section Styling').schemaType('journalSection').child(S.documentTypeList('journalSection')),
       // Custom Content Section Settings (Singleton)
       S.listItem()
@@ -175,16 +158,35 @@ export default (S) =>
             .title('Organizing Committee Members')
             .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
         ),
-      // Add Poster Presenters
+      // Poster Presenters Management Section
       S.listItem()
         .title('Poster Presenters')
-        .id('posterPresenters')
+        .id('posterPresentersManagement')
         .icon(DocumentIcon)
-        .schemaType('posterPresenters')
         .child(
-          S.documentTypeList('posterPresenters')
-            .title('Poster Presenters')
-            .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
+          S.list()
+            .title('Poster Presenters Management')
+            .items([
+              // Poster Presenters Settings (Singleton)
+              S.listItem()
+                .title('Poster Presenters Settings')
+                .id('posterPresentersSettings')
+                .child(
+                  S.document()
+                    .schemaType('posterPresentersSettings')
+                    .documentId('posterPresentersSettings')
+                    .title('Poster Presenters Settings')
+                ),
+              // Individual Poster Presenters
+              S.listItem()
+                .title('Poster Presenters')
+                .id('posterPresenters')
+                .child(
+                  S.documentTypeList('posterPresenters')
+                    .title('Poster Presenters')
+                    .defaultOrdering([{field: 'displayOrder', direction: 'asc'}])
+                ),
+            ])
         ),
       // Add Past Conference Gallery
       S.listItem()
@@ -208,16 +210,35 @@ export default (S) =>
             .title('Media Partners')
             .defaultOrdering([{field: 'companyName', direction: 'asc'}])
         ),
-      // Add Exhibitors
+      // Exhibitors Management Section
       S.listItem()
         .title('Exhibitors')
-        .id('exhibitors')
+        .id('exhibitorsManagement')
         .icon(DocumentIcon)
-        .schemaType('exhibitors')
         .child(
-          S.documentTypeList('exhibitors')
-            .title('Exhibitors')
-            .defaultOrdering([{field: 'companyName', direction: 'asc'}])
+          S.list()
+            .title('Exhibitors Management')
+            .items([
+              // Exhibitors Settings (Singleton)
+              S.listItem()
+                .title('Exhibitors Settings')
+                .id('exhibitorsSettings')
+                .child(
+                  S.document()
+                    .schemaType('exhibitorsSettings')
+                    .documentId('exhibitorsSettings')
+                    .title('Exhibitors Settings')
+                ),
+              // Individual Exhibitors
+              S.listItem()
+                .title('Exhibitors')
+                .id('exhibitors')
+                .child(
+                  S.documentTypeList('exhibitors')
+                    .title('Exhibitors')
+                    .defaultOrdering([{field: 'companyName', direction: 'asc'}])
+                ),
+            ])
         ),
       // Add Speakers
       S.listItem()

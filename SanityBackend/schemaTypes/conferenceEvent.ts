@@ -2,108 +2,85 @@ import { defineField, defineType } from 'sanity'
 
 export const conferenceEvent = defineType({
   name: 'conferenceEvent',
-  title: 'Conference Event',
+  title: 'Conferences Redirect',
   type: 'document',
+  icon: () => '🔗',
+  description: 'Configure where visitors should be redirected when they click on Conferences links',
   fields: [
     defineField({
       name: 'title',
-      title: 'Event Title',
+      title: 'Configuration Title',
       type: 'string',
+      initialValue: 'Conferences Redirect Configuration',
       validation: (Rule) => Rule.required(),
+      description: 'Internal title for this configuration (not displayed on frontend)',
     }),
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'image',
-      title: 'Event Poster',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'location',
-      title: 'Location',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'date',
-      title: 'Event Date',
-      type: 'datetime',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'imageLinkUrl',
-      title: '🔗 Image Link URL (NEW FIELD)',
+      name: 'redirectUrl',
+      title: 'Conferences URL',
       type: 'url',
-      description: 'URL where conference image and title should redirect when clicked',
-      validation: (Rule) => Rule.uri({
-        scheme: ['http', 'https']
-      }).error('Must be a valid URL (http:// or https://)'),
-    }),
-
-    defineField({
-      name: 'email',
-      title: 'Email (Optional)',
-      type: 'string',
       validation: (Rule) =>
-        Rule.email().error('Must be a valid email address'),
+        Rule.required()
+          .uri({
+            scheme: ['http', 'https'],
+            allowRelative: false
+          })
+          .error('Please enter a valid URL starting with http:// or https://'),
+      description: 'The external URL where visitors will be redirected when they click on Conferences links',
+      placeholder: 'https://example.com/conferences',
     }),
     defineField({
-      name: 'registerNowUrl',
-      title: 'Register Now Button URL',
-      type: 'url',
-      description: 'URL for the "Register Now" button - accepts any valid URL format',
-      validation: (Rule) => Rule.uri({
-        scheme: ['http', 'https']
-      }).error('Must be a valid URL (http:// or https://)'),
-    }),
-    defineField({
-      name: 'submitAbstractUrl',
-      title: 'Submit Abstract Button URL',
-      type: 'url',
-      description: 'URL for the "Submit Abstract" button - accepts any valid URL format',
-      validation: (Rule) => Rule.uri({
-        scheme: ['http', 'https']
-      }).error('Must be a valid URL (http:// or https://)'),
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      description: 'Optional description of what visitors will find at the redirect URL',
+      placeholder: 'This link will take you to our external website where you can view all conference details...',
     }),
     defineField({
       name: 'isActive',
-      title: 'Show on Website',
+      title: 'Enable Redirect',
       type: 'boolean',
-      description: 'Toggle this ON to display this conference event on the website. Toggle OFF to hide it from all public pages.',
       initialValue: true,
+      description: 'Toggle to enable or disable the redirect functionality',
+    }),
+    defineField({
+      name: 'lastUpdated',
+      title: 'Last Updated',
+      type: 'datetime',
+      initialValue: () => new Date().toISOString(),
+      readOnly: true,
+      description: 'When this configuration was last modified',
     }),
   ],
   preview: {
     select: {
       title: 'title',
-      date: 'date',
-      location: 'location',
+      redirectUrl: 'redirectUrl',
       isActive: 'isActive',
-      media: 'image',
     },
-    prepare({ title, date, location, isActive, media }: any) {
-      const formattedDate = date ? new Date(date).toLocaleDateString() : 'No date';
-      const status = isActive ? '✅' : '❌';
+    prepare({ title, redirectUrl, isActive }: any) {
+      const status = isActive ? '✅ Active' : '❌ Inactive';
+      let domain = 'No URL';
+
+      if (redirectUrl) {
+        try {
+          domain = new URL(redirectUrl).hostname;
+        } catch (error) {
+          domain = 'Invalid URL';
+        }
+      }
 
       return {
-        title: `${status} ${title}`,
-        subtitle: `${formattedDate} • ${location}`,
-        media,
+        title: title || 'Conferences Redirect',
+        subtitle: `${status} → ${domain}`,
+        media: () => '🔗',
       };
     },
   },
+
+  // Singleton - only one document of this type should exist
+  __experimental_singleton: true,
 })
 
 export default conferenceEvent;

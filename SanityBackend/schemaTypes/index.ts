@@ -3,8 +3,7 @@ import pastConference from "./pastConference";
 import about from './about';
 import aboutUsSection from './aboutUsSection';
 import heroSection from './heroSection';
-import conferences from "./conferences";
-import conferencesSectionSettings from "./conferencesSectionSettings";
+
 import siteSettings from './siteSettings';
 import imageSection from './imageSection';
 import sponsorshipTiers from './sponsorshipTiers';
@@ -23,7 +22,7 @@ import { registrationSettings } from './registrationSettings';
 import { registrationTypes } from './registrationTypes';
 // import { sponsorshipTiersRegistration } from './sponsorshipTiersRegistration'; // Using existing sponsorshipTiers instead
 import { accommodationOptions } from './accommodationOptions';
-import { conferenceRegistration } from './conferenceRegistration';
+
 import { pricingPeriods } from './pricingPeriods';
 import { formConfiguration } from './formConfiguration';
 import { paymentRecord } from './paymentRecord';
@@ -37,6 +36,7 @@ import organizingCommittee from './organizingCommittee';
 
 // Poster presenters schema
 import posterPresenters from './posterPresenters';
+import posterPresentersSettings from './posterPresentersSettings';
 
 // Past conference gallery schema
 import pastConferenceGallery from './pastConferenceGallery';
@@ -45,6 +45,7 @@ import pastConferenceGallery from './pastConferenceGallery';
 import mediaPartners from './mediaPartners';
 // Exhibitors schema
 import exhibitors from './exhibitors';
+import exhibitorsSettings from './exhibitorsSettings';
 
 // Speakers schema
 import speakers from './speakers';
@@ -68,8 +69,7 @@ export const schemaTypes = [
   about,
   aboutUsSection,
   heroSection,
-  conferences,
-  conferencesSectionSettings,
+
   siteSettings,
   imageSection,
   sponsorshipTiers,
@@ -86,7 +86,7 @@ export const schemaTypes = [
   registrationTypes,
   // sponsorshipTiersRegistration, // Using existing sponsorshipTiers instead
   accommodationOptions,
-  conferenceRegistration,
+
   pricingPeriods,
   formConfiguration,
   paymentRecord,
@@ -97,12 +97,14 @@ export const schemaTypes = [
   organizingCommittee,
   // Poster presenters schema
   posterPresenters,
+  posterPresentersSettings,
   // Past conference gallery schema
   pastConferenceGallery,
   // Media partners schema
   mediaPartners,
   // Exhibitors schema
   exhibitors,
+  exhibitorsSettings,
   // Speakers schema
   speakers,
   // Speaker guidelines schema

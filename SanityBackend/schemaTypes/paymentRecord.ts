@@ -14,13 +14,7 @@ export const paymentRecord = defineType({
       description: 'Associated registration identifier',
     }),
 
-    defineField({
-      name: 'registrationRef',
-      title: 'Registration Reference',
-      type: 'reference',
-      to: [{ type: 'conferenceRegistration' }],
-      description: 'Reference to the associated registration',
-    }),
+
 
     defineField({
       name: 'paymentId',

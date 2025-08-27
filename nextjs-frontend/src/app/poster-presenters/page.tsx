@@ -7,6 +7,15 @@ import PosterPresenterModal from '@/app/components/PosterPresenterModal';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 
+interface PosterPresentersSettings {
+  showPosterPresenters: boolean;
+  sectionTitle: string;
+  sectionDescription?: string;
+  navigationLabel: string;
+  showOnHomepage: boolean;
+  homepageDisplayLimit: number;
+}
+
 const PosterPresentersPage: React.FC = () => {
   const [posterPresenters, setPosterPresenters] = useState<PosterPresenter[]>([]);
   const [filteredPresenters, setFilteredPresenters] = useState<PosterPresenter[]>([]);
@@ -14,6 +23,8 @@ const PosterPresentersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedPresenter, setSelectedPresenter] = useState<PosterPresenter | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [settings, setSettings] = useState<PosterPresentersSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(true);
   
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,12 +37,41 @@ const PosterPresentersPage: React.FC = () => {
   const [sessionTracks, setSessionTracks] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchPosterPresenters();
+    fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (settings?.showPosterPresenters) {
+      fetchPosterPresenters();
+    } else {
+      setLoading(false);
+    }
+  }, [settings]);
 
   useEffect(() => {
     applyFilters();
   }, [posterPresenters, searchQuery, selectedResearchArea, selectedSessionTrack, showFeaturedOnly]);
+
+  const fetchSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      const response = await fetch('/api/poster-presenters-settings');
+      const settingsData = await response.json();
+      setSettings(settingsData);
+    } catch (error) {
+      console.error('Error fetching poster presenters settings:', error);
+      // Default to enabled if settings fetch fails
+      setSettings({
+        showPosterPresenters: true,
+        sectionTitle: 'Poster Presenters',
+        navigationLabel: 'Poster Presenters',
+        showOnHomepage: true,
+        homepageDisplayLimit: 6,
+      });
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
 
   const fetchPosterPresenters = async () => {
     try {
@@ -116,6 +156,52 @@ const PosterPresentersPage: React.FC = () => {
     setShowFeaturedOnly(false);
   };
 
+  // Show loading while fetching settings
+  if (settingsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Show fallback if poster presenters are disabled
+  if (settings && !settings.showPosterPresenters) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="text-6xl mb-6">📋</div>
+          <h1 className="text-4xl font-bold text-slate-900 mb-6">
+            Poster Presenters
+          </h1>
+          <p className="text-lg text-slate-600 mb-8">
+            The poster presenters section is currently not available. Please check back later or contact us for more information.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/"
+              className="inline-flex items-center bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Back to Home
+            </a>
+            <a
+              href="/contact"
+              className="inline-flex items-center bg-white text-slate-700 px-8 py-4 rounded-xl font-semibold border-2 border-slate-300 hover:border-blue-500 hover:text-blue-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Contact Us
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -150,9 +236,11 @@ const PosterPresentersPage: React.FC = () => {
       <div className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-20">
         <div className="absolute inset-0 bg-black opacity-30"></div>
         <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">POSTER PRESENTERS</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            {settings?.sectionTitle?.toUpperCase() || 'POSTER PRESENTERS'}
+          </h1>
           <p className="text-xl text-blue-100 mb-6 max-w-3xl mx-auto">
-            Discover innovative research and groundbreaking findings from our talented poster presenters
+            {settings?.sectionDescription || 'Discover innovative research and groundbreaking findings from our talented poster presenters'}
           </p>
           <nav className="text-sm">
             <span className="text-blue-200">Home</span>

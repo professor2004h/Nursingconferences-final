@@ -4,14 +4,54 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Exhibitor, ExhibitorsApiResponse } from '@/app/types/exhibitors';
 
+interface ExhibitorsSettings {
+  showExhibitors: boolean;
+  sectionTitle: string;
+  sectionDescription?: string;
+  navigationLabel: string;
+  showOnHomepage: boolean;
+  homepageDisplayLimit: number;
+}
+
 const ExhibitorsPage: React.FC = () => {
   const [exhibitors, setExhibitors] = useState<Exhibitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [settings, setSettings] = useState<ExhibitorsSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   useEffect(() => {
-    fetchExhibitors();
+    fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (settings?.showExhibitors) {
+      fetchExhibitors();
+    } else {
+      setLoading(false);
+    }
+  }, [settings]);
+
+  const fetchSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      const response = await fetch('/api/exhibitors-settings');
+      const settingsData = await response.json();
+      setSettings(settingsData);
+    } catch (error) {
+      console.error('Error fetching exhibitors settings:', error);
+      // Default to enabled if settings fetch fails
+      setSettings({
+        showExhibitors: true,
+        sectionTitle: 'Exhibitors',
+        navigationLabel: 'Exhibitors',
+        showOnHomepage: true,
+        homepageDisplayLimit: 6,
+      });
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
 
   const fetchExhibitors = async () => {
     try {
@@ -33,6 +73,52 @@ const ExhibitorsPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Show loading while fetching settings
+  if (settingsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Show fallback if exhibitors are disabled
+  if (settings && !settings.showExhibitors) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="text-6xl mb-6">🏢</div>
+          <h1 className="text-4xl font-bold text-slate-900 mb-6">
+            Exhibitors
+          </h1>
+          <p className="text-lg text-slate-600 mb-8">
+            The exhibitors section is currently not available. Please check back later or contact us for more information.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/"
+              className="inline-flex items-center bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Back to Home
+            </a>
+            <a
+              href="/contact"
+              className="inline-flex items-center bg-white text-slate-700 px-8 py-4 rounded-xl font-semibold border-2 border-slate-300 hover:border-blue-500 hover:text-blue-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Contact Us
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -65,9 +151,11 @@ const ExhibitorsPage: React.FC = () => {
       {/* Hero Section */}
       <div className="relative bg-white py-12 sm:py-16">
         <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-green-600">Exhibitors</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-green-600">
+            {settings?.sectionTitle || 'Exhibitors'}
+          </h1>
           <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
-            We are grateful to our exhibitors who help showcase innovations and support our conferences
+            {settings?.sectionDescription || 'We are grateful to our exhibitors who help showcase innovations and support our conferences'}
           </p>
         </div>
       </div>

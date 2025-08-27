@@ -1,177 +1,53 @@
-import Image from "next/image";
-import { getConferenceEvents, type ConferenceEventType } from "../getconferences";
-import { getConferences } from "../getconferences";
+import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { getConferencesRedirectUrl } from '../getConferencesRedirect';
+
+export const metadata: Metadata = {
+  title: 'Conferences | Intelli Global Conferences',
+  description: 'Explore our upcoming conferences and events.',
+  keywords: ['conferences', 'nursing conferences', 'healthcare events'],
+};
 
 export default async function ConferencesPage() {
-  let events: ConferenceEventType[] = [];
-  let conference = null;
+  // Get the redirect URL from Sanity
+  const redirectUrl = await getConferencesRedirectUrl();
 
-  try {
-    events = await getConferenceEvents(50); // Get more events for the dedicated page
-    conference = await getConferences();
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Fetched events:', events.map(e => ({
-        title: e.title,
-        imageLinkUrl: e.imageLinkUrl,
-        slug: e.slug?.current
-      })));
-    }
-  } catch (error) {
-    console.error('Error fetching conferences:', error);
-    events = [];
-    conference = null;
+  // If redirect is configured and active, redirect to external URL
+  if (redirectUrl) {
+    redirect(redirectUrl);
   }
 
+  // Fallback content if no redirect is configured
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            {conference?.title || "Our Conferences"}
-          </h1>
-          <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            Join leading experts, researchers, and professionals from around the world to share knowledge, 
-            network, and drive industry advancement.
-          </p>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">
+          Conferences
+        </h1>
+        <p className="text-lg text-slate-600 mb-8">
+          We&apos;re currently updating our conferences section. Please check back soon or contact us for information about our upcoming events.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/"
+            className="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            Back to Home
+          </a>
+          <a
+            href="/contact"
+            className="inline-flex items-center bg-white text-slate-700 px-8 py-4 rounded-xl font-semibold border-2 border-slate-300 hover:border-orange-500 hover:text-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Contact Us
+          </a>
         </div>
-      </section>
-
-      {/* Conferences Grid */}
-      <section className="py-16 md:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {events && events.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {events.map((event) => {
-                if (process.env.NODE_ENV === 'development') {
-                  console.log('Rendering event:', event.title, 'imageLinkUrl:', event.imageLinkUrl);
-                }
-                return (
-                <div key={event._id} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-slate-200 hover:border-orange-200">
-                  {event.imageUrl && (
-                    <div className="relative h-56 overflow-hidden">
-                      {event.imageLinkUrl && event.imageLinkUrl.trim() !== '' ? (
-                        <a href={event.imageLinkUrl} className="block w-full h-full" title={`External link to ${event.imageLinkUrl}`} target="_blank" rel="noopener noreferrer">
-                          <Image
-                            src={event.imageUrl}
-                            alt={event.title}
-                            width={400}
-                            height={250}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
-                        </a>
-                      ) : (
-                        <div className="block w-full h-full cursor-default">
-                          <Image
-                            src={event.imageUrl}
-                            alt={event.title}
-                            width={400}
-                            height={250}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
-                        </div>
-                      )}
-
-                        {/* Date Badge */}
-                        <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
-                          <div className="text-orange-600 font-bold text-sm">
-                            {new Date(event.date).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </div>
-                          <div className="text-slate-600 text-xs">
-                            {new Date(event.date).getFullYear()}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="p-6">
-                      {event.imageLinkUrl && event.imageLinkUrl.trim() !== '' ? (
-                        <a href={event.imageLinkUrl} className="block" title={`External link to ${event.imageLinkUrl}`} target="_blank" rel="noopener noreferrer">
-                          <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 leading-tight group-hover:text-orange-600 transition-colors hover:text-orange-600">
-                            {event.title}
-                          </h3>
-                        </a>
-                      ) : (
-                        <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 leading-tight">
-                          {event.title}
-                        </h3>
-                      )}
-
-                      <div className="flex items-center text-slate-600 mb-4">
-                        <svg className="w-4 h-4 mr-2 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span className="text-sm">{event.location}</span>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        {event.registerNowUrl && event.registerNowUrl.trim() !== '' ? (
-                          <a
-                            href={event.registerNowUrl}
-                            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-lg font-semibold text-base hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl text-center"
-                          >
-                            Register Now
-                          </a>
-                        ) : (
-                          <button
-                            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-lg font-semibold text-base hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl opacity-50 cursor-not-allowed"
-                            disabled
-                          >
-                            Register Now
-                          </button>
-                        )}
-
-                        {event.submitAbstractUrl && event.submitAbstractUrl.trim() !== '' ? (
-                          <a
-                            href={event.submitAbstractUrl}
-                            className="w-full border-2 border-slate-300 text-slate-700 px-4 py-3 rounded-lg font-semibold text-base hover:border-orange-500 hover:text-orange-600 transition-all duration-300 text-center"
-                          >
-                            Submit Abstract
-                          </a>
-                        ) : (
-                          <button
-                            className="w-full border-2 border-slate-300 text-slate-700 px-4 py-3 rounded-lg font-semibold text-base hover:border-orange-500 hover:text-orange-600 transition-all duration-300 opacity-50 cursor-not-allowed"
-                            disabled
-                          >
-                            Submit Abstract
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="w-24 h-24 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m6-10v10m-6-4h6" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">No Conferences Available</h3>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                We&apos;re currently updating our conference listings. Please check back soon for upcoming events and opportunities.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center mt-6 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
-              >
-                Contact Us for Updates
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
