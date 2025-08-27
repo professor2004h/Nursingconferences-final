@@ -1,0 +1,43 @@
+{
+  "paypal": {
+    "success": false,
+    "steps": {
+      "paymentProcessing": {
+        "success": false,
+        "error": "Email delivery failed"
+      }
+    },
+    "errors": [
+      "Payment processing failed: Email delivery failed"
+    ],
+    "duration": 0
+  },
+  "razorpay": {
+    "success": false,
+    "steps": {
+      "paymentProcessing": {
+        "success": false,
+        "error": "Email delivery failed"
+      }
+    },
+    "errors": [
+      "Payment processing failed: Email delivery failed"
+    ],
+    "duration": 0
+  },
+  "emailDelivery": {
+    "success": true,
+    "emailsSent": 2,
+    "errors": []
+  },
+  "summary": {
+    "totalTests": 3,
+    "passedTests": 1,
+    "failedTests": 2,
+    "totalDuration": 3033,
+    "errors": [
+      "Payment processing failed: Email delivery failed",
+      "Payment processing failed: Email delivery failed"
+    ]
+  }
+}

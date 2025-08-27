@@ -201,7 +201,7 @@ async function sendUnifiedReceiptEmail(paymentData, registrationData, recipientE
     console.log('📧 Sending unified receipt email...');
     
     // SMTP configuration
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.hostinger.com',
       port: parseInt(process.env.SMTP_PORT || '465'),
       secure: process.env.SMTP_SECURE === 'true' || true,
