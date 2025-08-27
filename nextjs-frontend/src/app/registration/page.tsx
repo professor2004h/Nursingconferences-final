@@ -1406,17 +1406,45 @@ function RegistrationPageContent() {
                       </div>
 
                       {/* Payment Buttons Grid - Rows on mobile, side by side on larger screens */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch">
                         {/* PayPal Payment Option */}
-                        <div className="space-y-2">
+                        <div className="space-y-2 flex flex-col h-full">
                           <div className="text-center">
                             <h4 className="font-medium text-gray-700 mb-1 text-sm sm:text-base">PayPal</h4>
                             <p className="text-xs text-gray-500 mb-2 sm:mb-3 px-1">
                               Pay securely with PayPal, credit cards, or debit cards
                             </p>
                           </div>
-                          <PayPalErrorBoundary>
-                            <PayPalButtonReliable
+                          <div className="flex-1">
+                            <PayPalErrorBoundary>
+                              <PayPalButtonReliable
+                                amount={priceCalculation.totalPrice}
+                                currency={selectedCurrency}
+                                registrationId={currentRegistrationId}
+                                registrationData={formData}
+                                onSuccess={handlePaymentSuccess}
+                                onError={handlePaymentError}
+                                onCancel={handlePaymentCancel}
+                                onRegistrationIdUpdate={(newId) => {
+                                  console.log('🔄 Registration ID updated from PayPal:', newId);
+                                  setCurrentRegistrationId(newId);
+                                }}
+                                disabled={isLoading}
+                              />
+                            </PayPalErrorBoundary>
+                          </div>
+                        </div>
+
+                        {/* Razorpay Payment Option */}
+                        <div className="space-y-2 flex flex-col h-full">
+                          <div className="text-center">
+                            <h4 className="font-medium text-gray-700 mb-1 text-sm sm:text-base">Razorpay</h4>
+                            <p className="text-xs text-gray-500 mb-2 sm:mb-3 px-1">
+                              Pay with UPI, credit cards, or debit cards, net banking, and wallets
+                            </p>
+                          </div>
+                          <div className="flex-1">
+                            <RazorpayButton
                               amount={priceCalculation.totalPrice}
                               currency={selectedCurrency}
                               registrationId={currentRegistrationId}
@@ -1425,36 +1453,12 @@ function RegistrationPageContent() {
                               onError={handlePaymentError}
                               onCancel={handlePaymentCancel}
                               onRegistrationIdUpdate={(newId) => {
-                                console.log('🔄 Registration ID updated from PayPal:', newId);
+                                console.log('🔷 Registration ID updated from Razorpay:', newId);
                                 setCurrentRegistrationId(newId);
                               }}
                               disabled={isLoading}
                             />
-                          </PayPalErrorBoundary>
-                        </div>
-
-                        {/* Razorpay Payment Option */}
-                        <div className="space-y-2">
-                          <div className="text-center">
-                            <h4 className="font-medium text-gray-700 mb-1 text-sm sm:text-base">Razorpay</h4>
-                            <p className="text-xs text-gray-500 mb-2 sm:mb-3 px-1">
-                              Pay with UPI, credit cards, or debit cards, net banking, and wallets
-                            </p>
                           </div>
-                          <RazorpayButton
-                            amount={priceCalculation.totalPrice}
-                            currency={selectedCurrency}
-                            registrationId={currentRegistrationId}
-                            registrationData={formData}
-                            onSuccess={handlePaymentSuccess}
-                            onError={handlePaymentError}
-                            onCancel={handlePaymentCancel}
-                            onRegistrationIdUpdate={(newId) => {
-                              console.log('🔷 Registration ID updated from Razorpay:', newId);
-                              setCurrentRegistrationId(newId);
-                            }}
-                            disabled={isLoading}
-                          />
                         </div>
                       </div>
 

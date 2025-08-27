@@ -292,6 +292,7 @@ export default function PayPalButtonReliable({
             />
           </PayPalScriptProvider>
 
+
           <div className="mt-4 text-center">
             <p className="text-xs text-gray-500">
               Secure payment powered by PayPal
