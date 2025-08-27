@@ -129,10 +129,7 @@ export async function POST(request: NextRequest) {
     // Trigger receipt email system (same as PayPal)
     try {
       console.log('📧 Triggering receipt email system for Razorpay payment...');
-      
-      // Import the unified email system
-      const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
-      
+
       // Get registration details from Sanity (use the same registration we found earlier)
       const registrationForEmail = await client.fetch(`
         *[_type == "conferenceRegistration" && registrationId == $regId][0] {
@@ -188,34 +185,105 @@ export async function POST(request: NextRequest) {
       };
 
       const customerEmail = registrationForEmail.personalDetails?.email;
-      
+
       if (customerEmail) {
-        console.log('📧 Sending Razorpay payment receipt to customer:', customerEmail);
-        
-        const emailResult = await sendPaymentReceiptEmailWithRealData(
-          paymentData,
-          registrationData,
-          customerEmail
-        );
-        
-        if (emailResult.success) {
-          console.log('✅ Razorpay payment receipt sent successfully');
-          
-          // Update registration with receipt status
-          await client
-            .patch(registrationId)
-            .set({
-              receiptEmailSent: true,
-              receiptEmailSentAt: new Date().toISOString(),
-              receiptEmailRecipient: customerEmail,
-              pdfReceiptGenerated: emailResult.pdfGenerated,
-              pdfReceiptStoredInSanity: emailResult.pdfUploaded,
-              webhookProcessed: true
+        console.log('📧 Processing Razorpay payment completion with unified system:', customerEmail);
+
+        // Use unified post-payment processing system
+        try {
+          const unifiedProcessingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/process-completion`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              registrationId: registrationId,
+              paymentData: {
+                paymentId: razorpay_payment_id,
+                paymentOrderId: razorpay_order_id,
+                signature: razorpay_signature,
+                amount: amount,
+                currency: currency,
+                capturedAt: new Date().toISOString(),
+                razorpay_payment_id,
+                razorpay_order_id,
+                razorpay_signature
+              },
+              paymentMethod: 'razorpay',
+              customerEmail: customerEmail
             })
-            .commit();
-            
-        } else {
-          console.error('❌ Failed to send Razorpay payment receipt:', emailResult.error);
+          });
+
+          const unifiedResult = await unifiedProcessingResponse.json();
+
+          if (unifiedResult.success) {
+            console.log('✅ Razorpay unified post-payment processing completed successfully');
+            console.log('📧 Email sent:', unifiedResult.data.emailSent);
+            console.log('📄 PDF generated:', unifiedResult.data.pdfGenerated);
+            console.log('📤 PDF uploaded:', unifiedResult.data.pdfUploaded);
+          } else {
+            console.error('❌ Unified post-payment processing failed:', unifiedResult.error);
+
+            // Fallback to legacy system if unified system fails
+            console.log('🔄 Falling back to legacy email system...');
+            const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer.js');
+
+            const emailResult = await sendPaymentReceiptEmailWithRealData(
+              paymentData,
+              registrationData,
+              customerEmail
+            );
+
+            if (emailResult.success) {
+              console.log('✅ Fallback email system succeeded');
+
+              // Update registration with receipt status
+              await client
+                .patch(registrationId)
+                .set({
+                  receiptEmailSent: true,
+                  receiptEmailSentAt: new Date().toISOString(),
+                  receiptEmailRecipient: customerEmail,
+                  pdfReceiptGenerated: emailResult.pdfGenerated,
+                  pdfReceiptStoredInSanity: emailResult.pdfUploaded,
+                  webhookProcessed: true
+                })
+                .commit();
+            } else {
+              console.error('❌ Fallback email system also failed:', emailResult.error);
+            }
+          }
+        } catch (unifiedError) {
+          console.error('❌ Error calling unified processing system:', unifiedError);
+
+          // Fallback to legacy system
+          console.log('🔄 Using legacy email system due to unified system error...');
+          const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer.js');
+
+          const emailResult = await sendPaymentReceiptEmailWithRealData(
+            paymentData,
+            registrationData,
+            customerEmail
+          );
+
+          if (emailResult.success) {
+            console.log('✅ Legacy email system succeeded');
+
+            // Update registration with receipt status
+            await client
+              .patch(registrationId)
+              .set({
+                receiptEmailSent: true,
+                receiptEmailSentAt: new Date().toISOString(),
+                receiptEmailRecipient: customerEmail,
+                pdfReceiptGenerated: emailResult.pdfGenerated,
+                pdfReceiptStoredInSanity: emailResult.pdfUploaded,
+                webhookProcessed: true
+              })
+              .commit();
+          } else {
+            console.error('❌ Legacy email system also failed:', emailResult.error);
+          }
         }
       } else {
         console.error('❌ No customer email found for receipt delivery');
@@ -253,7 +321,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   return NextResponse.json({
     message: 'Razorpay payment verification endpoint',
     usage: 'POST with payment verification data',

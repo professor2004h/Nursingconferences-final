@@ -296,53 +296,117 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
             throw new Error('No customer email address found for registration');
           }
 
-          console.log('📧 Sending payment receipt to CUSTOMER:', customerEmail);
+          console.log('📧 Processing PayPal payment completion with unified system:', customerEmail);
           console.log('💰 Payment amount:', `${realPaymentData.currency} ${realPaymentData.amount}`);
           console.log('🎯 Registration ID:', realRegistrationData.registrationId);
           console.log('👤 Customer Name:', realRegistrationData.fullName);
 
-          // Send receipt to CUSTOMER with PDF storage in Sanity
-          const emailResult = await sendPaymentReceiptEmailWithRealData(
-            realPaymentData,
-            realRegistrationData,
-            customerEmail
-          );
-
-          if (emailResult.success) {
-            console.log('✅ REAL payment receipt sent successfully to CUSTOMER from webhook');
-            console.log('📧 Customer email:', customerEmail);
-            console.log('📄 PDF generated:', emailResult.pdfGenerated);
-            console.log('📊 PDF size:', emailResult.pdfSize ? `${(emailResult.pdfSize / 1024).toFixed(2)} KB` : 'N/A');
-            console.log('💾 PDF stored in Sanity:', emailResult.pdfUploaded);
-            console.log('🆔 PDF Asset ID:', emailResult.pdfAssetId || 'N/A');
-            console.log('🔗 Email Message ID:', emailResult.messageId);
-            console.log('🎯 Registration updated with payment completion');
-
-            // Update registration with email sent status
-            await client
-              .patch(customId)
-              .set({
-                receiptEmailSent: true,
-                receiptEmailSentAt: new Date().toISOString(),
-                receiptEmailRecipient: customerEmail,
-                pdfReceiptGenerated: emailResult.pdfGenerated,
-                pdfReceiptStoredInSanity: emailResult.pdfUploaded
+          // Use unified post-payment processing system
+          try {
+            const unifiedProcessingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/process-completion`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                registrationId: customId,
+                paymentData: {
+                  paypalTransactionId: capture.id,
+                  paypalOrderId: orderId,
+                  transactionId: capture.id,
+                  orderId: orderId,
+                  amount: parseFloat(capture.amount.value),
+                  currency: capture.amount.currency_code,
+                  capturedAt: new Date().toISOString()
+                },
+                paymentMethod: 'paypal',
+                customerEmail: customerEmail
               })
-              .commit();
+            });
 
-            console.log('✅ Registration updated with receipt delivery status');
-          } else {
-            console.error('❌ Failed to send payment receipt to CUSTOMER from webhook:', emailResult.error);
+            const unifiedResult = await unifiedProcessingResponse.json();
 
-            // Update registration with email failure status
-            await client
-              .patch(customId)
-              .set({
-                receiptEmailSent: false,
-                receiptEmailError: emailResult.error,
-                receiptEmailAttemptedAt: new Date().toISOString()
-              })
-              .commit();
+            if (unifiedResult.success) {
+              console.log('✅ PayPal unified post-payment processing completed successfully');
+              console.log('📧 Email sent:', unifiedResult.data.emailSent);
+              console.log('📄 PDF generated:', unifiedResult.data.pdfGenerated);
+              console.log('📤 PDF uploaded:', unifiedResult.data.pdfUploaded);
+            } else {
+              console.error('❌ Unified post-payment processing failed:', unifiedResult.error);
+
+              // Fallback to legacy system if unified system fails
+              console.log('🔄 Falling back to legacy email system...');
+              const emailResult = await sendPaymentReceiptEmailWithRealData(
+                realPaymentData,
+                realRegistrationData,
+                customerEmail
+              );
+
+              if (emailResult.success) {
+                console.log('✅ Fallback email system succeeded');
+
+                // Update registration with email sent status
+                await client
+                  .patch(customId)
+                  .set({
+                    receiptEmailSent: true,
+                    receiptEmailSentAt: new Date().toISOString(),
+                    receiptEmailRecipient: customerEmail,
+                    pdfReceiptGenerated: emailResult.pdfGenerated,
+                    pdfReceiptStoredInSanity: emailResult.pdfUploaded
+                  })
+                  .commit();
+              } else {
+                console.error('❌ Fallback email system also failed:', emailResult.error);
+              }
+            }
+          } catch (unifiedError) {
+            console.error('❌ Error calling unified processing system:', unifiedError);
+
+            // Fallback to legacy system
+            console.log('🔄 Using legacy email system due to unified system error...');
+            const emailResult = await sendPaymentReceiptEmailWithRealData(
+              realPaymentData,
+              realRegistrationData,
+              customerEmail
+            );
+
+            if (emailResult.success) {
+              console.log('✅ Legacy payment receipt sent successfully to CUSTOMER from webhook');
+              console.log('📧 Customer email:', customerEmail);
+              console.log('📄 PDF generated:', emailResult.pdfGenerated);
+              console.log('📊 PDF size:', emailResult.pdfSize ? `${(emailResult.pdfSize / 1024).toFixed(2)} KB` : 'N/A');
+              console.log('💾 PDF stored in Sanity:', emailResult.pdfUploaded);
+              console.log('🆔 PDF Asset ID:', emailResult.pdfAssetId || 'N/A');
+              console.log('🔗 Email Message ID:', emailResult.messageId);
+              console.log('🎯 Registration updated with payment completion');
+
+              // Update registration with email sent status
+              await client
+                .patch(customId)
+                .set({
+                  receiptEmailSent: true,
+                  receiptEmailSentAt: new Date().toISOString(),
+                  receiptEmailRecipient: customerEmail,
+                  pdfReceiptGenerated: emailResult.pdfGenerated,
+                  pdfReceiptStoredInSanity: emailResult.pdfUploaded
+                })
+                .commit();
+
+              console.log('✅ Registration updated with receipt delivery status');
+            } else {
+              console.error('❌ Legacy email system also failed:', emailResult.error);
+
+              // Update registration with email failure status
+              await client
+                .patch(customId)
+                .set({
+                  receiptEmailSent: false,
+                  receiptEmailError: emailResult.error,
+                  receiptEmailAttemptedAt: new Date().toISOString()
+                })
+                .commit();
+            }
           }
 
         } catch (emailError) {
