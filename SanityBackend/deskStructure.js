@@ -60,8 +60,44 @@ export default (S) =>
             ])
         ),
       S.listItem().title('Image Section').schemaType('imageSection').child(S.documentTypeList('imageSection')),
-      S.listItem().title('Sponsorship Tiers').schemaType('sponsorshipTiers').child(S.documentTypeList('sponsorshipTiers')),
-      S.listItem().title('Sponsor Registration').schemaType('sponsorRegistration').child(S.documentTypeList('sponsorRegistration')),
+      // Sponsorship Management Section
+      S.listItem()
+        .title('Sponsorship Management')
+        .id('sponsorshipManagement')
+        .child(
+          S.list()
+            .title('Sponsorship Management')
+            .items([
+              // Sponsorship Settings (Singleton)
+              S.listItem()
+                .title('Sponsorship Settings')
+                .id('sponsorshipSettings')
+                .child(
+                  S.document()
+                    .schemaType('sponsorshipSettings')
+                    .documentId('sponsorshipSettings')
+                    .title('Sponsorship Settings')
+                ),
+              // Sponsorship Tiers
+              S.listItem()
+                .title('Sponsorship Tiers')
+                .id('sponsorshipTiers')
+                .child(
+                  S.documentTypeList('sponsorshipTiers')
+                    .title('Sponsorship Tiers')
+                    .defaultOrdering([{field: 'price', direction: 'asc'}])
+                ),
+              // Sponsor Registrations
+              S.listItem()
+                .title('Sponsor Registrations')
+                .id('sponsorRegistration')
+                .child(
+                  S.documentTypeList('sponsorRegistration')
+                    .title('Sponsor Registrations')
+                    .defaultOrdering([{field: 'submissionDate', direction: 'desc'}])
+                ),
+            ])
+        ),
       S.listItem().title('Payment Transaction').schemaType('paymentTransaction').child(S.documentTypeList('paymentTransaction')),
 
       S.listItem().title('Journal Section Styling').schemaType('journalSection').child(S.documentTypeList('journalSection')),

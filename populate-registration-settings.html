@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Populate Registration Settings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        button {
+            background-color: #007cba;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #005a87;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Populate Registration Settings</h1>
+        
+        <div class="section">
+            <h3>📋 What this tool does:</h3>
+            <ul>
+                <li>Creates registration settings document in Sanity</li>
+                <li>Configures hero section with title, subtitle, and breadcrumb</li>
+                <li>Sets up pricing dates and conference details</li>
+                <li>Configures contact information and payment settings</li>
+                <li>Sets form configuration and required fields</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>🎨 Hero Section Configuration:</h3>
+            <ul>
+                <li><strong>Title:</strong> "REGISTRATION"</li>
+                <li><strong>Subtitle:</strong> "Register for the International Conference on Nursing"</li>
+                <li><strong>Breadcrumb:</strong> "Home » Registration"</li>
+                <li><strong>Background Image:</strong> Can be uploaded via Sanity Studio</li>
+            </ul>
+        </div>
+
+        <button onclick="populateRegistrationSettings()" id="populateBtn">
+            🚀 Create Registration Settings
+        </button>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        async function populateRegistrationSettings() {
+            const button = document.getElementById('populateBtn');
+            const status = document.getElementById('status');
+            
+            button.disabled = true;
+            button.textContent = '⏳ Creating registration settings...';
+            
+            try {
+                const response = await fetch('/api/populate-registration-settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    status.innerHTML = `
+                        <div class="status success">
+                            <h4>✅ Registration Settings Created Successfully!</h4>
+                            <p><strong>Document ID:</strong> ${result.documentId}</p>
+                            <p><strong>Next Steps:</strong></p>
+                            <ul style="text-align: left; margin: 10px 0;">
+                                <li>Visit <a href="http://localhost:3333/structure/registrationSystem;registrationSettings;${result.documentId}" target="_blank">Sanity Studio</a> to upload background image</li>
+                                <li>Check the <a href="http://localhost:3000/registration" target="_blank">Registration Page</a> to see the hero section</li>
+                                <li>Customize hero text, dates, and other settings in Sanity Studio</li>
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.error || 'Failed to create registration settings');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                status.innerHTML = `
+                    <div class="status error">
+                        <h4>❌ Error Creating Registration Settings</h4>
+                        <p>${error.message}</p>
+                        <p><strong>Alternative:</strong> Create the settings manually in <a href="http://localhost:3333/structure/registrationSystem;registrationSettings" target="_blank">Sanity Studio</a></p>
+                    </div>
+                `;
+            } finally {
+                button.disabled = false;
+                button.textContent = '🚀 Create Registration Settings';
+            }
+        }
+    </script>
+</body>
+</html>

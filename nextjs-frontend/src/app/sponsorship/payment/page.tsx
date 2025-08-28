@@ -114,7 +114,7 @@ export default function PaymentPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Session Expired</h1>
           <p className="text-gray-600 mb-6">Your registration session has expired. Please start over.</p>
           <Link
-            href="/sponsorship/register"
+            href="/registration"
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Start New Registration
@@ -278,7 +278,7 @@ export default function PaymentPage() {
         {/* Back Link */}
         <div className="text-center mt-8">
           <Link
-            href="/sponsorship/register"
+            href="/registration"
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             ← Back to Registration

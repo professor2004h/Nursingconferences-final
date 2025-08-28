@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalButtonFixed from '@/app/components/PayPalButtonFixed';
@@ -11,6 +12,17 @@ import RazorpayButton from '@/app/components/RazorpayButton';
 import { CurrencyProvider } from '@/app/contexts/CurrencyContext';
 import CurrencySelector from '@/app/components/CurrencySelector';
 import { useCurrencyPricing } from '@/app/hooks/useCurrencyPricing';
+import { getRegistrationSettingsWithFallback, RegistrationSettingsType } from '@/app/getRegistrationSettings';
+import imageUrlBuilder from '@sanity/image-url';
+import { client } from '@/app/sanity/client';
+
+// Initialize the image URL builder
+const builder = imageUrlBuilder(client);
+
+// Helper function to generate image URLs
+function urlFor(source: any) {
+  return builder.image(source);
+}
 
 
 // Form data interface
@@ -75,6 +87,7 @@ function RegistrationPageContent() {
   const [currentRegistrationId, setCurrentRegistrationId] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [currentPricingPeriod, setCurrentPricingPeriod] = useState<'earlyBird' | 'nextRound' | 'spotRegistration'>('earlyBird');
+  const [registrationSettings, setRegistrationSettings] = useState<RegistrationSettingsType | null>(null);
 
   // Dynamic registration data
   const {
@@ -89,6 +102,36 @@ function RegistrationPageContent() {
 
   // Currency pricing hook
   const { selectedCurrency, formatPrice, getRegistrationPrice, getSponsorshipPrice, getAccommodationPrice } = useCurrencyPricing();
+
+  // Fetch registration settings
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        // Try to fetch from API first
+        const response = await fetch('/api/registration-settings');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.settings) {
+            setRegistrationSettings(data.settings);
+            return;
+          }
+        }
+
+        // Fallback to direct function call
+        const settings = await getRegistrationSettingsWithFallback();
+        setRegistrationSettings(settings);
+      } catch (error) {
+        // Use default settings as fallback
+        try {
+          const defaultSettings = await getRegistrationSettingsWithFallback();
+          setRegistrationSettings(defaultSettings);
+        } catch (fallbackError) {
+          // Silent fallback
+        }
+      }
+    }
+    fetchSettings();
+  }, []);
 
 
 
@@ -555,22 +598,27 @@ function RegistrationPageContent() {
     }
   };
 
-  // Debug logging (only on mount and when data changes)
-  useEffect(() => {
-    if (dynamicData) {
-      console.log('🔍 Registration Page Debug:', {
-        dynamicLoading,
-        dynamicError,
-        dynamicData: !!dynamicData,
-        registrationTypes: dynamicData?.registrationTypes?.length || 0,
-        registrationTypeNames: dynamicData?.registrationTypes?.map(t => ({ name: t.name, category: t.category })) || [],
-        sponsorshipTiers: dynamicData?.sponsorshipTiers?.length || 0,
-        accommodationOptions: dynamicData?.accommodationOptions?.length || 0,
-        activePeriod: dynamicData?.activePeriod?.periodId || 'None',
-        pricingPeriods: dynamicData?.pricingPeriods?.length || 0
-      });
+  // Get background image URL if available - moved before early returns
+  const heroBackgroundImage = useMemo(() => {
+    if (!registrationSettings?.heroSection?.backgroundImage) return null;
+
+    try {
+      // Try to get the URL using urlFor with proper dimensions
+      return urlFor(registrationSettings.heroSection.backgroundImage)
+        .width(1920)
+        .height(1080)
+        .quality(90)
+        .url();
+    } catch (error) {
+      console.error('Error generating image URL:', error);
+      // Fallback to direct URL if available
+      return registrationSettings.heroSection.backgroundImage.asset?.url || null;
     }
-  }, [dynamicData, dynamicLoading, dynamicError]);
+  }, [registrationSettings]);
+
+
+
+
 
   // Early return for loading state
   if (dynamicLoading) {
@@ -627,25 +675,59 @@ function RegistrationPageContent() {
     );
   }
 
+
+
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Header with hero background - matching reference site */}
-      <div
-        className="relative bg-cover bg-center bg-no-repeat text-white py-20 z-10"
+      {/* Hero Section */}
+      <section
+        className="registration-hero-section relative bg-gradient-to-br from-blue-900 via-slate-800 to-blue-900
+                   w-full flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/api/placeholder/1200/400")',
+          backgroundImage: heroBackgroundImage
+            ? `url(${heroBackgroundImage})`
+            : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-left">
-            <h1 className="text-5xl font-bold mb-4">REGISTRATION</h1>
-            <div className="text-sm opacity-90">
-              <span>Home</span> <span className="mx-2">»</span> <span>Registration</span>
+        {/* 60% Black Overlay */}
+        <div
+          className="absolute inset-0 bg-black"
+          style={{ opacity: 0.6 }}
+        ></div>
+
+        <div className="registration-hero-content absolute inset-0 flex items-center justify-center z-10">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight">
+                {registrationSettings?.heroSection?.title || 'REGISTRATION'}
+              </h1>
+              {registrationSettings?.heroSection?.subtitle && (
+                <div className="max-w-3xl mx-auto">
+                  <p className="text-lg sm:text-xl md:text-2xl text-white leading-relaxed opacity-90">
+                    {registrationSettings.heroSection.subtitle}
+                  </p>
+                </div>
+              )}
+              <div className="text-sm sm:text-base text-white opacity-90">
+                <nav className="flex items-center justify-center space-x-2">
+                  <Link
+                    href="/"
+                    className="text-white hover:text-white/70 transition-colors duration-200 underline decoration-1 underline-offset-2"
+                  >
+                    Home
+                  </Link>
+                  <span>»</span>
+                  <span>Registration</span>
+                </nav>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Main Form Container */}
       <div className="max-w-6xl mx-auto px-4 py-8">

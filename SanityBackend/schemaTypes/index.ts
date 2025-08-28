@@ -7,6 +7,7 @@ import heroSection from './heroSection';
 import siteSettings from './siteSettings';
 import imageSection from './imageSection';
 import sponsorshipTiers from './sponsorshipTiers';
+import sponsorshipSettings from './sponsorshipSettings';
 import sponsorRegistration from './sponsorRegistration';
 import paymentTransaction from './paymentTransaction';
 import pastConferencesSection from './pastConferencesSection';
@@ -73,6 +74,7 @@ export const schemaTypes = [
   siteSettings,
   imageSection,
   sponsorshipTiers,
+  sponsorshipSettings,
   sponsorRegistration,
   paymentTransaction,
   pastConferencesSection,

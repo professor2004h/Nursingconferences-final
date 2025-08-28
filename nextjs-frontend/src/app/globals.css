@@ -605,9 +605,85 @@ a:hover {
   }
 }
 
+/* ===== REGISTRATION HERO SECTION - MOBILE 16:9 ASPECT RATIO ===== */
+.registration-hero-section {
+  /* Mobile: Force 16:9 aspect ratio with fallback */
+  aspect-ratio: 16/9 !important;
+  /* Fallback for older browsers */
+  height: 56.25vw !important; /* 16:9 ratio = 9/16 = 0.5625 */
+  max-height: 450px !important; /* Increased from 400px for better visual balance */
+  min-height: 220px !important; /* Slightly increased minimum height */
+  padding: 1.5rem 1rem !important; /* Increased vertical padding for better text spacing */
+  width: 100% !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+/* Registration Hero Content - Perfect Centering */
+.registration-hero-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 1rem !important;
+}
+
+/* Mobile text sizing for better readability */
+@media (max-width: 640px) {
+  .registration-hero-content h1 {
+    font-size: 2rem !important; /* 32px */
+    line-height: 1.2 !important;
+    margin-bottom: 1rem !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .registration-hero-content p {
+    font-size: 1rem !important; /* 16px */
+    line-height: 1.4 !important;
+    margin-bottom: 0.75rem !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .registration-hero-content span {
+    font-size: 0.875rem !important; /* 14px */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) !important;
+  }
+}
+
+/* Tablet and Desktop: Switch to fixed heights */
+@media (min-width: 768px) {
+  .registration-hero-section {
+    aspect-ratio: auto !important;
+    height: 350px !important;
+    max-height: none !important;
+    min-height: auto !important;
+    padding: 3rem 4rem !important;
+  }
+
+  .registration-hero-content {
+    padding: 2rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .registration-hero-section {
+    height: 450px !important;
+    padding: 4rem 6rem !important;
+  }
+
+  .registration-hero-content {
+    padding: 3rem !important;
+  }
+}
+
 /* ===== MOBILE HERO OPTIMIZATION (320px-640px) ===== */
 @media (max-width: 640px) {
-  .hero-section {
+  .hero-section:not(.registration-hero-section) {
     /* Mobile: 16:9 aspect ratio for proper image display */
     height: 56.25vw;
     min-height: 320px; /* Minimum for very small screens */
