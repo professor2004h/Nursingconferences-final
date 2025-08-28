@@ -23,6 +23,7 @@ import { registrationSettings } from './registrationSettings';
 import { registrationTypes } from './registrationTypes';
 // import { sponsorshipTiersRegistration } from './sponsorshipTiersRegistration'; // Using existing sponsorshipTiers instead
 import { accommodationOptions } from './accommodationOptions';
+import { conferenceRegistration } from './conferenceRegistration';
 
 import { pricingPeriods } from './pricingPeriods';
 import { formConfiguration } from './formConfiguration';
@@ -88,6 +89,7 @@ export const schemaTypes = [
   registrationTypes,
   // sponsorshipTiersRegistration, // Using existing sponsorshipTiers instead
   accommodationOptions,
+  conferenceRegistration,
 
   pricingPeriods,
   formConfiguration,

@@ -34,9 +34,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file type
-    if (!abstractFile.type.includes('pdf') && !abstractFile.type.includes('doc') && !abstractFile.type.includes('docx')) {
-      console.log('❌ Validation failed: Invalid file type:', abstractFile.type)
+    // Validate file type with proper MIME types
+    const allowedMimeTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ]
+
+    const allowedExtensions = ['.pdf', '.doc', '.docx']
+    const fileExtension = abstractFile.name.toLowerCase().substring(abstractFile.name.lastIndexOf('.'))
+
+    if (!allowedMimeTypes.includes(abstractFile.type) && !allowedExtensions.includes(fileExtension)) {
+      console.log('❌ Validation failed: Invalid file type:', {
+        mimeType: abstractFile.type,
+        extension: fileExtension,
+        fileName: abstractFile.name
+      })
       return NextResponse.json(
         { error: 'Only PDF, DOC, and DOCX files are allowed' },
         { status: 400 }
@@ -64,8 +77,22 @@ export async function POST(request: NextRequest) {
     // Try to upload file and update document
     try {
       console.log('📤 Uploading file to Sanity...')
+
+      // Get the correct file extension
+      const fileExtension = abstractFile.name.toLowerCase().substring(abstractFile.name.lastIndexOf('.'))
+      const sanitizedFileName = `${firstName}_${lastName}_abstract${fileExtension}`
+
+      console.log('📁 File details:', {
+        originalName: abstractFile.name,
+        mimeType: abstractFile.type,
+        size: abstractFile.size,
+        extension: fileExtension,
+        sanitizedName: sanitizedFileName
+      })
+
       const fileAsset = await writeClient.assets.upload('file', abstractFile, {
-        filename: `${firstName}_${lastName}_abstract.pdf`
+        filename: sanitizedFileName,
+        contentType: abstractFile.type
       })
       console.log('✅ File uploaded successfully:', fileAsset._id)
 

@@ -6,6 +6,7 @@ import {colorInput} from '@sanity/color-input'
 import {table} from '@sanity/table'
 import {schemaTypes} from './schemaTypes'
 import deskStructure from './deskStructure'
+import './components/GlobalPDFHandler'  // Initialize global PDF handler
 
 export default defineConfig({
   name: 'default',

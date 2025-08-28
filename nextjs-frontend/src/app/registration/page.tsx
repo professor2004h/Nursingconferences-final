@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useDynamicRegistration } from '@/app/hooks/useDynamicRegistration';
 import { useMultipleToggleableRadio } from '@/app/hooks/useToggleableRadio';
 import PayPalButtonFixed from '@/app/components/PayPalButtonFixed';
@@ -626,8 +625,7 @@ function RegistrationPageContent() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading registration form...</p>
-          <p className="mt-2 text-xs text-gray-500">Debug: Loading={String(dynamicLoading)}, Error={dynamicError || 'None'}</p>
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -639,11 +637,11 @@ function RegistrationPageContent() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-red-800 mb-2">Error Loading Registration Form</h2>
-            <p className="text-red-700 mb-4">{dynamicError}</p>
+            <h2 className="text-lg font-semibold text-red-800 mb-2">Unable to Load Registration Form</h2>
+            <p className="text-red-700 mb-4">Please check your connection and try again.</p>
             <button
               onClick={refetchDynamicData}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
             >
               Try Again
             </button>
@@ -683,7 +681,7 @@ function RegistrationPageContent() {
       {/* Hero Section */}
       <section
         className="registration-hero-section relative bg-gradient-to-br from-blue-900 via-slate-800 to-blue-900
-                   w-full flex items-center justify-center overflow-hidden"
+                   w-full overflow-hidden h-96 md:h-[450px] lg:h-[500px]"
         style={{
           backgroundImage: heroBackgroundImage
             ? `url(${heroBackgroundImage})`
@@ -699,32 +697,16 @@ function RegistrationPageContent() {
           style={{ opacity: 0.6 }}
         ></div>
 
-        <div className="registration-hero-content absolute inset-0 flex items-center justify-center z-10">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
-              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight">
-                {registrationSettings?.heroSection?.title || 'REGISTRATION'}
-              </h1>
-              {registrationSettings?.heroSection?.subtitle && (
-                <div className="max-w-3xl mx-auto">
-                  <p className="text-lg sm:text-xl md:text-2xl text-white leading-relaxed opacity-90">
-                    {registrationSettings.heroSection.subtitle}
-                  </p>
-                </div>
-              )}
-              <div className="text-sm sm:text-base text-white opacity-90">
-                <nav className="flex items-center justify-center space-x-2">
-                  <Link
-                    href="/"
-                    className="text-white hover:text-white/70 transition-colors duration-200 underline decoration-1 underline-offset-2"
-                  >
-                    Home
-                  </Link>
-                  <span>»</span>
-                  <span>Registration</span>
-                </nav>
-              </div>
-            </div>
+        <div className="registration-hero-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl px-4 z-10">
+          <div className="registration-hero-text-container flex flex-col items-center justify-center text-center space-y-4">
+            <h1 className="registration-hero-title text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center leading-tight tracking-wide">
+              {registrationSettings?.heroSection?.title || 'REGISTRATION'}
+            </h1>
+            {registrationSettings?.heroSection?.subtitle && (
+              <p className="registration-hero-subtitle text-lg md:text-xl text-white/90 text-center max-w-2xl">
+                {registrationSettings.heroSection.subtitle}
+              </p>
+            )}
           </div>
         </div>
       </section>

@@ -203,10 +203,19 @@ export default function RegistrationTableView() {
   const downloadPDF = (registration) => {
     const pdfUrl = registration.pdfReceipt?.asset?.url || registration.registrationTable?.pdfReceiptFile?.asset?.url
     if (pdfUrl) {
+      const fileName = `receipt_${registration.paypalTransactionId || registration.registrationId}.pdf`
+
+      // Create link with new tab target
       const link = document.createElement('a')
       link.href = pdfUrl
-      link.download = `receipt_${registration.paypalTransactionId || registration.registrationId}.pdf`
+      link.target = '_blank'  // Force new tab
+      link.rel = 'noopener noreferrer'  // Security
+      link.download = fileName
+
+      // Add to DOM, click, and remove
+      document.body.appendChild(link)
       link.click()
+      document.body.removeChild(link)
     } else {
       alert('PDF receipt not available for this registration')
     }
@@ -647,7 +656,9 @@ export default function RegistrationTableView() {
                                 mode: 'ghost',
                                 tone: 'positive',
                                 onClick: () => downloadPDF(registration),
-                                fontSize: 1
+                                fontSize: 1,
+                                className: 'pdf-download-btn',
+                                title: 'Download PDF receipt (opens in new tab)'
                               })
                             : React.createElement(Text, { size: 1, muted: true }, 'Not Available')
                         )

@@ -95,15 +95,162 @@ const AbstractTableView = () => {
     return texts[status] || 'Unknown'
   }
 
-  const downloadFile = (fileUrl, fileName) => {
-    if (fileUrl) {
+  // Alternative download method using fetch to get proper content type
+  const downloadFileWithFetch = async (fileUrl, fileName, fallbackName = 'abstract') => {
+    try {
+      console.log('🔍 Fetch Download Debug:', { fileUrl, fileName, fallbackName })
+
+      const response = await fetch(fileUrl)
+      const contentType = response.headers.get('content-type')
+      const blob = await response.blob()
+
+      console.log('🔍 Response headers:', {
+        contentType,
+        contentDisposition: response.headers.get('content-disposition')
+      })
+
+      // Determine extension from content type
+      let extension = '.pdf' // default
+      if (contentType) {
+        if (contentType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+          extension = '.docx'
+        } else if (contentType.includes('application/msword')) {
+          extension = '.doc'
+        } else if (contentType.includes('application/pdf')) {
+          extension = '.pdf'
+        }
+      }
+
+      // Create filename with correct extension
+      let downloadFileName = fileName
+      if (!downloadFileName || !downloadFileName.includes('.')) {
+        downloadFileName = `${fallbackName}${extension}`
+      } else {
+        // Replace extension if it's wrong
+        const nameWithoutExt = downloadFileName.split('.')[0]
+        downloadFileName = `${nameWithoutExt}${extension}`
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.href = fileUrl
-      link.download = fileName || 'abstract.pdf'
+      link.href = url
       link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+      link.download = downloadFileName
+
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
+
+      // Clean up
+      window.URL.revokeObjectURL(url)
+
+      console.log(`📄 Downloaded file via fetch: ${downloadFileName} (Content-Type: ${contentType})`)
+    } catch (error) {
+      console.error('❌ Fetch download failed, falling back to direct download:', error)
+      downloadFile(fileUrl, fileName, fallbackName)
+    }
+  }
+
+  const downloadFile = (fileUrl, fileName, fallbackName = 'abstract') => {
+    if (fileUrl) {
+      console.log('🔍 Download Debug Info:', {
+        fileUrl,
+        fileName,
+        fallbackName,
+        urlIncludes: {
+          pdf: fileUrl.toLowerCase().includes('.pdf'),
+          docx: fileUrl.toLowerCase().includes('.docx'),
+          doc: fileUrl.toLowerCase().includes('.doc')
+        }
+      })
+
+      const link = document.createElement('a')
+      link.href = fileUrl
+      link.target = '_blank'  // Force new tab
+      link.rel = 'noopener noreferrer'  // Security
+
+      // ENHANCED URL-BASED EXTENSION DETECTION
+      let downloadFileName
+      const urlLower = fileUrl.toLowerCase()
+
+      // Extract actual file extension from Sanity URL
+      // Sanity URLs typically look like: https://cdn.sanity.io/files/project/dataset/filename.ext
+      const urlParts = fileUrl.split('/')
+      const lastPart = urlParts[urlParts.length - 1]
+      const urlExtension = lastPart.includes('.') ? lastPart.split('.').pop().toLowerCase() : null
+
+      console.log('🔍 URL Analysis:', {
+        urlParts,
+        lastPart,
+        urlExtension,
+        detectedType: urlExtension
+      })
+
+      // Use URL extension to determine correct file type
+      if (urlExtension === 'docx') {
+        downloadFileName = fileName && fileName.includes('.') ? fileName : `${fallbackName}.docx`
+        // Force correct extension
+        if (fileName && !fileName.toLowerCase().endsWith('.docx')) {
+          const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "")
+          downloadFileName = `${nameWithoutExt}.docx`
+        }
+      } else if (urlExtension === 'doc') {
+        downloadFileName = fileName && fileName.includes('.') ? fileName : `${fallbackName}.doc`
+        // Force correct extension
+        if (fileName && !fileName.toLowerCase().endsWith('.doc')) {
+          const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "")
+          downloadFileName = `${nameWithoutExt}.doc`
+        }
+      } else if (urlExtension === 'pdf') {
+        downloadFileName = fileName && fileName.includes('.') ? fileName : `${fallbackName}.pdf`
+        // Force correct extension
+        if (fileName && !fileName.toLowerCase().endsWith('.pdf')) {
+          const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "")
+          downloadFileName = `${nameWithoutExt}.pdf`
+        }
+      } else {
+        // Fallback to old method if URL parsing fails
+        if (urlLower.includes('.docx')) {
+          downloadFileName = `${fallbackName}.docx`
+        } else if (urlLower.includes('.doc')) {
+          downloadFileName = `${fallbackName}.doc`
+        } else {
+          downloadFileName = fileName || `${fallbackName}.pdf`
+        }
+      }
+
+      link.download = downloadFileName
+
+      // Add to DOM, click, and remove
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      console.log(`📄 Downloaded file: ${downloadFileName} (URL-based detection)`)
+    }
+  }
+
+  const getFileIcon = (fileName) => {
+    if (!fileName) return '📄'
+    const ext = fileName.toLowerCase().split('.').pop()
+    switch (ext) {
+      case 'pdf': return '📄'
+      case 'doc': return '📝'
+      case 'docx': return '📝'
+      default: return '📄'
+    }
+  }
+
+  const getFileTypeLabel = (fileName) => {
+    if (!fileName) return 'Document'
+    const ext = fileName.toLowerCase().split('.').pop()
+    switch (ext) {
+      case 'pdf': return 'PDF'
+      case 'doc': return 'DOC'
+      case 'docx': return 'DOCX'
+      default: return 'File'
     }
   }
 
@@ -123,8 +270,12 @@ const AbstractTableView = () => {
         abstractContent,
         abstractFile{
           asset->{
+            _id,
             url,
-            originalFilename
+            originalFilename,
+            mimeType,
+            extension,
+            size
           }
         },
         submissionDate,
@@ -134,6 +285,7 @@ const AbstractTableView = () => {
 
       const submissions = await client.fetch(query)
       console.log('🔄 Refreshed submissions:', submissions.length)
+      console.log('🔍 Sample submission with file:', submissions.find(s => s.abstractFile?.asset))
       setDocuments(submissions)
     } catch (err) {
       console.error('❌ Error refreshing submissions:', err)
@@ -402,18 +554,33 @@ const AbstractTableView = () => {
                   </td>
                   <td style={{padding: '12px 8px', textAlign: 'center'}}>
                     {doc.abstractFile?.asset?.url ? (
-                      <Button
-                        mode="ghost"
-                        tone="primary"
-                        icon={DownloadIcon}
-                        fontSize={1}
-                        padding={2}
-                        onClick={() => downloadFile(
-                          doc.abstractFile.asset.url,
-                          `${doc.firstName}_${doc.lastName}_abstract.pdf`
-                        )}
-                        title="Download Abstract"
-                      />
+                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
+                        <Text size={1}>
+                          {getFileIcon(doc.abstractFile.asset.originalFilename)}
+                        </Text>
+                        <Button
+                          mode="ghost"
+                          tone="primary"
+                          icon={DownloadIcon}
+                          text={getFileTypeLabel(doc.abstractFile.asset.originalFilename)}
+                          fontSize={1}
+                          padding={2}
+                          onClick={() => {
+                            console.log('🔍 File Data Debug:', {
+                              url: doc.abstractFile.asset.url,
+                              originalFilename: doc.abstractFile.asset.originalFilename,
+                              fallback: `${doc.firstName}_${doc.lastName}_abstract`,
+                              fullAsset: doc.abstractFile.asset
+                            })
+                            downloadFileWithFetch(
+                              doc.abstractFile.asset.url,
+                              doc.abstractFile.asset.originalFilename,
+                              `${doc.firstName}_${doc.lastName}_abstract`
+                            )
+                          }}
+                          title={`Download ${getFileTypeLabel(doc.abstractFile.asset.originalFilename)} (opens in new tab)`}
+                        />
+                      </div>
                     ) : (
                       <Text size={1} muted>No file</Text>
                     )}

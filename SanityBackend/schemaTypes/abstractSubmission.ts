@@ -62,12 +62,19 @@ export default defineType({
     }),
     defineField({
       name: 'abstractFile',
-      title: 'Abstract File (PDF)',
+      title: 'Abstract File (PDF, DOC, DOCX)',
       type: 'file',
       options: {
-        accept: '.pdf'
+        accept: '.pdf,.doc,.docx'
       },
-      validation: Rule => Rule.required()
+      components: {
+        input: (props) => {
+          const { DocumentFileInput } = require('../components/CustomFileInput.jsx')
+          return DocumentFileInput(props)
+        },
+      },
+      validation: Rule => Rule.required(),
+      description: 'Abstract document (PDF, DOC, or DOCX) - opens in new tab when downloaded'
     }),
     defineField({
       name: 'submissionDate',

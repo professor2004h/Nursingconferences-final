@@ -1,4 +1,4 @@
-/* Theme-aware table styling for Registration Data */
+/* Theme-aware table styling for Registration Data with PDF New Tab Support */
 
 .registration-table-container {
   /* Use CSS custom properties that adapt to Sanity's theme */
@@ -302,5 +302,79 @@
   .registration-table th,
   .registration-table td {
     border: 1px solid #000;
+  }
+}
+
+/* ===== PDF NEW TAB DOWNLOAD STYLES ===== */
+
+/* PDF Download Button Enhancement */
+.pdf-download-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pdf-download-btn::before {
+  content: "🔗";
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.pdf-download-btn::after {
+  content: "Opens in new tab";
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pdf-download-btn:hover::after {
+  opacity: 1;
+}
+
+/* PDF Receipt Cell Styling */
+.registration-table .pdf-receipt {
+  position: relative;
+}
+
+.registration-table .pdf-receipt button {
+  transition: all 0.2s ease;
+}
+
+.registration-table .pdf-receipt button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* PDF Icon Enhancement */
+.pdf-download-btn [data-sanity-icon="document-pdf"] {
+  color: #dc2626;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Dark theme PDF tooltip */
+[data-ui="dark"] .pdf-download-btn::after {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
+}
+
+/* Mobile PDF download styles */
+@media (max-width: 768px) {
+  .pdf-download-btn::after {
+    font-size: 10px;
+    padding: 4px 8px;
+    bottom: -25px;
   }
 }

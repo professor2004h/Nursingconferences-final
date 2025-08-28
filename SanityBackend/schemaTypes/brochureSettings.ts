@@ -50,8 +50,14 @@ export const brochureSettings = defineType({
       options: {
         accept: '.pdf',
       },
+      components: {
+        input: (props) => {
+          const { PDFFileInput } = require('../components/CustomFileInput.jsx')
+          return PDFFileInput(props)
+        },
+      },
       validation: (Rule) => Rule.required(),
-      description: 'Upload the PDF brochure file that users will download',
+      description: 'Upload the PDF brochure file that users will download - opens in new tab',
     }),
     defineField({
       name: 'active',
