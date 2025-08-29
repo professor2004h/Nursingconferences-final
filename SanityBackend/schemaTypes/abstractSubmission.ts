@@ -7,6 +7,22 @@ export default defineType({
   icon: () => '📄',
   fields: [
     defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Mr', value: 'Mr' },
+          { title: 'Ms', value: 'Ms' },
+          { title: 'Dr', value: 'Dr' },
+          { title: 'Prof', value: 'Prof' },
+          { title: 'Mrs', value: 'Mrs' }
+        ]
+      },
+      initialValue: 'N/A',
+      description: 'Personal title (Mr, Ms, Dr, Prof, Mrs)'
+    }),
+    defineField({
       name: 'firstName',
       title: 'First Name',
       type: 'string',
@@ -46,9 +62,10 @@ export default defineType({
     }),
     defineField({
       name: 'interestedIn',
-      title: 'Interested In',
+      title: 'Category',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.required(),
+      description: 'Presentation category/type (e.g., Oral Presentation, Poster Presentation)'
     }),
     defineField({
       name: 'trackName',
@@ -66,7 +83,7 @@ export default defineType({
       name: 'abstractContent',
       title: 'Abstract Content',
       type: 'text',
-      validation: Rule => Rule.required()
+      description: 'Legacy field - no longer collected in form but preserved for existing data'
     }),
     defineField({
       name: 'abstractFile',
@@ -75,12 +92,7 @@ export default defineType({
       options: {
         accept: '.pdf,.doc,.docx'
       },
-      components: {
-        input: (props) => {
-          const { DocumentFileInput } = require('../components/CustomFileInput.jsx')
-          return DocumentFileInput(props)
-        },
-      },
+
       validation: Rule => Rule.required(),
       description: 'Abstract document (PDF, DOC, or DOCX) - opens in new tab when downloaded'
     }),

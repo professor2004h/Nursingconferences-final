@@ -15,15 +15,16 @@ const AbstractTableView = () => {
         setLoading(true)
         const query = `*[_type == "abstractSubmission"] | order(submissionDate desc) {
           _id,
+          title,
           firstName,
           lastName,
           email,
           phoneNumber,
           country,
+          organization,
           interestedIn,
           trackName,
           abstractTitle,
-          abstractContent,
           abstractFile{
             asset->{
               url,
@@ -259,6 +260,7 @@ const AbstractTableView = () => {
     try {
       const query = `*[_type == "abstractSubmission"] | order(submissionDate desc) {
         _id,
+        title,
         firstName,
         lastName,
         email,
@@ -268,7 +270,6 @@ const AbstractTableView = () => {
         interestedIn,
         trackName,
         abstractTitle,
-        abstractContent,
         abstractFile{
           asset->{
             _id,
@@ -304,6 +305,7 @@ const AbstractTableView = () => {
 
     const headers = [
       'ID',
+      'Title',
       'First Name',
       'Last Name',
       'Email',
@@ -312,7 +314,7 @@ const AbstractTableView = () => {
       'Organization',
       'Category',
       'Track',
-      'Title',
+      'Abstract Title',
       'Status',
       'Submission Date',
       'File URL'
@@ -320,12 +322,13 @@ const AbstractTableView = () => {
 
     const csvData = documents.map(doc => [
       doc._id?.slice(-8) || 'N/A',
+      doc.title || 'N/A',
       doc.firstName || '',
       doc.lastName || '',
       doc.email || '',
       doc.phoneNumber || '',
       doc.country || '',
-      doc.organization || 'ABC',
+      doc.organization || 'N/A',
       doc.interestedIn || '',
       doc.trackName || '',
       doc.abstractTitle || '',
@@ -430,6 +433,13 @@ const AbstractTableView = () => {
                   textAlign: 'left',
                   fontWeight: '600'
                 }}>
+                  <Text size={1} weight="semibold">Title</Text>
+                </th>
+                <th style={{
+                  padding: '12px 8px',
+                  textAlign: 'left',
+                  fontWeight: '600'
+                }}>
                   <Text size={1} weight="semibold">Name</Text>
                 </th>
                 <th style={{
@@ -479,7 +489,7 @@ const AbstractTableView = () => {
                   textAlign: 'left',
                   fontWeight: '600'
                 }}>
-                  <Text size={1} weight="semibold">Title</Text>
+                  <Text size={1} weight="semibold">Abstract Title</Text>
                 </th>
                 <th style={{
                   padding: '12px 8px',
@@ -520,6 +530,11 @@ const AbstractTableView = () => {
                   </td>
                   <td style={{padding: '12px 8px'}}>
                     <Text size={1} weight="medium">
+                      {doc.title || 'N/A'}
+                    </Text>
+                  </td>
+                  <td style={{padding: '12px 8px'}}>
+                    <Text size={1} weight="medium">
                       {doc.firstName} {doc.lastName}
                     </Text>
                   </td>
@@ -533,7 +548,7 @@ const AbstractTableView = () => {
                     <Text size={1}>{doc.country}</Text>
                   </td>
                   <td style={{padding: '12px 8px'}}>
-                    <Text size={1}>{doc.organization || 'ABC'}</Text>
+                    <Text size={1}>{doc.organization || 'N/A'}</Text>
                   </td>
                   <td style={{padding: '12px 8px'}}>
                     <Text size={1}>{doc.interestedIn}</Text>

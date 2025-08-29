@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getSiteSettings, getImageUrl, getFullBrandName } from '../getSiteSettings';
+import { getSiteSettings, getSiteSettingsFresh, getImageUrl, getFullBrandName } from '../getSiteSettings';
 import { shouldShowPastConferencesInMenu } from '../getPastConferencesRedirect';
 
 export default async function Footer() {
@@ -9,8 +9,14 @@ export default async function Footer() {
   let showPastConferences = true;
 
   try {
-    siteSettings = await getSiteSettings();
+    // Use fresh data to bypass cache
+    siteSettings = await getSiteSettingsFresh();
     showPastConferences = await shouldShowPastConferencesInMenu();
+
+    // Debug logging
+    console.log('🔍 Footer Debug - Site Settings:', !!siteSettings);
+    console.log('🔍 Footer Debug - Footer Content:', !!siteSettings?.footerContent);
+    console.log('🔍 Footer Debug - Footer Text:', siteSettings?.footerContent?.footerText);
   } catch (error) {
     console.error('Error fetching site settings for footer:', error);
   }
@@ -27,7 +33,14 @@ export default async function Footer() {
 
   // Get footer text from footerContent
   const footerText = siteSettings?.footerContent?.footerText ||
-    'We at Nursing Conference 2026 built an ecosystem that brings the Scholars, people in the Scientific Study & Research, knowledge group of the society, the students, learners and more on a common ground – to share their knowledge, on the scientific progress that brings along the benefits to humanity and to our existence itself.';
+    'Main descriptive text that appears in the footer section about your organization';
+
+  // Debug the footer text
+  console.log('🔍 Footer Text Debug:', {
+    hasFooterContent: !!siteSettings?.footerContent,
+    footerTextValue: siteSettings?.footerContent?.footerText,
+    finalFooterText: footerText
+  });
 
   // Debug logging for Register Button (development only)
   if (process.env.NODE_ENV === 'development') {

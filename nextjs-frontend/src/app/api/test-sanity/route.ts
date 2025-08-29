@@ -12,15 +12,16 @@ export async function GET() {
     // Test write client by creating a test document
     const testDoc = await writeClient.create({
       _type: 'abstractSubmission',
+      title: 'Dr',
       firstName: 'Test',
       lastName: 'User',
       email: 'test@example.com',
       phoneNumber: '1234567890',
       country: 'Test Country',
+      organization: 'Test University',
       interestedIn: 'oral-presentation-in-person',
       trackName: 'nursing-education',
       abstractTitle: 'Test Abstract',
-      abstractContent: 'This is a test abstract submission.',
       submissionDate: new Date().toISOString(),
       status: 'pending'
     })

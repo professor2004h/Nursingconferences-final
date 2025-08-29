@@ -11,15 +11,16 @@ export async function POST(request: NextRequest) {
     // Create abstract submission document without file
     const submission = await writeClient.create({
       _type: 'abstractSubmission',
+      title: 'Dr',
       firstName: firstName || 'Test',
       lastName: lastName || 'User',
       email: email || 'test@example.com',
       phoneNumber: '1234567890',
       country: 'Test Country',
+      organization: 'Test University',
       interestedIn: 'oral-presentation-in-person',
       trackName: 'nursing-education',
       abstractTitle: 'Test Abstract Without File',
-      abstractContent: 'This is a test abstract submission without file upload.',
       submissionDate: new Date().toISOString(),
       status: 'pending'
     })

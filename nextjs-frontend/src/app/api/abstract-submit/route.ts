@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
 
     // Extract form fields
+    const title = formData.get('title') as string
     const firstName = formData.get('firstName') as string
     const lastName = formData.get('lastName') as string
     const email = formData.get('email') as string
@@ -16,21 +17,20 @@ export async function POST(request: NextRequest) {
     const interestedIn = formData.get('interestedIn') as string
     const trackName = formData.get('trackName') as string
     const abstractTitle = formData.get('abstractTitle') as string
-    const abstractContent = formData.get('abstractContent') as string
     const abstractFile = formData.get('abstractFile') as File
 
     console.log('📝 Form data extracted:', {
-      firstName, lastName, email, country, interestedIn, trackName, abstractTitle,
+      title, firstName, lastName, email, country, interestedIn, trackName, abstractTitle,
       fileSize: abstractFile?.size,
       fileType: abstractFile?.type
     })
 
     // Validate required fields
-    if (!firstName || !lastName || !email || !phoneNumber || !country || !organization ||
-        !interestedIn || !trackName || !abstractTitle || !abstractContent || !abstractFile) {
+    if (!title || !firstName || !lastName || !email || !phoneNumber || !country || !organization ||
+        !interestedIn || !trackName || !abstractTitle || !abstractFile) {
       console.log('❌ Validation failed: Missing required fields')
       return NextResponse.json(
-        { error: 'All fields are required including organization' },
+        { error: 'All fields are required including title and organization' },
         { status: 400 }
       )
     }
@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
     // Create abstract submission document first (without file for now)
     const submission = await writeClient.create({
       _type: 'abstractSubmission',
+      title,
       firstName,
       lastName,
       email,
@@ -70,7 +71,6 @@ export async function POST(request: NextRequest) {
       interestedIn,
       trackName,
       abstractTitle,
-      abstractContent,
       submissionDate: new Date().toISOString(),
       status: 'pending'
     })
@@ -135,15 +135,16 @@ export async function GET() {
     const submissions = await client.fetch(`
       *[_type == "abstractSubmission"] | order(submissionDate desc) {
         _id,
+        title,
         firstName,
         lastName,
         email,
         phoneNumber,
         country,
+        organization,
         interestedIn,
         trackName,
         abstractTitle,
-        abstractContent,
         abstractFile{
           asset->{
             url,

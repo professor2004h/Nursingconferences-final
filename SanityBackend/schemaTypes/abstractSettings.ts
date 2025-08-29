@@ -34,12 +34,7 @@ export default defineType({
       options: {
         accept: '.pdf,.doc,.docx'
       },
-      components: {
-        input: (props) => {
-          const { CustomFileInput } = require('../components/CustomFileInput.jsx')
-          return CustomFileInput(props)
-        },
-      },
+
       description: 'Template file for abstract submission that users can download - PDFs open in new tab'
     }),
     defineField({

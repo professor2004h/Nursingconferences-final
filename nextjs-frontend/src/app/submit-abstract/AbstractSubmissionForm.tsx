@@ -14,6 +14,7 @@ interface Props {
 
 export default function AbstractSubmissionForm({ settings }: Props) {
   const [formData, setFormData] = useState({
+    title: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -23,7 +24,6 @@ export default function AbstractSubmissionForm({ settings }: Props) {
     interestedIn: '',
     trackName: '',
     abstractTitle: '',
-    abstractContent: '',
     abstractFile: null as File | null
   })
 
@@ -76,6 +76,7 @@ export default function AbstractSubmissionForm({ settings }: Props) {
         })
         // Reset form
         setFormData({
+          title: '',
           firstName: '',
           lastName: '',
           email: '',
@@ -85,7 +86,6 @@ export default function AbstractSubmissionForm({ settings }: Props) {
           interestedIn: '',
           trackName: '',
           abstractTitle: '',
-          abstractContent: '',
           abstractFile: null
         })
         // Reset file input
@@ -120,22 +120,23 @@ export default function AbstractSubmissionForm({ settings }: Props) {
         </div>
       )}
 
-      {/* Row 1: Select Any, First Name, Last Name */}
+      {/* Row 1: Select Title, First Name, Last Name */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <select
-            id="interestedIn"
-            name="interestedIn"
-            value={formData.interestedIn}
+            id="title"
+            name="title"
+            value={formData.title}
             onChange={handleInputChange}
             required
             className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm"
           >
-            <option value="">Select Presentation Type</option>
-            <option value="oral-presentation-in-person">Oral Presentation (In-Person)</option>
-            <option value="oral-presentation-virtual">Oral Presentation (Virtual)</option>
-            <option value="poster-presentation">Poster Presentation</option>
-            <option value="workshop">Workshop</option>
+            <option value="">Select Title</option>
+            <option value="Mr">Mr</option>
+            <option value="Ms">Ms</option>
+            <option value="Dr">Dr</option>
+            <option value="Prof">Prof</option>
+            <option value="Mrs">Mrs</option>
           </select>
         </div>
 
@@ -285,21 +286,7 @@ export default function AbstractSubmissionForm({ settings }: Props) {
         />
       </div>
 
-      {/* Row 6: Abstract Content */}
-      <div>
-        <textarea
-          id="abstractContent"
-          name="abstractContent"
-          value={formData.abstractContent}
-          onChange={handleInputChange}
-          required
-          rows={6}
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-vertical text-sm"
-          placeholder="Enter your abstract content (maximum 300 words)"
-        />
-      </div>
-
-      {/* Row 7: File Upload */}
+      {/* Row 6: File Upload */}
       <div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-600 font-medium">Attach your File (Doc or Pdf)</span>
