@@ -611,7 +611,7 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
             
             <!-- Footer -->
             <div style="background-color: #f8f9fa; padding: 15px 20px; text-align: center; border-top: 1px solid #dee2e6;">
-              <p style="margin: 0 0 5px 0; font-size: 10px; color: #666;">© 2025 International Nursing Conference 2025</p>
+              <p style="margin: 0 0 5px 0; font-size: 10px; color: #666;">© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</p>
               <p style="margin: 0; font-size: 10px; color: #999;">Generated on: ${new Date().toLocaleString()}</p>
             </div>
             
@@ -623,7 +623,7 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
         </html>
       `,
       text: `
-PAYMENT RECEIPT - International Nursing Conference 2025
+PAYMENT RECEIPT - ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
 
 PAYMENT INFORMATION:
 Transaction ID: ${paymentData.transactionId || 'N/A'}
@@ -650,7 +650,7 @@ Total Amount: ${paymentData.currency || 'USD'} ${paymentData.amount || '0.00'}
 CONTACT INFORMATION:
 Email: contactus@intelliglobalconferences.com
 
-© 2025 International Nursing Conference 2025
+© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
 Generated on: ${new Date().toLocaleString()}
       `,
       attachments: pdfBuffer ? [
@@ -935,9 +935,9 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
               <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9;">Registration Receipt</p>
             </div>
 
-            <!-- Conference Title -->
+            <!-- Conference Title - DYNAMIC from Sanity -->
             <div style="padding: 20px; background-color: #ffffff;">
-              <h2 style="margin: 0; font-size: 18px; color: #333; font-weight: bold;">International Nursing Conference 2025</h2>
+              <h2 style="margin: 0; font-size: 18px; color: #333; font-weight: bold;">${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</h2>
             </div>
 
             <!-- Payment Information -->
@@ -1021,7 +1021,7 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
 
             <!-- Footer -->
             <div style="background-color: #f8f9fa; padding: 15px 20px; text-align: center; border-top: 1px solid #dee2e6;">
-              <p style="margin: 0 0 5px 0; font-size: 10px; color: #666;">© 2025 International Nursing Conference 2025</p>
+              <p style="margin: 0 0 5px 0; font-size: 10px; color: #666;">© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</p>
               <p style="margin: 0; font-size: 10px; color: #999;">Generated on: ${new Date().toLocaleString()}</p>
             </div>
 
@@ -1031,7 +1031,7 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
         </html>
       `,
       text: `
-PAYMENT RECEIPT - International Nursing Conference 2025
+PAYMENT RECEIPT - ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
 
 PAYMENT INFORMATION:
 Transaction ID: ${paymentData.transactionId || 'N/A'}
@@ -1054,7 +1054,7 @@ Number of Participants: ${String(registrationData.numberOfParticipants || 1)}
 CONTACT INFORMATION:
 Email: ${emailConfig.fromEmail}
 
-© 2025 International Nursing Conference 2025
+© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
 Generated on: ${new Date().toLocaleString()}
       `,
       attachments: pdfBuffer ? [

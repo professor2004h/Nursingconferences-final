@@ -71,37 +71,57 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
     doc.rect(0, i, pageWidth, 1, 'F');
   }
 
-  // Fetch and add company logo
+  // Fetch and add company logo - CRITICAL FIX
   try {
+    console.log('🖼️ Attempting to fetch and embed company logo...');
     const footerLogo = await getFooterLogo();
+
     if (footerLogo?.url) {
-      // Optimize logo URL for high quality
+      console.log(`📥 Logo found: ${footerLogo.url}`);
+
+      // Optimize logo URL for high quality PDF embedding
       let optimizedLogoUrl = footerLogo.url;
       if (footerLogo.url.includes('cdn.sanity.io')) {
         optimizedLogoUrl = `${footerLogo.url}?w=800&h=300&q=100&fit=max&fm=png`;
       }
 
-      // Load and embed the logo
+      // Load and embed the logo with proper error handling
       const logoResponse = await fetch(optimizedLogoUrl);
+      if (!logoResponse.ok) {
+        throw new Error(`Logo fetch failed: ${logoResponse.status}`);
+      }
+
       const logoArrayBuffer = await logoResponse.arrayBuffer();
       const logoBase64 = Buffer.from(logoArrayBuffer).toString('base64');
 
-      // Determine image format
+      // Determine image format based on URL
       let imageFormat = 'PNG';
-      if (footerLogo.url.toLowerCase().includes('.jpg') || footerLogo.url.toLowerCase().includes('.jpeg')) {
+      const url = footerLogo.url.toLowerCase();
+      if (url.includes('.jpg') || url.includes('.jpeg')) {
         imageFormat = 'JPEG';
+      } else if (url.includes('.png')) {
+        imageFormat = 'PNG';
+      } else if (url.includes('.gif')) {
+        imageFormat = 'GIF';
       }
 
-      // Position logo in header
+      // Position logo in header with proper dimensions
       const logoWidth = receiptSettings.receiptTemplate?.logoSize?.width || 72;
       const logoHeight = receiptSettings.receiptTemplate?.logoSize?.height || 24;
       const logoX = LAYOUT.margins.left;
       const logoY = (LAYOUT.header.height - logoHeight) / 2;
 
+      // Create data URL and embed logo
       const logoDataUrl = `data:image/${imageFormat.toLowerCase()};base64,${logoBase64}`;
       doc.addImage(logoDataUrl, imageFormat, logoX, logoY, logoWidth, logoHeight);
-      console.log('✅ Company logo embedded in PDF header');
+
+      console.log(`✅ Company logo embedded successfully in PDF header`);
+      console.log(`   📐 Dimensions: ${logoWidth}x${logoHeight}px`);
+      console.log(`   📍 Position: (${logoX}, ${logoY})`);
+      console.log(`   🎨 Format: ${imageFormat}`);
+
     } else {
+      console.log('⚠️ No logo found in Sanity, using company name fallback');
       // Fallback: Company name in header if no logo
       doc.setTextColor(...colors.headerText);
       doc.setFontSize(20);
@@ -109,7 +129,9 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
       doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.titleY);
     }
   } catch (logoError) {
-    console.log('⚠️ Logo loading failed, using text fallback:', logoError.message);
+    console.error('❌ Logo embedding failed:', logoError.message);
+    console.log('🔄 Using company name text fallback in header');
+
     // Fallback: Company name in header
     doc.setTextColor(...colors.headerText);
     doc.setFontSize(20);
@@ -293,32 +315,60 @@ async function getReceiptSettings() {
 }
 
 /**
- * Get footer logo from Sanity
+ * Get company logo from Sanity - ENHANCED with multiple logo sources
  */
 async function getFooterLogo() {
   try {
+    console.log('🔍 Searching for company logo in Sanity CMS...');
+
+    // Try multiple logo sources in order of preference
     const query = `*[_type == "siteSettings"][0]{
-      footerLogo{
+      logo{
         asset->{
           _id,
           url
+        },
+        alt
+      },
+      footerContent{
+        footerLogo{
+          asset->{
+            _id,
+            url
+          },
+          alt
         }
       }
     }`;
 
     const siteSettings = await sanityClient.fetch(query);
+    console.log('📋 Site settings fetched:', !!siteSettings);
 
-    if (siteSettings?.footerLogo?.asset?.url) {
+    // Try main website logo first
+    if (siteSettings?.logo?.asset?.url) {
+      console.log('✅ Found main website logo');
       return {
-        url: siteSettings.footerLogo.asset.url,
-        _id: siteSettings.footerLogo.asset._id
+        url: siteSettings.logo.asset.url,
+        _id: siteSettings.logo.asset._id,
+        alt: siteSettings.logo.alt || 'Intelli Global Conferences Logo'
       };
     }
 
-    console.log('⚠️ No footer logo found in site settings');
+    // Try footer logo as fallback
+    if (siteSettings?.footerContent?.footerLogo?.asset?.url) {
+      console.log('✅ Found footer logo');
+      return {
+        url: siteSettings.footerContent.footerLogo.asset.url,
+        _id: siteSettings.footerContent.footerLogo.asset._id,
+        alt: siteSettings.footerContent.footerLogo.alt || 'Intelli Global Conferences Logo'
+      };
+    }
+
+    console.log('⚠️ No logo found in site settings');
+    console.log('📋 Available fields:', Object.keys(siteSettings || {}));
     return null;
   } catch (error) {
-    console.error('❌ Error fetching footer logo:', error);
+    console.error('❌ Error fetching company logo:', error);
     return null;
   }
 }
