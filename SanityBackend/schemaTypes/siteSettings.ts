@@ -368,6 +368,16 @@ Thank you for your support!`,
       },
       fields: [
         defineField({
+          name: 'footerText',
+          title: 'Footer Description Text',
+          type: 'text',
+          rows: 4,
+          description: 'Main descriptive text that appears in the footer section about your organization',
+          placeholder: 'We at Nursing Conference 2026 built an ecosystem that brings the Scholars, people in the Scientific Study & Research...',
+          initialValue: 'We at Nursing Conference 2026 built an ecosystem that brings the Scholars, people in the Scientific Study & Research, knowledge group of the society, the students, learners and more on a common ground – to share their knowledge, on the scientific progress that brings along the benefits to humanity and to our existence itself.',
+          validation: (Rule: any) => Rule.max(1000).error('Footer text should be under 1000 characters'),
+        }),
+        defineField({
           name: 'termsAndConditions',
           title: 'Terms & Conditions',
           type: 'array',

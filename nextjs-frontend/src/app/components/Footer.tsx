@@ -25,6 +25,10 @@ export default async function Footer() {
   // Get register button config from footerContent
   const registerButton = siteSettings?.footerContent?.registerButton;
 
+  // Get footer text from footerContent
+  const footerText = siteSettings?.footerContent?.footerText ||
+    'We at Nursing Conference 2026 built an ecosystem that brings the Scholars, people in the Scientific Study & Research, knowledge group of the society, the students, learners and more on a common ground – to share their knowledge, on the scientific progress that brings along the benefits to humanity and to our existence itself.';
+
   // Debug logging for Register Button (development only)
   if (process.env.NODE_ENV === 'development') {
     console.log('🔍 Register Button Debug:', {
@@ -131,9 +135,7 @@ export default async function Footer() {
                 </div>
               )}
               <p className="text-gray-300 mb-6 max-w-md">
-                We at Nursing Conference 2026 built an ecosystem that brings the Scholars, people in the Scientific Study & Research,
-                knowledge group of the society, the students, learners and more on a common ground – to share their knowledge,
-                on the scientific progress that brings along the benefits to humanity and to our existence itself.
+                {footerText}
               </p>
             </div>
 

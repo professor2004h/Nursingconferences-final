@@ -58,6 +58,7 @@ export interface SiteSettings {
     paymentConfirmationTemplate?: string;
   };
   footerContent?: {
+    footerText?: string;
     termsAndConditions?: any[];
     privacyPolicy?: any[];
     faqs?: Array<{
@@ -145,6 +146,7 @@ export async function getSiteSettings(forceRefresh = false): Promise<SiteSetting
       refundPolicy,
       adminSettings,
       footerContent{
+        footerText,
         termsAndConditions,
         privacyPolicy,
         faqs[]{
@@ -242,6 +244,7 @@ export async function getSiteSettingsFresh(): Promise<SiteSettings | null> {
       refundPolicy,
       adminSettings,
       footerContent{
+        footerText,
         termsAndConditions,
         privacyPolicy,
         faqs[]{
@@ -326,6 +329,7 @@ export async function getSiteSettingsForHeader(): Promise<SiteSettings | null> {
       refundPolicy,
       adminSettings,
       footerContent{
+        footerText,
         termsAndConditions,
         privacyPolicy,
         faqs[]{
@@ -412,6 +416,7 @@ export async function getSiteSettingsSSR(): Promise<SiteSettings | null> {
       journal,
       adminSettings,
       footerContent{
+        footerText,
         termsAndConditions,
         privacyPolicy,
         faqs[]{
