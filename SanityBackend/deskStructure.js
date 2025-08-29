@@ -1,5 +1,5 @@
 // Custom Sanity Studio structure to include Map Location in the sidebar
-import {DocumentIcon, DownloadIcon, PinIcon, UserIcon, EditIcon, UsersIcon} from '@sanity/icons'
+import {DocumentIcon, DownloadIcon, PinIcon, UserIcon, EditIcon, UsersIcon, CogIcon} from '@sanity/icons'
 import BrochureTableView from './components/BrochureTableView'
 import RegistrationTableView from './components/RegistrationTableView'
 import AbstractTableView from './components/AbstractTableView.jsx'
@@ -35,6 +35,18 @@ export default (S) =>
       S.listItem().title('About Organisation').schemaType('aboutUsSection').child(S.documentTypeList('aboutUsSection')),
       S.listItem().title('Hero Section').schemaType('heroSection').child(S.documentTypeList('heroSection')),
       S.listItem().title('Site Settings').schemaType('siteSettings').child(S.documentTypeList('siteSettings')),
+
+      // Receipt & Email Settings (Singleton)
+      S.listItem()
+        .title('Receipt & Email Settings')
+        .id('receiptSettings')
+        .icon(CogIcon)
+        .child(
+          S.document()
+            .schemaType('receiptSettings')
+            .documentId('receipt-settings-main')
+            .title('Receipt & Email Configuration')
+        ),
 
       // Registration System - Consolidated
       S.divider(),
