@@ -80,10 +80,7 @@ const SpeakerGuidelinesPage: React.FC = () => {
       <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <span className="text-orange-400 font-semibold text-lg tracking-wide uppercase mb-4 block">
-              Conference Information
-            </span>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
               {guidelines.title}
             </h1>
             {guidelines.subtitle && (
@@ -95,18 +92,18 @@ const SpeakerGuidelinesPage: React.FC = () => {
 
           {/* Breadcrumb */}
           <nav className="flex justify-center" aria-label="Breadcrumb">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
+            <ol className="inline-flex items-center space-x-1 sm:space-x-2 md:space-x-3 text-sm sm:text-base">
               <li className="inline-flex items-center">
-                <Link href="/" className="text-blue-200 hover:text-white transition-colors">
+                <Link href="/" className="text-blue-200 hover:text-white transition-colors whitespace-nowrap">
                   Home
                 </Link>
               </li>
               <li>
                 <div className="flex items-center">
-                  <svg className="w-6 h-6 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-300 mx-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-blue-100 ml-1 md:ml-2">Speaker Guidelines</span>
+                  <span className="text-blue-100 whitespace-nowrap">Speaker Guidelines</span>
                 </div>
               </li>
             </ol>
