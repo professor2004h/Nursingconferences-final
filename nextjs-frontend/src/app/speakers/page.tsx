@@ -77,7 +77,7 @@ const SpeakersPage: React.FC = () => {
         {/* Simple Header */}
         <div className="bg-white border-b border-gray-200 py-12 mt-20">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 whitespace-nowrap">CONFERENCE SPEAKERS</h1>
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:whitespace-nowrap leading-tight">CONFERENCE SPEAKERS</h1>
           </div>
         </div>
         <div className="container mx-auto px-4 py-16">
@@ -93,7 +93,7 @@ const SpeakersPage: React.FC = () => {
         {/* Simple Header */}
         <div className="bg-white border-b border-gray-200 py-12 mt-20">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 whitespace-nowrap">CONFERENCE SPEAKERS</h1>
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:whitespace-nowrap leading-tight">CONFERENCE SPEAKERS</h1>
           </div>
         </div>
         <div className="container mx-auto px-4 py-16">
@@ -118,7 +118,7 @@ const SpeakersPage: React.FC = () => {
       {/* Simple Header */}
       <div className="bg-white border-b border-gray-200 py-12 mt-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 whitespace-nowrap">CONFERENCE SPEAKERS</h1>
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:whitespace-nowrap leading-tight">CONFERENCE SPEAKERS</h1>
         </div>
       </div>
 
