@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     const email = formData.get('email') as string
     const phoneNumber = formData.get('phoneNumber') as string
     const country = formData.get('country') as string
+    const organization = formData.get('organization') as string
     const interestedIn = formData.get('interestedIn') as string
     const trackName = formData.get('trackName') as string
     const abstractTitle = formData.get('abstractTitle') as string
@@ -25,11 +26,11 @@ export async function POST(request: NextRequest) {
     })
 
     // Validate required fields
-    if (!firstName || !lastName || !email || !phoneNumber || !country ||
+    if (!firstName || !lastName || !email || !phoneNumber || !country || !organization ||
         !interestedIn || !trackName || !abstractTitle || !abstractContent || !abstractFile) {
       console.log('❌ Validation failed: Missing required fields')
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: 'All fields are required including organization' },
         { status: 400 }
       )
     }
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
       email,
       phoneNumber,
       country,
+      organization,
       interestedIn,
       trackName,
       abstractTitle,

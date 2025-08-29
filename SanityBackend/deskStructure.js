@@ -111,34 +111,40 @@ export default (S) =>
             .documentId('customContentSection')
             .title('Custom Content Section Settings')
         ),
-      // Add Brochure Settings
+      // Unified Brochure System
       S.listItem()
-        .title('Brochure Settings')
-        .id('brochureSettings')
+        .title('Brochure System')
+        .id('brochureSystem')
         .icon(DocumentIcon)
-        .schemaType('brochureSettings')
-        .child(S.documentTypeList('brochureSettings').title('Brochure Settings')),
-      // Add Brochure Downloads with Table View
-      S.listItem()
-        .title('Brochure Downloads')
-        .id('brochureDownloads')
-        .icon(DownloadIcon)
         .child(
           S.list()
-            .title('Brochure Download Management')
+            .title('Brochure Management System')
             .items([
-              // Custom Interactive Table View with Export
+              // Brochure Settings
+              S.listItem()
+                .title('Brochure Settings')
+                .id('brochureSettings')
+                .icon(DocumentIcon)
+                .child(
+                  S.document()
+                    .schemaType('brochureSettings')
+                    .documentId('brochureSettings')
+                    .title('Brochure Settings')
+                ),
+              // Brochure Downloads - Table View
               S.listItem()
                 .title('Downloads Table')
                 .id('brochureDownloadsTable')
+                .icon(DownloadIcon)
                 .child(
                   S.component(BrochureTableView)
                     .title('Brochure Download Submissions - Table View')
                 ),
-              // Traditional Document List View
+              // Brochure Downloads - List View
               S.listItem()
                 .title('Downloads List')
                 .id('brochureDownloadsList')
+                .icon(DownloadIcon)
                 .child(
                   S.documentTypeList('brochureDownload')
                     .title('Brochure Download Submissions - List View')

@@ -126,7 +126,10 @@ export const validateBrochureForm = (data: BrochureFormData): BrochureFormErrors
     errors.organization = 'Organization/Institution is required';
   }
 
-  // Note: Country is now optional for the simplified form
+  // Validate country (now required)
+  if (!data.country || data.country.trim().length === 0) {
+    errors.country = 'Country is required';
+  }
 
   return errors;
 };

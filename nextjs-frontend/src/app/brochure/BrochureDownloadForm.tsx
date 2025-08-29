@@ -20,6 +20,9 @@ export default function BrochureDownloadForm() {
     professionalTitle: '',
   });
 
+  // Debug: Log COUNTRY_OPTIONS to see if it's loaded
+  console.log('🔍 COUNTRY_OPTIONS:', COUNTRY_OPTIONS?.length, 'countries loaded');
+
   const [errors, setErrors] = useState<BrochureFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -61,7 +64,6 @@ export default function BrochureDownloadForm() {
       // Prepare form data with defaults for optional fields
       const submitData = {
         ...formData,
-        country: formData.country || 'Not specified',
         professionalTitle: formData.professionalTitle || '',
       };
 
@@ -235,6 +237,40 @@ export default function BrochureDownloadForm() {
           />
           {errors.organization && (
             <p className="mt-1 text-xs text-red-600">{errors.organization}</p>
+          )}
+        </div>
+
+        {/* Country */}
+        <div>
+          <select
+            id="country"
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            className={`w-full px-4 py-3 border rounded focus:ring-2 focus:ring-[#2563eb] focus:border-[#2563eb] transition-colors bg-white ${
+              errors.country ? 'border-red-500' : 'border-gray-300'
+            }`}
+            disabled={isSubmitting}
+          >
+            <option value="">Select Country*</option>
+            {COUNTRY_OPTIONS && COUNTRY_OPTIONS.length > 0 ? (
+              COUNTRY_OPTIONS.map((country) => (
+                <option key={country.value} value={country.value}>
+                  {country.label}
+                </option>
+              ))
+            ) : (
+              <>
+                <option value="India">India</option>
+                <option value="United States">United States</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Canada">Canada</option>
+                <option value="Australia">Australia</option>
+              </>
+            )}
+          </select>
+          {errors.country && (
+            <p className="mt-1 text-xs text-red-600">{errors.country}</p>
           )}
         </div>
 

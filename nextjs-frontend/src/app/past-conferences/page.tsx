@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { getPastConferencesRedirectUrl } from '../getPastConferencesRedirect';
+import { redirect, notFound } from 'next/navigation';
+import { getPastConferencesRedirectUrl, shouldShowPastConferencesInMenu } from '../getPastConferencesRedirect';
 
 export const metadata: Metadata = {
   title: 'Past Conferences | Intelli Global Conferences',
@@ -9,6 +9,14 @@ export const metadata: Metadata = {
 };
 
 export default async function PastConferencesPage() {
+  // Check if Past Conferences should be visible
+  const shouldShow = await shouldShowPastConferencesInMenu();
+
+  // If Past Conferences is hidden, show 404
+  if (!shouldShow) {
+    notFound();
+  }
+
   // Get the redirect URL from Sanity
   const redirectUrl = await getPastConferencesRedirectUrl();
 

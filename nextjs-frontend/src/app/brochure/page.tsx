@@ -28,10 +28,39 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function getBrochureSettings() {
   try {
-    // Import Sanity client directly to avoid dynamic server usage
-    const { getSiteSettings } = await import('../getSiteSettings');
-    const siteSettings = await getSiteSettings();
-    return siteSettings?.brochureSettings || null;
+    // Import Sanity client directly to fetch brochure settings
+    const { client } = await import('../sanity/client');
+
+    const query = `*[_type == "brochureSettings"][0] {
+      title,
+      description,
+      heroBackgroundImage {
+        asset-> {
+          _id,
+          url
+        }
+      },
+      heroOverlayOpacity,
+      pdfFile {
+        asset-> {
+          _id,
+          url,
+          originalFilename
+        }
+      }
+    }`;
+
+    const brochureSettings = await client.fetch(query, {}, {
+      // Disable caching to ensure fresh data
+      cache: 'no-store'
+    });
+
+    // Convert image asset to URL for easier use
+    if (brochureSettings?.heroBackgroundImage?.asset?.url) {
+      brochureSettings.heroBackgroundImageUrl = brochureSettings.heroBackgroundImage.asset.url;
+    }
+
+    return brochureSettings || null;
   } catch (e) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Failed to load brochure settings:', e);

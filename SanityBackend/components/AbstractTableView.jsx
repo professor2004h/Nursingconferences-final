@@ -264,6 +264,7 @@ const AbstractTableView = () => {
         email,
         phoneNumber,
         country,
+        organization,
         interestedIn,
         trackName,
         abstractTitle,
@@ -308,6 +309,7 @@ const AbstractTableView = () => {
       'Email',
       'Phone Number',
       'Country',
+      'Organization',
       'Category',
       'Track',
       'Title',
@@ -323,6 +325,7 @@ const AbstractTableView = () => {
       doc.email || '',
       doc.phoneNumber || '',
       doc.country || '',
+      doc.organization || 'ABC',
       doc.interestedIn || '',
       doc.trackName || '',
       doc.abstractTitle || '',
@@ -455,6 +458,13 @@ const AbstractTableView = () => {
                   textAlign: 'left',
                   fontWeight: '600'
                 }}>
+                  <Text size={1} weight="semibold">Organization</Text>
+                </th>
+                <th style={{
+                  padding: '12px 8px',
+                  textAlign: 'left',
+                  fontWeight: '600'
+                }}>
                   <Text size={1} weight="semibold">Category</Text>
                 </th>
                 <th style={{
@@ -521,6 +531,9 @@ const AbstractTableView = () => {
                   </td>
                   <td style={{padding: '12px 8px'}}>
                     <Text size={1}>{doc.country}</Text>
+                  </td>
+                  <td style={{padding: '12px 8px'}}>
+                    <Text size={1}>{doc.organization || 'ABC'}</Text>
                   </td>
                   <td style={{padding: '12px 8px'}}>
                     <Text size={1}>{doc.interestedIn}</Text>

@@ -597,23 +597,7 @@ function RegistrationPageContent() {
     }
   };
 
-  // Get background image URL if available - moved before early returns
-  const heroBackgroundImage = useMemo(() => {
-    if (!registrationSettings?.heroSection?.backgroundImage) return null;
 
-    try {
-      // Try to get the URL using urlFor with proper dimensions
-      return urlFor(registrationSettings.heroSection.backgroundImage)
-        .width(1920)
-        .height(1080)
-        .quality(90)
-        .url();
-    } catch (error) {
-      console.error('Error generating image URL:', error);
-      // Fallback to direct URL if available
-      return registrationSettings.heroSection.backgroundImage.asset?.url || null;
-    }
-  }, [registrationSettings]);
 
 
 
@@ -678,38 +662,7 @@ function RegistrationPageContent() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Hero Section */}
-      <section
-        className="registration-hero-section relative bg-gradient-to-br from-blue-900 via-slate-800 to-blue-900
-                   w-full overflow-hidden h-96 md:h-[450px] lg:h-[500px]"
-        style={{
-          backgroundImage: heroBackgroundImage
-            ? `url(${heroBackgroundImage})`
-            : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        {/* 60% Black Overlay */}
-        <div
-          className="absolute inset-0 bg-black"
-          style={{ opacity: 0.6 }}
-        ></div>
 
-        <div className="registration-hero-content absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl px-4 z-10">
-          <div className="registration-hero-text-container flex flex-col items-center justify-center text-center space-y-4">
-            <h1 className="registration-hero-title text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center leading-tight tracking-wide">
-              {registrationSettings?.heroSection?.title || 'REGISTRATION'}
-            </h1>
-            {registrationSettings?.heroSection?.subtitle && (
-              <p className="registration-hero-subtitle text-lg md:text-xl text-white/90 text-center max-w-2xl">
-                {registrationSettings.heroSection.subtitle}
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* Main Form Container */}
       <div className="max-w-6xl mx-auto px-4 py-8">

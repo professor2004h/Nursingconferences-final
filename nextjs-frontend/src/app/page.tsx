@@ -4,9 +4,10 @@ import Link from "next/link";
 
 import { getAboutUsContent } from "./getAboutUs";
 import { getConferences, getConferenceEvents, getConferencesSectionSettings, type ConferenceEventType, type ConferencesSectionSettings } from "./getconferences";
+import { getHeroSection } from "./getHeroSection";
 import { getFeaturedPastConferences, type PastConferenceType } from "./getPastConferences";
 import { PortableText } from "@portabletext/react";
-import { getHeroSection } from "./getHeroSection";
+
 import { getImageSectionContent, getDefaultImageSection } from "./getImageSection";
 import { getSiteSettingsSSR } from "./getSiteSettings";
 import { getVenueSettings } from "./getVenueSettings";

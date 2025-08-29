@@ -4,6 +4,7 @@ import React, { useState, memo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { type SiteSettings } from '../getSiteSettings';
+import { shouldShowPastConferencesInMenu } from '../getPastConferencesRedirect';
 
 interface PosterPresentersSettings {
   showPosterPresenters: boolean;
@@ -27,6 +28,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const [posterPresentersSettings, setPosterPresentersSettings] = useState<PosterPresentersSettings | null>(null);
   const [exhibitorsSettings, setExhibitorsSettings] = useState<ExhibitorsSettings | null>(null);
+  const [showPastConferences, setShowPastConferences] = useState(false); // Default to false for immediate hiding
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownContentRef = useRef<HTMLDivElement>(null);
 
@@ -130,13 +132,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       >
         Sponsorship
       </Link>
-      <Link
-        href="/past-conferences"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={handleDropdownLinkClick}
-      >
-        Past Conferences
-      </Link>
+      {showPastConferences && (
+        <Link
+          href="/past-conferences"
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+          onClick={handleDropdownLinkClick}
+        >
+          Past Conferences
+        </Link>
+      )}
       <Link
         href="/media-partners"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
@@ -299,6 +303,32 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
     };
 
     fetchExhibitorsSettings();
+  }, []);
+
+  // Fetch past conferences visibility setting with periodic refresh
+  useEffect(() => {
+    const fetchPastConferencesVisibility = async () => {
+      try {
+        console.log('🔍 HeaderClient: Checking Past Conferences visibility...');
+        const shouldShow = await shouldShowPastConferencesInMenu();
+        console.log('📊 HeaderClient: shouldShowPastConferencesInMenu =', shouldShow);
+        setShowPastConferences(shouldShow);
+        console.log('✅ HeaderClient: State updated to', shouldShow);
+      } catch (error) {
+        console.error('❌ HeaderClient: Error fetching past conferences visibility:', error);
+        // Default to showing if fetch fails
+        setShowPastConferences(true);
+      }
+    };
+
+    // Initial fetch
+    fetchPastConferencesVisibility();
+
+    // Set up periodic refresh every 5 seconds for faster updates during testing
+    const interval = setInterval(fetchPastConferencesVisibility, 5000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -528,13 +558,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                 >
                   Sponsorship
                 </Link>
-                <Link
-                  href="/past-conferences"
-                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                  onClick={closeMenu}
-                >
-                  Past Conferences
-                </Link>
+                {showPastConferences && (
+                  <Link
+                    href="/past-conferences"
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={closeMenu}
+                  >
+                    Past Conferences
+                  </Link>
+                )}
                 <Link
                   href="/media-partners"
                   className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"

@@ -19,6 +19,7 @@ export default function AbstractSubmissionForm({ settings }: Props) {
     email: '',
     phoneNumber: '',
     country: '',
+    organization: '',
     interestedIn: '',
     trackName: '',
     abstractTitle: '',
@@ -80,6 +81,7 @@ export default function AbstractSubmissionForm({ settings }: Props) {
           email: '',
           phoneNumber: '',
           country: '',
+          organization: '',
           interestedIn: '',
           trackName: '',
           abstractTitle: '',
@@ -122,16 +124,17 @@ export default function AbstractSubmissionForm({ settings }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <select
-            id="abstractType"
-            name="abstractTitle"
-            value={formData.abstractTitle}
+            id="interestedIn"
+            name="interestedIn"
+            value={formData.interestedIn}
             onChange={handleInputChange}
             required
             className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm"
           >
-            <option value="">Select Any</option>
-            <option value="oral">Oral Presentation</option>
-            <option value="poster">Poster Presentation</option>
+            <option value="">Select Presentation Type</option>
+            <option value="oral-presentation-in-person">Oral Presentation (In-Person)</option>
+            <option value="oral-presentation-virtual">Oral Presentation (Virtual)</option>
+            <option value="poster-presentation">Poster Presentation</option>
             <option value="workshop">Workshop</option>
           </select>
         </div>
@@ -215,7 +218,21 @@ export default function AbstractSubmissionForm({ settings }: Props) {
         </div>
       </div>
 
-      {/* Row 3: Category, Track */}
+      {/* Row 3: Organization */}
+      <div>
+        <input
+          type="text"
+          id="organization"
+          name="organization"
+          value={formData.organization}
+          onChange={handleInputChange}
+          required
+          className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+          placeholder="Enter your organization/institution name"
+        />
+      </div>
+
+      {/* Row 4: Category, Track */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <select
@@ -254,7 +271,21 @@ export default function AbstractSubmissionForm({ settings }: Props) {
         </div>
       </div>
 
-      {/* Row 4: Address */}
+      {/* Row 5: Abstract Title */}
+      <div>
+        <input
+          type="text"
+          id="abstractTitle"
+          name="abstractTitle"
+          value={formData.abstractTitle}
+          onChange={handleInputChange}
+          required
+          className="w-full px-3 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+          placeholder="Enter your abstract title"
+        />
+      </div>
+
+      {/* Row 6: Abstract Content */}
       <div>
         <textarea
           id="abstractContent"
@@ -262,13 +293,13 @@ export default function AbstractSubmissionForm({ settings }: Props) {
           value={formData.abstractContent}
           onChange={handleInputChange}
           required
-          rows={3}
+          rows={6}
           className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-vertical text-sm"
-          placeholder="Address"
+          placeholder="Enter your abstract content (maximum 300 words)"
         />
       </div>
 
-      {/* Row 5: File Upload */}
+      {/* Row 7: File Upload */}
       <div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-600 font-medium">Attach your File (Doc or Pdf)</span>

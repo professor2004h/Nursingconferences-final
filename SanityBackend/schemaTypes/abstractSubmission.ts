@@ -37,6 +37,14 @@ export default defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
+      name: 'organization',
+      title: 'Organization/Institution',
+      type: 'string',
+      validation: Rule => Rule.required().min(2).max(200),
+      description: 'Name of your organization, institution, or company',
+      placeholder: 'Enter your organization/institution name'
+    }),
+    defineField({
       name: 'interestedIn',
       title: 'Interested In',
       type: 'string',

@@ -1,0 +1,52 @@
+// GROQ Query for Sanity Vision Tool
+// Add organization field to existing abstract submissions
+
+// Step 1: Check how many documents need updating
+// Run this query first to see how many documents don't have organization field:
+*[_type == "abstractSubmission" && !defined(organization)] {
+  _id,
+  firstName,
+  lastName,
+  email,
+  "needsUpdate": true
+}
+
+// Step 2: Manual update query (run this in Vision's "Mutations" tab)
+// Copy and paste this into the Mutations tab in Sanity Vision:
+
+/*
+[
+  ...(*[_type == "abstractSubmission" && !defined(organization)] | {
+    "patch": {
+      "id": _id,
+      "set": {
+        "organization": "ABC"
+      }
+    }
+  }.patch)
+]
+*/
+
+// Step 3: Verify the update
+// Run this query after the mutation to verify all documents now have organization field:
+*[_type == "abstractSubmission"] {
+  _id,
+  firstName,
+  lastName,
+  email,
+  organization,
+  "hasOrganization": defined(organization)
+}
+
+// Alternative single document update (if you want to update one by one):
+// Replace DOCUMENT_ID with the actual document ID
+/*
+{
+  "patch": {
+    "id": "DOCUMENT_ID",
+    "set": {
+      "organization": "ABC"
+    }
+  }
+}
+*/

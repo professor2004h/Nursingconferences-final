@@ -3,18 +3,7 @@ import { client } from './sanity/client';
 export interface RegistrationSettingsType {
   _id: string;
   title: string;
-  heroSection: {
-    backgroundImage?: {
-      asset: {
-        _ref: string;
-        url?: string;
-      };
-      hotspot?: any;
-    };
-    title: string;
-    subtitle: string;
-    breadcrumb: string;
-  };
+
   pricingDates: {
     earlyBirdEnd: string;
     nextRoundStart: string;
@@ -55,18 +44,7 @@ export async function getRegistrationSettings(): Promise<RegistrationSettingsTyp
     let query = `*[_id == "Zv40Z5ggwujmDSMbbmCqTW"][0]{
       _id,
       title,
-      heroSection{
-        backgroundImage{
-          asset->{
-            _id,
-            url
-          },
-          hotspot
-        },
-        title,
-        subtitle,
-        breadcrumb
-      },
+
       pricingDates{
         earlyBirdEnd,
         nextRoundStart,
@@ -114,18 +92,7 @@ export async function getRegistrationSettings(): Promise<RegistrationSettingsTyp
       ][0]{
         _id,
         title,
-        heroSection{
-          backgroundImage{
-            asset->{
-              _id,
-              url
-            },
-            hotspot
-          },
-          title,
-          subtitle,
-          breadcrumb
-        },
+
         pricingDates{
           earlyBirdEnd,
           nextRoundStart,
@@ -179,11 +146,7 @@ export function getDefaultRegistrationSettings(): RegistrationSettingsType {
   return {
     _id: 'default',
     title: 'Registration Settings',
-    heroSection: {
-      title: 'REGISTRATION',
-      subtitle: 'Register for the conference',
-      breadcrumb: 'Home » Registration',
-    },
+
     pricingDates: {
       earlyBirdEnd: '2025-02-28T23:59:59.000Z',
       nextRoundStart: '2025-03-01T00:00:00.000Z',

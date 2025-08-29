@@ -16,6 +16,7 @@ export async function GET() {
       redirectUrl: redirectConfig.redirectUrl,
       isActive: redirectConfig.isActive,
       description: redirectConfig.description,
+      showInMenu: redirectConfig.showInMenu,
     });
   } catch (error) {
     console.error('Error fetching past conferences redirect:', error);

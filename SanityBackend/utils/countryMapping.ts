@@ -263,7 +263,7 @@ export const getCountryNameFromCode = (code: string): string => {
  * Handles both legacy codes and new full names
  */
 export const normalizeCountryForDisplay = (value: string | null | undefined): string => {
-  if (!value) return 'Unknown';
+  if (!value) return 'India'; // Default to India for missing countries
   
   // If it's already a valid full country name, return as is
   if (VALID_COUNTRY_NAMES.includes(value)) {

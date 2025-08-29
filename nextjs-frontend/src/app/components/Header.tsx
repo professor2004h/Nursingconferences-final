@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getSiteSettings, getImageUrl, getFullBrandName, type SiteSettings } from '../getSiteSettings';
+import { shouldShowPastConferencesInMenu } from '../getPastConferencesRedirect';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPastConferences, setShowPastConferences] = useState(false); // Default to false for immediate hiding
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -25,6 +27,31 @@ export default function Header() {
       }
     };
     fetchSettings();
+  }, []);
+
+  // Fetch past conferences visibility setting with periodic refresh
+  useEffect(() => {
+    const fetchPastConferencesVisibility = async () => {
+      try {
+        console.log('🔍 Header: Checking Past Conferences visibility...');
+        const shouldShow = await shouldShowPastConferencesInMenu();
+        console.log('📊 Header: shouldShowPastConferencesInMenu =', shouldShow);
+        setShowPastConferences(shouldShow);
+        console.log('✅ Header: State updated to', shouldShow);
+      } catch (error) {
+        console.error('❌ Header: Error fetching past conferences visibility:', error);
+        setShowPastConferences(true);
+      }
+    };
+
+    // Initial fetch
+    fetchPastConferencesVisibility();
+
+    // Set up periodic refresh every 10 seconds for faster updates during testing
+    const interval = setInterval(fetchPastConferencesVisibility, 10000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   // Check if header section should be visible
@@ -236,9 +263,11 @@ export default function Header() {
             <Link href="/about" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               About Us
             </Link>
-            <Link href="/past-conferences" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-              Past Conferences
-            </Link>
+            {showPastConferences && (
+              <Link href="/past-conferences" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+                Past Conferences
+              </Link>
+            )}
             <Link href="/organizing-committee" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Committee
             </Link>
@@ -300,13 +329,15 @@ export default function Header() {
               >
                 About Us
               </Link>
-              <Link
-                href="/past-conferences"
-                className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Past Conferences
-              </Link>
+              {showPastConferences && (
+                <Link
+                  href="/past-conferences"
+                  className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Past Conferences
+                </Link>
+              )}
               <Link
                 href="/organizing-committee"
                 className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"

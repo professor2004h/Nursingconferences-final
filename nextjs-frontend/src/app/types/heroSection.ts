@@ -35,8 +35,5 @@ export interface HeroSectionType {
 }
 
 export interface HeroSectionResponse {
-  success: boolean;
-  data: HeroSectionType | null;
-  error?: string;
-  message?: string;
+  hero: HeroSectionType | null;
 }

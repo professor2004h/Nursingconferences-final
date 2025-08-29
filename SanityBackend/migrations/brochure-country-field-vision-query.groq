@@ -1,0 +1,63 @@
+// GROQ Query for Sanity Vision Tool
+// Add country field to existing brochure download records
+
+// Step 1: Check how many brochure download records need updating
+// Run this query first to see how many documents don't have country field:
+*[_type == "brochureDownload" && !defined(country)] {
+  _id,
+  fullName,
+  email,
+  organization,
+  downloadTimestamp,
+  "needsUpdate": true
+}
+
+// Step 2: Manual update query (run this in Vision's "Mutations" tab)
+// Copy and paste this into the Mutations tab in Sanity Vision:
+
+/*
+[
+  ...(*[_type == "brochureDownload" && !defined(country)] | {
+    "patch": {
+      "id": _id,
+      "set": {
+        "country": "India"
+      }
+    }
+  }.patch)
+]
+*/
+
+// Step 3: Verify the update
+// Run this query after the mutation to verify all brochure downloads now have country field:
+*[_type == "brochureDownload"] {
+  _id,
+  fullName,
+  email,
+  organization,
+  country,
+  downloadTimestamp,
+  "hasCountry": defined(country)
+}
+
+// Step 4: Check statistics
+// Run this to see migration statistics:
+{
+  "totalBrochureDownloads": count(*[_type == "brochureDownload"]),
+  "withCountry": count(*[_type == "brochureDownload" && defined(country)]),
+  "withoutCountry": count(*[_type == "brochureDownload" && !defined(country)]),
+  "defaultIndia": count(*[_type == "brochureDownload" && country == "India"])
+}
+
+// Alternative single document update (if you want to update one by one):
+// Replace DOCUMENT_ID with the actual document ID
+/*
+{
+  "patch": {
+    "id": "DOCUMENT_ID",
+    "set": {
+      "country": "India"
+    }
+  }
+}
+*/

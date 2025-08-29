@@ -45,6 +45,13 @@ export const pastConference = defineType({
       description: 'Toggle to enable or disable the redirect functionality',
     }),
     defineField({
+      name: 'showInMenu',
+      title: 'Show in Navigation Menu',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Toggle to show or hide "Past Conferences" from the website navigation menu and entire website',
+    }),
+    defineField({
       name: 'lastUpdated',
       title: 'Last Updated',
       type: 'datetime',

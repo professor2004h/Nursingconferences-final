@@ -2,12 +2,15 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getSiteSettings, getImageUrl, getFullBrandName } from '../getSiteSettings';
+import { shouldShowPastConferencesInMenu } from '../getPastConferencesRedirect';
 
 export default async function Footer() {
   let siteSettings = null;
+  let showPastConferences = true;
 
   try {
     siteSettings = await getSiteSettings();
+    showPastConferences = await shouldShowPastConferencesInMenu();
   } catch (error) {
     console.error('Error fetching site settings for footer:', error);
   }
@@ -205,7 +208,9 @@ export default async function Footer() {
             <ul className="space-y-2">
               <li><Link href="/about" className="text-white font-medium hover:text-orange-400 transition-colors">About Us</Link></li>
               <li><Link href="/conferences" className="text-white font-medium hover:text-orange-400 transition-colors">All Conferences</Link></li>
-              <li><Link href="/past-conferences" className="text-white font-medium hover:text-orange-400 transition-colors">Past Conferences</Link></li>
+              {showPastConferences && (
+                <li><Link href="/past-conferences" className="text-white font-medium hover:text-orange-400 transition-colors">Past Conferences</Link></li>
+              )}
               <li><Link href="/sponsorship" className="text-white font-medium hover:text-orange-400 transition-colors">Sponsorship</Link></li>
               <li><Link href="/cancellation-policy" className="text-white font-medium hover:text-orange-400 transition-colors">Cancellation Policy</Link></li>
               <li><Link href="/contact" className="text-white font-medium hover:text-orange-400 transition-colors">Contact Us</Link></li>

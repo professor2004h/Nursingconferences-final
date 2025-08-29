@@ -14,45 +14,7 @@ export const registrationSettings = defineType({
       readOnly: true,
     }),
 
-    // Hero Section Settings
-    defineField({
-      name: 'heroSection',
-      title: 'Hero Section',
-      type: 'object',
-      description: 'Configure the hero section content and appearance',
-      fields: [
-        defineField({
-          name: 'backgroundImage',
-          title: 'Hero Background Image',
-          type: 'image',
-          description: 'Background image for the hero section (recommended: 1920x1080px)',
-          options: {
-            hotspot: true,
-          },
-        }),
-        defineField({
-          name: 'title',
-          title: 'Hero Title',
-          type: 'string',
-          initialValue: 'REGISTRATION',
-          description: 'Main heading displayed in the hero section',
-        }),
-        defineField({
-          name: 'subtitle',
-          title: 'Hero Subtitle',
-          type: 'string',
-          initialValue: 'Register for the conference',
-          description: 'Subtitle text displayed below the hero title',
-        }),
-        defineField({
-          name: 'breadcrumb',
-          title: 'Breadcrumb Text',
-          type: 'string',
-          initialValue: 'Home » Registration',
-          description: 'Breadcrumb navigation text',
-        }),
-      ],
-    }),
+
 
     // Date Settings
     defineField({

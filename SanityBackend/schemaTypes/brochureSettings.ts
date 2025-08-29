@@ -1,5 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { DocumentIcon } from '@sanity/icons';
+import { PDFFileInput } from '../components/CustomFileInput.jsx';
 
 export const brochureSettings = defineType({
   name: 'brochureSettings',
@@ -51,10 +52,7 @@ export const brochureSettings = defineType({
         accept: '.pdf',
       },
       components: {
-        input: (props) => {
-          const { PDFFileInput } = require('../components/CustomFileInput.jsx')
-          return PDFFileInput(props)
-        },
+        input: PDFFileInput,
       },
       validation: (Rule) => Rule.required(),
       description: 'Upload the PDF brochure file that users will download - opens in new tab',
