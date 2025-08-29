@@ -90,21 +90,31 @@ const SpeakerGuidelinesPage: React.FC = () => {
             )}
           </div>
 
-          {/* Breadcrumb */}
+          {/* Breadcrumb Navigation */}
           <nav className="flex justify-center" aria-label="Breadcrumb">
-            <ol className="inline-flex items-center space-x-1 sm:space-x-2 md:space-x-3 text-sm sm:text-base">
-              <li className="inline-flex items-center">
-                <Link href="/" className="text-blue-200 hover:text-white transition-colors whitespace-nowrap">
+            <ol className="flex items-center justify-center space-x-2 text-sm md:text-base">
+              <li>
+                <Link
+                  href="/"
+                  className="text-blue-200 hover:text-white transition-colors duration-200 font-medium"
+                >
                   Home
                 </Link>
               </li>
-              <li>
-                <div className="flex items-center">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-300 mx-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-blue-100 whitespace-nowrap">Speaker Guidelines</span>
-                </div>
+              <li className="flex items-center">
+                <svg
+                  className="w-4 h-4 text-blue-300 mx-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-blue-100 font-medium">Speaker Guidelines</span>
               </li>
             </ol>
           </nav>
