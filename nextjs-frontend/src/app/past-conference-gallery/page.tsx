@@ -44,26 +44,26 @@ const PastConferenceGalleryPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50">
+        {/* Simple Header */}
+        <div className="bg-white border-b border-gray-200 py-12 mt-20">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:whitespace-nowrap leading-tight">CONFERENCE GALLERY</h1>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-900 to-purple-900 text-white py-16">
+      {/* Simple Header */}
+      <div className="bg-white border-b border-gray-200 py-12 mt-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">CONFERENCE GALLERY</h1>
-          <p className="text-xl text-blue-100 mb-6">
-            Memorable moments from our past conferences
-          </p>
-          <nav className="text-sm">
-            <Link href="/" className="text-blue-200 hover:text-white">Home</Link>
-            <span className="mx-2">»</span>
-            <span>Gallery</span>
-          </nav>
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:whitespace-nowrap leading-tight">CONFERENCE GALLERY</h1>
         </div>
       </div>
 
