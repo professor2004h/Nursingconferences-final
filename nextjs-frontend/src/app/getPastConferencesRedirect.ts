@@ -63,16 +63,35 @@ export async function getPastConferencesRedirectUrl(): Promise<string | null> {
 // Check if Past Conferences should be shown in navigation menu
 export async function shouldShowPastConferencesInMenu(): Promise<boolean> {
   try {
-    const redirectConfig = await getPastConferencesRedirect();
+    // Check if we're on the client side
+    if (typeof window !== 'undefined') {
+      console.log('🌐 shouldShowPastConferencesInMenu: Running on client side, using API');
+      // Use API endpoint on client side
+      const response = await fetch('/api/past-conferences-visibility');
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+      const data = await response.json();
+      const shouldShow = data?.showPastConferences === true;
 
-    // Show in menu if showInMenu is true, hide if false or undefined
-    const shouldShow = redirectConfig?.showInMenu === true;
+      console.log('🔍 shouldShowPastConferencesInMenu: API response =', data);
+      console.log('🔍 shouldShowPastConferencesInMenu: returning =', shouldShow);
 
-    console.log('🔍 shouldShowPastConferencesInMenu: redirectConfig =', redirectConfig);
-    console.log('🔍 shouldShowPastConferencesInMenu: showInMenu =', redirectConfig?.showInMenu);
-    console.log('🔍 shouldShowPastConferencesInMenu: returning =', shouldShow);
+      return shouldShow;
+    } else {
+      console.log('🖥️ shouldShowPastConferencesInMenu: Running on server side, using direct Sanity query');
+      // Use direct Sanity query on server side
+      const redirectConfig = await getPastConferencesRedirect();
 
-    return shouldShow;
+      // Show in menu if showInMenu is true, hide if false or undefined
+      const shouldShow = redirectConfig?.showInMenu === true;
+
+      console.log('🔍 shouldShowPastConferencesInMenu: redirectConfig =', redirectConfig);
+      console.log('🔍 shouldShowPastConferencesInMenu: showInMenu =', redirectConfig?.showInMenu);
+      console.log('🔍 shouldShowPastConferencesInMenu: returning =', shouldShow);
+
+      return shouldShow;
+    }
   } catch (error) {
     console.error('Error checking past conferences menu visibility:', error);
     // Default to hiding if there's an error (safer approach)

@@ -22,6 +22,11 @@ interface HeaderClientProps {
 
 // Memoized component to prevent unnecessary re-renders
 const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientProps) {
+  console.log('🎯 HeaderClient: Component rendering/re-rendering', {
+    timestamp: new Date().toISOString(),
+    hasSiteSettings: !!siteSettings
+  });
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const [isMobileMoreExpanded, setIsMobileMoreExpanded] = useState(false);
@@ -34,8 +39,58 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
   // Debug logging (development only)
   if (process.env.NODE_ENV === 'development') {
-    console.log('HeaderClient rendering:', { siteSettings: !!siteSettings, isMenuOpen });
+    console.log('HeaderClient rendering:', {
+      siteSettings: !!siteSettings,
+      isMenuOpen,
+      showPastConferences,
+      timestamp: new Date().toISOString()
+    });
   }
+
+  // Fetch past conferences visibility on client side
+  useEffect(() => {
+    console.log('🎯 HeaderClient: useEffect triggered for past conferences', {
+      timestamp: new Date().toISOString(),
+      currentShowPastConferences: showPastConferences
+    });
+
+    const fetchPastConferencesVisibility = async () => {
+      try {
+        console.log('🔍 HeaderClient: Starting fetch for past conferences visibility...');
+        const response = await fetch('/api/past-conferences-visibility', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('📡 HeaderClient: Response received:', {
+          status: response.status,
+          ok: response.ok,
+          statusText: response.statusText
+        });
+
+        if (!response.ok) {
+          console.error('❌ HeaderClient: Failed to fetch past conferences visibility:', response.status);
+          return;
+        }
+
+        const data = await response.json();
+        console.log('📊 HeaderClient: Past conferences visibility data:', data);
+
+        if (typeof data.showPastConferences === 'boolean') {
+          setShowPastConferences(data.showPastConferences);
+          console.log('✅ HeaderClient: Updated showPastConferences to:', data.showPastConferences);
+        } else {
+          console.error('❌ HeaderClient: Invalid data format:', typeof data.showPastConferences);
+        }
+      } catch (error) {
+        console.error('❌ HeaderClient: Error fetching past conferences visibility:', error);
+      }
+    };
+
+    fetchPastConferencesVisibility();
+  }, []); // Empty dependency array - run once on mount
 
   // Simple toggle functions without useCallback to avoid React hook issues
   const toggleMenu = () => {
@@ -135,10 +190,23 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       {showPastConferences && (
         <Link
           href="/past-conferences"
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
           onClick={handleDropdownLinkClick}
         >
-          Past Conferences
+          <span>Past Conferences</span>
+          <svg
+            className="w-4 h-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
         </Link>
       )}
       <Link
@@ -307,28 +375,38 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
 
   // Fetch past conferences visibility setting with periodic refresh
   useEffect(() => {
+    console.log('🚀 HeaderClient: useEffect triggered - setting up past conferences visibility check');
+
     const fetchPastConferencesVisibility = async () => {
       try {
         console.log('🔍 HeaderClient: Checking Past Conferences visibility...');
+        console.log('🔍 HeaderClient: Current showPastConferences state:', showPastConferences);
         const shouldShow = await shouldShowPastConferencesInMenu();
         console.log('📊 HeaderClient: shouldShowPastConferencesInMenu =', shouldShow);
         setShowPastConferences(shouldShow);
         console.log('✅ HeaderClient: State updated to', shouldShow);
+        console.log('🔍 HeaderClient: State after update:', shouldShow);
       } catch (error) {
         console.error('❌ HeaderClient: Error fetching past conferences visibility:', error);
         // Default to showing if fetch fails
         setShowPastConferences(true);
+        console.log('⚠️ HeaderClient: Set to default true due to error');
       }
     };
 
     // Initial fetch
+    console.log('🔄 HeaderClient: Starting initial fetch...');
     fetchPastConferencesVisibility();
 
     // Set up periodic refresh every 5 seconds for faster updates during testing
+    console.log('⏰ HeaderClient: Setting up 5-second interval...');
     const interval = setInterval(fetchPastConferencesVisibility, 5000);
 
     // Cleanup interval on unmount
-    return () => clearInterval(interval);
+    return () => {
+      console.log('🧹 HeaderClient: Cleaning up interval');
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -561,10 +639,23 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                 {showPastConferences && (
                   <Link
                     href="/past-conferences"
-                    className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between"
                     onClick={closeMenu}
                   >
-                    Past Conferences
+                    <span>Past Conferences</span>
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
                   </Link>
                 )}
                 <Link
