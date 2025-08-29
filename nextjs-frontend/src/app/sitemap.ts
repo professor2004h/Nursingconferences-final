@@ -34,12 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/past-conferences`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
+
     {
       url: `${baseUrl}/contact`,
       lastModified: new Date(),
@@ -73,14 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   try {
-    // Get past conferences for sitemap
-    const pastConferences = await getPastConferences()
-    const pastConferencePages: MetadataRoute.Sitemap = pastConferences.map((conference) => ({
-      url: `${baseUrl}/past-conferences/${conference.slug.current}`,
-      lastModified: new Date(conference.date),
-      changeFrequency: 'monthly' as const,
-      priority: conference.featured ? 0.7 : 0.6,
-    }))
+    // Past conferences routes removed - now redirects to external URL
 
     // Get upcoming conferences for sitemap
     const upcomingConferences = await getConferenceEvents()
@@ -93,7 +81,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [
       ...staticPages,
-      ...pastConferencePages,
       ...upcomingConferencePages,
     ]
   } catch (error) {

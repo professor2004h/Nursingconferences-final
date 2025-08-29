@@ -209,7 +209,7 @@ export default async function Footer() {
               <li><Link href="/about" className="text-white font-medium hover:text-orange-400 transition-colors">About Us</Link></li>
               <li><Link href="/conferences" className="text-white font-medium hover:text-orange-400 transition-colors">All Conferences</Link></li>
               {showPastConferences && (
-                <li><Link href="/past-conferences" className="text-white font-medium hover:text-orange-400 transition-colors">Past Conferences</Link></li>
+                <li><a href="https://www.intelliglobalconferences.com/past-conferences" target="_blank" rel="noopener noreferrer" className="text-white font-medium hover:text-orange-400 transition-colors">Past Conferences</a></li>
               )}
               <li><Link href="/sponsorship" className="text-white font-medium hover:text-orange-400 transition-colors">Sponsorship</Link></li>
               <li><Link href="/cancellation-policy" className="text-white font-medium hover:text-orange-400 transition-colors">Cancellation Policy</Link></li>

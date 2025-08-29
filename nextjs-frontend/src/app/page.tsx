@@ -550,11 +550,12 @@ function HomePageContent({
             {/* Past Conferences Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 max-w-7xl mx-auto flex-shrink-0 mb-8 lg:mb-12">
               {pastConferences.map((conference) => (
-                <Link
-                  href={`/past-conferences/${encodeURIComponent(conference.slug.current)}`}
+                <a
+                  href="https://www.intelliglobalconferences.com/past-conferences"
                   key={conference._id}
                   className="block h-full"
-                  prefetch={true}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <div className="group bg-slate-800/95 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-slate-700/95 transition-all duration-200 transform hover:-translate-y-1 border border-slate-600/30 hover:border-orange-400/60 w-full h-full flex flex-col shadow-lg hover:shadow-xl min-h-[280px] lg:min-h-[320px]">
                     {conference.mainImageUrl && (
@@ -649,21 +650,23 @@ function HomePageContent({
                       </div>
                     </div>
                   </div>
-                </Link>
+                </a>
               ))}
             </div>
 
             {/* View All Past Conferences Button */}
             <div className="text-center flex-shrink-0">
-              <Link
-                href="/past-conferences"
+              <a
+                href="https://www.intelliglobalconferences.com/past-conferences"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-base sm:text-lg"
               >
                 View All Past Conferences
                 <svg className="w-5 h-5 ml-2 sm:ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </Link>
+              </a>
             </div>
           </div>
         </section>
