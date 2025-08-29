@@ -74,15 +74,10 @@ const SpeakersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-20">
-          <div className="absolute inset-0 bg-black opacity-30"></div>
-          <div className="relative container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">CONFERENCE SPEAKERS</h1>
-            <nav className="text-sm">
-              <span className="text-blue-200">Home</span>
-              <span className="mx-2">»</span>
-              <span>Speakers</span>
-            </nav>
+        {/* Simple Header */}
+        <div className="bg-white border-b border-gray-200 py-8">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">CONFERENCE SPEAKERS</h1>
           </div>
         </div>
         <div className="container mx-auto px-4 py-16">
@@ -95,15 +90,10 @@ const SpeakersPage: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-20">
-          <div className="absolute inset-0 bg-black opacity-30"></div>
-          <div className="relative container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">CONFERENCE SPEAKERS</h1>
-            <nav className="text-sm">
-              <span className="text-blue-200">Home</span>
-              <span className="mx-2">»</span>
-              <span>Speakers</span>
-            </nav>
+        {/* Simple Header */}
+        <div className="bg-white border-b border-gray-200 py-8">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">CONFERENCE SPEAKERS</h1>
           </div>
         </div>
         <div className="container mx-auto px-4 py-16">
@@ -125,19 +115,10 @@ const SpeakersPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-20">
-        <div className="absolute inset-0 bg-black opacity-30"></div>
-        <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">CONFERENCE SPEAKERS</h1>
-          <p className="text-xl text-blue-100 mb-6">
-            Meet our distinguished speakers and thought leaders
-          </p>
-          <nav className="text-sm">
-            <span className="text-blue-200">Home</span>
-            <span className="mx-2">»</span>
-            <span>Speakers</span>
-          </nav>
+      {/* Simple Header */}
+      <div className="bg-white border-b border-gray-200 py-8">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">CONFERENCE SPEAKERS</h1>
         </div>
       </div>
 
