@@ -283,6 +283,12 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
     const { getReceiptSettings } = require('./unifiedReceiptGenerator');
     const receiptSettings = await getReceiptSettings();
 
+    console.log('🎛️ Using dynamic receipt settings from Sanity:');
+    console.log(`   📋 Conference Title: "${receiptSettings.conferenceTitle}"`);
+    console.log(`   🏢 Company Name: "${receiptSettings.companyName}"`);
+    console.log(`   📧 Sender Email: "${receiptSettings.emailSettings?.senderEmail}"`);
+    console.log(`   🎨 Blue Header: ${receiptSettings.receiptTemplate?.useBlueHeader}`);
+
     // Generate ONLY the blue header PDF (no white template)
     let pdfBuffer = null;
     try {
@@ -407,9 +413,9 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
     }
 
     const mailOptions = {
-      from: `"Intelli Global Conferences" <${process.env.SMTP_USER || 'contactus@intelliglobalconferences.com'}>`,
+      from: `"${receiptSettings.companyName || 'Intelli Global Conferences'}" <${receiptSettings.emailSettings?.senderEmail || process.env.SMTP_USER || 'contactus@intelliglobalconferences.com'}>`,
       to: recipientEmail,
-      subject: '✅ Payment Receipt - International Nursing Conference 2025',
+      subject: `✅ Payment Receipt - ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -504,9 +510,9 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
               <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9;">Registration Receipt</p>
             </div>
             
-            <!-- Conference Title -->
+            <!-- Conference Title - DYNAMIC from Sanity -->
             <div style="padding: 20px; background-color: #ffffff;">
-              <h2 style="margin: 0; font-size: 18px; color: #333; font-weight: bold;">International Nursing Conference 2025</h2>
+              <h2 style="margin: 0; font-size: 18px; color: #333; font-weight: bold;">${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</h2>
             </div>
             
             <!-- Payment Information -->
@@ -733,11 +739,19 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
     }
 
     // Fetch dynamic content from Sanity CMS
-    const [footerLogo, emailConfig, siteSettings] = await Promise.all([
+    const { getReceiptSettings } = require('./unifiedReceiptGenerator');
+    const [footerLogo, emailConfig, siteSettings, receiptSettings] = await Promise.all([
       getFooterLogo(),
       getEmailConfig(),
-      getSiteSettings()
+      getSiteSettings(),
+      getReceiptSettings()
     ]);
+
+    console.log('🎛️ Using dynamic receipt settings from Sanity:');
+    console.log(`   📋 Conference Title: "${receiptSettings.conferenceTitle}"`);
+    console.log(`   🏢 Company Name: "${receiptSettings.companyName}"`);
+    console.log(`   📧 Sender Email: "${receiptSettings.emailSettings?.senderEmail}"`);
+    console.log(`   🎨 Blue Header: ${receiptSettings.receiptTemplate?.useBlueHeader}`);
 
     // Generate PDF receipt with real data
     let pdfBuffer = null;
@@ -826,7 +840,7 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
     const mailOptions = {
       from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
       to: recipientEmail,
-      subject: '✅ Payment Receipt - International Nursing Conference 2025',
+      subject: `✅ Payment Receipt - ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}`,
       html: `
         <!DOCTYPE html>
         <html>

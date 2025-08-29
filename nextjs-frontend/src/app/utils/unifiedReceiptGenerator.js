@@ -46,7 +46,7 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
   // Blue header colors (matching the correct template)
   const headerColor = receiptSettings.receiptTemplate?.headerColor?.hex || '#4267B2';
   const headerRGB = hexToRgb(headerColor);
-  
+
   const colors = {
     headerBg: headerRGB,
     headerText: [255, 255, 255],
@@ -56,28 +56,81 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
     footerText: [102, 102, 102]
   };
 
-  // BLUE HEADER SECTION - This is the correct template
-  doc.setFillColor(...colors.headerBg);
-  doc.rect(0, 0, pageWidth, LAYOUT.header.height, 'F');
+  // BLUE GRADIENT HEADER SECTION - Matching reference design
+  // Create blue gradient background (dark blue to lighter blue)
+  const gradientSteps = 50;
+  const darkBlue = [15, 23, 42];   // #0f172a - Dark navy
+  const lightBlue = [30, 58, 138]; // #1e3a8a - Lighter navy
 
-  // Company name in header
+  for (let i = 0; i < LAYOUT.header.height; i += 1) {
+    const ratio = i / LAYOUT.header.height;
+    const r = Math.round(darkBlue[0] + (lightBlue[0] - darkBlue[0]) * ratio);
+    const g = Math.round(darkBlue[1] + (lightBlue[1] - darkBlue[1]) * ratio);
+    const b = Math.round(darkBlue[2] + (lightBlue[2] - darkBlue[2]) * ratio);
+    doc.setFillColor(r, g, b);
+    doc.rect(0, i, pageWidth, 1, 'F');
+  }
+
+  // Fetch and add company logo
+  try {
+    const footerLogo = await getFooterLogo();
+    if (footerLogo?.url) {
+      // Optimize logo URL for high quality
+      let optimizedLogoUrl = footerLogo.url;
+      if (footerLogo.url.includes('cdn.sanity.io')) {
+        optimizedLogoUrl = `${footerLogo.url}?w=800&h=300&q=100&fit=max&fm=png`;
+      }
+
+      // Load and embed the logo
+      const logoResponse = await fetch(optimizedLogoUrl);
+      const logoArrayBuffer = await logoResponse.arrayBuffer();
+      const logoBase64 = Buffer.from(logoArrayBuffer).toString('base64');
+
+      // Determine image format
+      let imageFormat = 'PNG';
+      if (footerLogo.url.toLowerCase().includes('.jpg') || footerLogo.url.toLowerCase().includes('.jpeg')) {
+        imageFormat = 'JPEG';
+      }
+
+      // Position logo in header
+      const logoWidth = receiptSettings.receiptTemplate?.logoSize?.width || 72;
+      const logoHeight = receiptSettings.receiptTemplate?.logoSize?.height || 24;
+      const logoX = LAYOUT.margins.left;
+      const logoY = (LAYOUT.header.height - logoHeight) / 2;
+
+      const logoDataUrl = `data:image/${imageFormat.toLowerCase()};base64,${logoBase64}`;
+      doc.addImage(logoDataUrl, imageFormat, logoX, logoY, logoWidth, logoHeight);
+      console.log('✅ Company logo embedded in PDF header');
+    } else {
+      // Fallback: Company name in header if no logo
+      doc.setTextColor(...colors.headerText);
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.titleY);
+    }
+  } catch (logoError) {
+    console.log('⚠️ Logo loading failed, using text fallback:', logoError.message);
+    // Fallback: Company name in header
+    doc.setTextColor(...colors.headerText);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.titleY);
+  }
+
+  // Registration Receipt subtitle in header
   doc.setTextColor(...colors.headerText);
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.titleY);
-
-  // Registration Receipt subtitle
   doc.setFontSize(14);
   doc.setFont('helvetica', 'normal');
   doc.text('Registration Receipt', LAYOUT.margins.left, LAYOUT.header.subtitleY);
 
   let yPos = LAYOUT.header.height + LAYOUT.spacing.headerGap + 10;
 
-  // Conference Title
+  // Conference Title - DYNAMIC from Sanity
   doc.setTextColor(...colors.valueText);
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text(receiptSettings.conferenceTitle || 'International Nursing Conference 2025', LAYOUT.margins.left, yPos);
+  const dynamicConferenceTitle = receiptSettings.conferenceTitle || 'International Nursing Conference 2025';
+  doc.text(dynamicConferenceTitle, LAYOUT.margins.left, yPos);
   yPos += LAYOUT.spacing.sectionGap + 5;
 
   // Payment Information Section
@@ -100,12 +153,12 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
   const registrationInfo = [
     ['Registration ID:', registrationData.registrationId || registrationData._id || 'N/A'],
     ['Full Name:', getFullName(registrationData)],
-    ['Email:', registrationData.email || registrationData.personalDetails?.email || 'N/A'],
-    ['Phone:', registrationData.phone || registrationData.personalDetails?.phone || 'N/A'],
-    ['Country:', registrationData.country || registrationData.personalDetails?.country || 'N/A'],
+    ['Email:', getEmail(registrationData)],
+    ['Phone:', getPhone(registrationData)],
+    ['Country:', getCountry(registrationData)],
     ['Address:', getAddress(registrationData)],
     ['Registration Type:', registrationData.registrationType || registrationData.selectedType?.name || 'N/A'],
-    ['Number of Participants:', registrationData.numberOfParticipants || '1']
+    ['Number of Participants:', String(registrationData.numberOfParticipants || '1')]
   ];
 
   yPos = addInfoFields(doc, registrationInfo, yPos, colors, LAYOUT);
@@ -177,6 +230,27 @@ function getFullName(registrationData) {
 function getAddress(registrationData) {
   if (registrationData.address) return registrationData.address;
   if (registrationData.personalDetails?.address) return registrationData.personalDetails.address;
+  if (registrationData.personalDetails?.fullPostalAddress) return registrationData.personalDetails.fullPostalAddress;
+  return 'N/A';
+}
+
+function getPhone(registrationData) {
+  if (registrationData.phone) return registrationData.phone;
+  if (registrationData.phoneNumber) return registrationData.phoneNumber;
+  if (registrationData.personalDetails?.phone) return registrationData.personalDetails.phone;
+  if (registrationData.personalDetails?.phoneNumber) return registrationData.personalDetails.phoneNumber;
+  return 'N/A';
+}
+
+function getCountry(registrationData) {
+  if (registrationData.country) return registrationData.country;
+  if (registrationData.personalDetails?.country) return registrationData.personalDetails.country;
+  return 'N/A';
+}
+
+function getEmail(registrationData) {
+  if (registrationData.email) return registrationData.email;
+  if (registrationData.personalDetails?.email) return registrationData.personalDetails.email;
   return 'N/A';
 }
 
@@ -218,6 +292,37 @@ async function getReceiptSettings() {
   }
 }
 
+/**
+ * Get footer logo from Sanity
+ */
+async function getFooterLogo() {
+  try {
+    const query = `*[_type == "siteSettings"][0]{
+      footerLogo{
+        asset->{
+          _id,
+          url
+        }
+      }
+    }`;
+
+    const siteSettings = await sanityClient.fetch(query);
+
+    if (siteSettings?.footerLogo?.asset?.url) {
+      return {
+        url: siteSettings.footerLogo.asset.url,
+        _id: siteSettings.footerLogo.asset._id
+      };
+    }
+
+    console.log('⚠️ No footer logo found in site settings');
+    return null;
+  } catch (error) {
+    console.error('❌ Error fetching footer logo:', error);
+    return null;
+  }
+}
+
 function getDefaultReceiptSettings() {
   return {
     conferenceTitle: 'International Nursing Conference 2025',
@@ -234,5 +339,6 @@ function getDefaultReceiptSettings() {
 
 module.exports = {
   generateBlueHeaderReceiptPDF,
-  getReceiptSettings
+  getReceiptSettings,
+  getFooterLogo
 };
