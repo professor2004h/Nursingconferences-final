@@ -168,10 +168,23 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
     >
       <Link
         href="/conferences"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
         onClick={handleDropdownLinkClick}
       >
-        Conferences
+        <span>Conferences</span>
+        <svg
+          className="w-4 h-4 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          />
+        </svg>
       </Link>
       <Link
         href="/speakers"
@@ -619,10 +632,23 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
               <div className="ml-4 space-y-1 border-l-2 border-gray-200 pl-3">
                 <Link
                   href="/conferences"
-                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between"
                   onClick={closeMenu}
                 >
-                  Conferences
+                  <span>Conferences</span>
+                  <svg
+                    className="w-3 h-3 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
                 </Link>
                 <Link
                   href="/speakers"
