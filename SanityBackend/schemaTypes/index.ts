@@ -55,6 +55,9 @@ import speakers from './speakers';
 // Speaker guidelines schema
 import speakerGuidelines from './speakerGuidelines';
 
+// Receipt settings schema
+import receiptSettings from './receiptSettings';
+
 // Venue settings schema
 import venueSettings from './venueSettings';
 
@@ -113,6 +116,8 @@ export const schemaTypes = [
   speakers,
   // Speaker guidelines schema
   speakerGuidelines,
+  // Receipt settings schema
+  receiptSettings,
   // Venue settings schema
   venueSettings,
   // Cancellation policy schema

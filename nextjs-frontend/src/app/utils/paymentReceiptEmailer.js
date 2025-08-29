@@ -51,274 +51,19 @@ const sanityWriteClient = createClient({
 });
 
 /**
- * SINGLE PAGE PDF LAYOUT - Matching Reference Image Design
- * Optimized for single-page layout with compact spacing and essential information
+ * UNIFIED BLUE HEADER PDF GENERATION - SINGLE SOURCE OF TRUTH
+ * This function ensures ONLY the blue header template is used for all client receipts
+ * Replaces all other PDF generation methods to prevent white template issues
  */
 async function generateReceiptPDF(paymentData, registrationData, footerLogo) {
-  if (!jsPDF) {
-    throw new Error('jsPDF not available for PDF generation');
-  }
+  // Import the unified blue header generator
+  const { generateBlueHeaderReceiptPDF } = require('./unifiedReceiptGenerator');
 
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.width;
-  const pageHeight = doc.internal.pageSize.height;
+  console.log('🧾 Using UNIFIED blue header PDF generation...');
+  return await generateBlueHeaderReceiptPDF(paymentData, registrationData);
 
-  // Single-page optimized layout constants matching reference image
-  const LAYOUT = {
-    margins: {
-      left: 20,
-      right: 20,
-      top: 15,
-      bottom: 20
-    },
-    spacing: {
-      sectionGap: 12,      // Reduced for single-page layout
-      lineHeight: 8,       // Compact line spacing
-      headerGap: 10,       // Reduced header spacing
-      fieldGap: 6          // Space between label and value
-    },
-    header: {
-      height: 50,          // Matching reference image header
-      titleY: 25,          // Company name position
-      subtitleY: 40        // "Registration Receipt" position
-    }
-  };
 
-  // Colors matching reference image
-  const colors = {
-    headerBg: [66, 103, 178],    // Blue header background from reference
-    headerText: [255, 255, 255], // White text on header
-    sectionHeader: [66, 103, 178], // Blue section headers
-    labelText: [102, 102, 102],  // Gray labels
-    valueText: [51, 51, 51],     // Dark text for values
-    footerText: [102, 102, 102]  // Light gray footer
-  };
 
-  // Remove old constants that are no longer needed
-  // All layout now uses LAYOUT and colors objects
-
-  // HEADER SECTION - Clean Logo-Only Design Matching Reference Image
-  // Navy blue gradient background (matching original design: #0f172a to #1e3a8a)
-  const navyDark = [15, 23, 42];   // #0f172a
-  const navyLight = [30, 58, 138]; // #1e3a8a
-
-  // Create navy blue gradient background
-  for (let i = 0; i < LAYOUT.header.height; i += 1) {
-    const ratio = i / LAYOUT.header.height;
-    const r = Math.round(navyDark[0] + (navyLight[0] - navyDark[0]) * ratio);
-    const g = Math.round(navyDark[1] + (navyLight[1] - navyDark[1]) * ratio);
-    const b = Math.round(navyDark[2] + (navyLight[2] - navyDark[2]) * ratio);
-    doc.setFillColor(r, g, b);
-    doc.rect(0, i, pageWidth, 1, 'F');
-  }
-
-  // Add high-quality logo only (no text in header)
-  if (footerLogo?.url) {
-    try {
-      // HIGH QUALITY logo URL for crisp PDF display
-      let optimizedLogoUrl = footerLogo.url;
-      if (footerLogo.url.includes('cdn.sanity.io')) {
-        optimizedLogoUrl = `${footerLogo.url}?w=800&h=300&q=100&fit=max&fm=png`;
-      }
-
-      // Load and embed the actual logo image
-      const logoResponse = await fetch(optimizedLogoUrl);
-      const logoArrayBuffer = await logoResponse.arrayBuffer();
-      const logoBase64 = Buffer.from(logoArrayBuffer).toString('base64');
-
-      // Determine image format
-      let imageFormat = 'PNG';
-      if (footerLogo.url.toLowerCase().includes('.png')) {
-        imageFormat = 'PNG';
-      } else if (footerLogo.url.toLowerCase().includes('.jpg') || footerLogo.url.toLowerCase().includes('.jpeg')) {
-        imageFormat = 'JPEG';
-      }
-
-      // Position logo in header with original dimensions and proper sizing
-      const logoWidth = 72;  // Original width for proper aspect ratio
-      const logoHeight = 24; // Original height for proper aspect ratio
-      const logoX = LAYOUT.margins.left;
-      const logoY = (LAYOUT.header.height - logoHeight) / 2;
-
-      const logoDataUrl = `data:image/${imageFormat.toLowerCase()};base64,${logoBase64}`;
-      doc.addImage(logoDataUrl, imageFormat, logoX, logoY, logoWidth, logoHeight);
-      console.log('✅ HIGH QUALITY logo embedded in PDF successfully');
-    } catch (logoError) {
-      console.log('⚠️ Logo embedding failed:', logoError.message);
-    }
-  }
-
-  // Conference title - matching reference image positioning
-  let yPos = LAYOUT.header.height + LAYOUT.spacing.sectionGap;
-
-  doc.setTextColor(...colors.valueText);
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('International Nursing Conference 2025', LAYOUT.margins.left, yPos);
-
-  yPos += LAYOUT.spacing.sectionGap;
-
-  // PAYMENT INFORMATION SECTION - Matching Reference Image
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.sectionHeader);
-  doc.text('Payment Information', LAYOUT.margins.left, yPos);
-  yPos += LAYOUT.spacing.headerGap;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-
-  // Payment details - essential information only for single page
-  const paymentDetails = [
-    ['Transaction ID:', paymentData.transactionId || 'N/A'],
-    ['Order ID:', paymentData.orderId || 'N/A'],
-    ['Amount:', `${paymentData.currency || 'USD'} ${paymentData.amount || '0.00'}`],
-    ['Payment Method:', paymentData.paymentMethod || 'PayPal'],
-    ['Payment Date:', paymentData.paymentDate ? new Date(paymentData.paymentDate).toLocaleDateString() : new Date().toLocaleDateString()],
-    ['Status:', paymentData.status || 'Completed']
-  ];
-
-  paymentDetails.forEach(([label, value]) => {
-    doc.setTextColor(...colors.labelText);
-    doc.text(label, LAYOUT.margins.left, yPos);
-    doc.setTextColor(...colors.valueText);
-    doc.text(value, LAYOUT.margins.left + 55, yPos);
-    yPos += LAYOUT.spacing.lineHeight;
-  });
-
-  yPos += LAYOUT.spacing.sectionGap;
-
-  // REGISTRATION DETAILS SECTION - Matching Reference Image
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.sectionHeader);
-  doc.text('Registration Details', LAYOUT.margins.left, yPos);
-  yPos += LAYOUT.spacing.headerGap;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-
-  // Registration details - essential information only for single page
-  const registrationDetails = [];
-
-  // Registration ID
-  registrationDetails.push(['Registration ID:', registrationData.registrationId || 'N/A']);
-
-  // Full name with multiple field support
-  const fullName = registrationData.fullName ||
-    (registrationData.personalDetails ?
-      `${registrationData.personalDetails.title || ''} ${registrationData.personalDetails.firstName || ''} ${registrationData.personalDetails.lastName || ''}`.trim()
-      : 'N/A');
-  registrationDetails.push(['Full Name:', fullName]);
-
-  // Email
-  const email = registrationData.email || registrationData.personalDetails?.email;
-  if (email) {
-    registrationDetails.push(['Email:', email]);
-  }
-
-  // Phone
-  const phone = registrationData.phoneNumber || registrationData.phone || registrationData.personalDetails?.phoneNumber;
-  if (phone) {
-    registrationDetails.push(['Phone:', phone]);
-  }
-
-  // Country
-  const country = registrationData.country || registrationData.personalDetails?.country;
-  if (country) {
-    registrationDetails.push(['Country:', country]);
-  }
-
-  // Address - simplified for single page layout
-  const address = registrationData.address || registrationData.personalDetails?.fullPostalAddress;
-  if (address) {
-    // Truncate long addresses for single page layout
-    const shortAddress = address.length > 50 ? address.substring(0, 47) + '...' : address;
-    registrationDetails.push(['Address:', shortAddress]);
-  }
-
-  // Dynamic Registration Type display based on registration category
-  const registrationType = getRegistrationTypeDisplay(registrationData);
-  if (registrationType) {
-    registrationDetails.push(['Registration Type:', registrationType]);
-  }
-
-  const participantCount = String(registrationData.numberOfParticipants || '1');
-  registrationDetails.push(['Number of Participants:', participantCount]);
-
-  // Render registration details with compact spacing
-  registrationDetails.forEach(([label, value]) => {
-    doc.setTextColor(...colors.labelText);
-    doc.text(label, LAYOUT.margins.left, yPos);
-    doc.setTextColor(...colors.valueText);
-    doc.text(value, LAYOUT.margins.left + 55, yPos);
-    yPos += LAYOUT.spacing.lineHeight;
-  });
-
-  yPos += LAYOUT.spacing.sectionGap;
-
-  // PAYMENT SUMMARY SECTION - Matching Reference Image
-  if (registrationData.pricing || paymentData.amount) {
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...colors.sectionHeader);
-    doc.text('Payment Summary', LAYOUT.margins.left, yPos);
-    yPos += LAYOUT.spacing.headerGap;
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-
-    const pricing = registrationData.pricing;
-    const currency = pricing?.currency || paymentData.currency || 'USD';
-
-    if (pricing && pricing.registrationFee) {
-      // Registration fee
-      doc.setTextColor(...colors.labelText);
-      doc.text('Registration Fee:', LAYOUT.margins.left, yPos);
-      doc.setTextColor(...colors.valueText);
-      doc.text(`${currency} ${pricing.registrationFee}`, LAYOUT.margins.left + 55, yPos);
-      yPos += LAYOUT.spacing.lineHeight;
-    }
-
-    // Total amount with emphasis
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...colors.labelText);
-    doc.text('Total Amount:', LAYOUT.margins.left, yPos);
-    doc.setTextColor(...colors.valueText);
-    doc.text(`${currency} ${pricing?.totalPrice || paymentData.amount || '0.00'}`, LAYOUT.margins.left + 55, yPos);
-    yPos += LAYOUT.spacing.lineHeight;
-
-    yPos += LAYOUT.spacing.sectionGap;
-  }
-
-  // CONTACT INFORMATION SECTION - Matching Reference Image
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...colors.sectionHeader);
-  doc.text('Contact Information', LAYOUT.margins.left, yPos);
-  yPos += LAYOUT.spacing.headerGap;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...colors.valueText);
-
-  // Essential contact information with correct email
-  doc.text('Email: contactus@intelliglobalconferences.com', LAYOUT.margins.left, yPos);
-  yPos += LAYOUT.spacing.lineHeight + 2;
-
-  // Footer section - matching reference image style
-  yPos += LAYOUT.spacing.sectionGap;
-
-  doc.setFontSize(8);
-  doc.setTextColor(...colors.footerText);
-  doc.text('Thank you for registering for the International Nursing Conference 2025', LAYOUT.margins.left, yPos);
-  yPos += LAYOUT.spacing.lineHeight;
-
-  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, LAYOUT.margins.left, yPos);
-
-  // Convert to buffer
-  const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-  return pdfBuffer;
 }
 
 /**
@@ -525,21 +270,24 @@ async function getEmailConfig() {
 }
 
 /**
- * Send payment receipt email with footer logo
+ * Send payment receipt email with UNIFIED blue header PDF
  * @param {Object} paymentData - Payment information
  * @param {Object} registrationData - Registration information
  * @param {string} recipientEmail - Email address to send receipt to
  */
 async function sendPaymentReceiptEmail(paymentData, registrationData, recipientEmail) {
   try {
-    // Fetch footer logo from Sanity
-    const footerLogo = await getFooterLogo();
+    console.log('🧾 Starting UNIFIED receipt email system...');
 
-    // Generate PDF receipt
+    // Fetch receipt settings from Sanity
+    const { getReceiptSettings } = require('./unifiedReceiptGenerator');
+    const receiptSettings = await getReceiptSettings();
+
+    // Generate ONLY the blue header PDF (no white template)
     let pdfBuffer = null;
     try {
-      pdfBuffer = await generateReceiptPDF(paymentData, registrationData, footerLogo);
-      console.log('✅ PDF receipt generated successfully');
+      pdfBuffer = await generateReceiptPDF(paymentData, registrationData);
+      console.log('✅ BLUE HEADER PDF receipt generated successfully');
     } catch (pdfError) {
       console.warn('⚠️  PDF generation failed, continuing with email only:', pdfError.message);
     }
@@ -1421,13 +1169,11 @@ function getRegistrationTypeDisplay(registrationData) {
  * @returns {Buffer} PDF buffer
  */
 async function generateUnifiedReceiptPDF(paymentData, registrationData, footerLogo = null) {
-  // If no logo provided, fetch it
-  if (!footerLogo) {
-    footerLogo = await getFooterLogo();
-  }
+  // Use the unified blue header generator to ensure consistency
+  const { generateBlueHeaderReceiptPDF } = require('./unifiedReceiptGenerator');
 
-  // Use the existing generateReceiptPDF function which has the correct layout
-  return await generateReceiptPDF(paymentData, registrationData, footerLogo);
+  console.log('🧾 Using UNIFIED blue header PDF generation system...');
+  return await generateBlueHeaderReceiptPDF(paymentData, registrationData);
 }
 
 /**
