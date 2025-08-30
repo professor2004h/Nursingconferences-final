@@ -315,21 +315,14 @@ async function getReceiptSettings() {
 }
 
 /**
- * Get company logo from Sanity - ENHANCED with multiple logo sources
+ * Get FOOTER logo from Sanity - SPECIFICALLY for PDF receipts
  */
 async function getFooterLogo() {
   try {
-    console.log('🔍 Searching for company logo in Sanity CMS...');
+    console.log('🔍 Searching for FOOTER logo in Sanity CMS...');
 
-    // Try multiple logo sources in order of preference
+    // Query specifically for footer logo FIRST (as requested)
     const query = `*[_type == "siteSettings"][0]{
-      logo{
-        asset->{
-          _id,
-          url
-        },
-        alt
-      },
       footerContent{
         footerLogo{
           asset->{
@@ -338,25 +331,22 @@ async function getFooterLogo() {
           },
           alt
         }
+      },
+      logo{
+        asset->{
+          _id,
+          url
+        },
+        alt
       }
     }`;
 
     const siteSettings = await sanityClient.fetch(query);
     console.log('📋 Site settings fetched:', !!siteSettings);
 
-    // Try main website logo first
-    if (siteSettings?.logo?.asset?.url) {
-      console.log('✅ Found main website logo');
-      return {
-        url: siteSettings.logo.asset.url,
-        _id: siteSettings.logo.asset._id,
-        alt: siteSettings.logo.alt || 'Intelli Global Conferences Logo'
-      };
-    }
-
-    // Try footer logo as fallback
+    // PRIORITY: Use footer logo FIRST (as specifically requested)
     if (siteSettings?.footerContent?.footerLogo?.asset?.url) {
-      console.log('✅ Found footer logo');
+      console.log('✅ Found FOOTER logo - using for PDF receipt');
       return {
         url: siteSettings.footerContent.footerLogo.asset.url,
         _id: siteSettings.footerContent.footerLogo.asset._id,
@@ -364,11 +354,21 @@ async function getFooterLogo() {
       };
     }
 
-    console.log('⚠️ No logo found in site settings');
+    // FALLBACK: Use main website logo only if footer logo not available
+    if (siteSettings?.logo?.asset?.url) {
+      console.log('⚠️ Footer logo not found, using main website logo as fallback');
+      return {
+        url: siteSettings.logo.asset.url,
+        _id: siteSettings.logo.asset._id,
+        alt: siteSettings.logo.alt || 'Intelli Global Conferences Logo'
+      };
+    }
+
+    console.log('⚠️ No footer logo OR main logo found in site settings');
     console.log('📋 Available fields:', Object.keys(siteSettings || {}));
     return null;
   } catch (error) {
-    console.error('❌ Error fetching company logo:', error);
+    console.error('❌ Error fetching footer logo:', error);
     return null;
   }
 }
