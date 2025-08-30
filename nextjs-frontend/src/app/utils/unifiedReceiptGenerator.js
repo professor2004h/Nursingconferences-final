@@ -40,7 +40,7 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
   const LAYOUT = {
     margins: { left: 20, right: 20, top: 15, bottom: 20 },
     spacing: { sectionGap: 12, lineHeight: 8, headerGap: 10, fieldGap: 6 },
-    header: { height: 50, titleY: 25, subtitleY: 40 }
+    header: { height: 35, titleY: 25, subtitleY: 40 } // Reduced height from 50 to 35
   };
 
   // Blue header colors (matching the correct template)
@@ -105,11 +105,11 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
         imageFormat = 'GIF';
       }
 
-      // Position logo in header - TOP LEFT CENTER alignment
-      const logoWidth = receiptSettings.receiptTemplate?.logoSize?.width || 120;
-      const logoHeight = receiptSettings.receiptTemplate?.logoSize?.height || 40;
+      // Position logo in CENTER-MIDDLE of reduced blue header
+      const logoWidth = receiptSettings.receiptTemplate?.logoSize?.width || 100;
+      const logoHeight = receiptSettings.receiptTemplate?.logoSize?.height || 30;
       const logoX = LAYOUT.margins.left;
-      const logoY = LAYOUT.margins.top + 8; // Top-left center positioning
+      const logoY = (LAYOUT.header.height - logoHeight) / 2; // Center-middle of blue header
 
       // Create data URL and embed logo
       const logoDataUrl = `data:image/${imageFormat.toLowerCase()};base64,${logoBase64}`;
@@ -126,7 +126,7 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
       doc.setTextColor(...colors.headerText);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.margins.top + 25);
+      doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.height / 2 + 5);
     }
   } catch (logoError) {
     console.error('❌ Logo embedding failed:', logoError.message);
@@ -136,7 +136,7 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
     doc.setTextColor(...colors.headerText);
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.margins.top + 25);
+    doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.height / 2 + 5);
   }
 
   // REMOVED: "Registration Receipt" subtitle as requested - header shows only logo
