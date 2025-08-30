@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSiteSettings } from '../../getSiteSettings';
 import nodemailer from 'nodemailer';
 
 // Contact form data interface
@@ -18,22 +17,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-// Simplified email sending function for Coolify
+// EXACT COPY of working payment receipt email system for contact form
 async function sendContactEmail(formData: ContactFormData, recipientEmail: string): Promise<boolean> {
   try {
-    console.log('📧 [CONTACT] Starting email send process...');
-    console.log('📧 [CONTACT] Recipient:', recipientEmail);
-    console.log('📧 [CONTACT] From:', formData.email);
+    console.log('📧 [CONTACT] Starting contact email using EXACT payment system pattern...');
 
-    // Validate environment variables
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.error('❌ [CONTACT] Missing SMTP credentials');
-      console.error('❌ [CONTACT] SMTP_USER:', process.env.SMTP_USER ? 'SET' : 'NOT SET');
-      console.error('❌ [CONTACT] SMTP_PASS:', process.env.SMTP_PASS ? 'SET' : 'NOT SET');
-      return false;
-    }
-
-    // Create SMTP configuration - EXACT same as working payment system
+    // EXACT SMTP configuration from working payment receipt system
     const smtpConfig = {
       host: process.env.SMTP_HOST || 'smtp.hostinger.com',
       port: parseInt(process.env.SMTP_PORT || '465'),
@@ -47,136 +36,91 @@ async function sendContactEmail(formData: ContactFormData, recipientEmail: strin
         servername: process.env.SMTP_HOST || 'smtp.hostinger.com',
         ciphers: 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA'
       },
-      connectionTimeout: 60000,
-      greetingTimeout: 30000,
-      socketTimeout: 60000,
-      pool: false,
-      maxConnections: 1,
-      debug: process.env.NODE_ENV !== 'production',
-      logger: process.env.NODE_ENV !== 'production'
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000,   // 30 seconds
+      socketTimeout: 60000,     // 60 seconds
+      pool: false,              // Disable connection pooling for Coolify
+      maxConnections: 1,        // Single connection for container environments
+      debug: process.env.NODE_ENV !== 'production', // Enable debug in development
+      logger: process.env.NODE_ENV !== 'production'  // Enable logging in development
     };
 
-    console.log('📧 [CONTACT] SMTP Config:', {
+    console.log('📧 [CONTACT] SMTP Configuration:', {
       host: smtpConfig.host,
       port: smtpConfig.port,
       secure: smtpConfig.secure,
       user: smtpConfig.auth.user,
-      hasPassword: !!smtpConfig.auth.pass
+      hasPassword: !!smtpConfig.auth.pass,
+      environment: process.env.NODE_ENV
     });
 
-    // Create transporter
+    // Create transporter - EXACT same as payment system
     const transporter = nodemailer.createTransporter(smtpConfig);
 
-    // Verify connection with fallback
-    try {
-      console.log('📧 [CONTACT] Testing SMTP connection...');
-      await transporter.verify();
-      console.log('✅ [CONTACT] SMTP connection verified');
-    } catch (verifyError) {
-      console.warn('⚠️ [CONTACT] SMTP verification failed, trying alternative config...');
-
-      // Try alternative configuration for Coolify
-      const altConfig = {
-        ...smtpConfig,
-        port: 587,
-        secure: false,
-        tls: {
-          rejectUnauthorized: false,
-          starttls: true,
-          servername: process.env.SMTP_HOST || 'smtp.hostinger.com'
-        }
-      };
-
-      const altTransporter = nodemailer.createTransporter(altConfig);
-      try {
-        await altTransporter.verify();
-        console.log('✅ [CONTACT] Alternative SMTP config verified');
-        // Use alternative transporter
-        const altResult = await sendEmailWithTransporter(altTransporter, formData, recipientEmail);
-        return altResult;
-      } catch (altError) {
-        console.error('❌ [CONTACT] Both SMTP configs failed:', altError);
-        // Continue with original transporter anyway
-      }
-    }
-
-    // Send email
-    const result = await sendEmailWithTransporter(transporter, formData, recipientEmail);
-    return result;
-
-  } catch (error) {
-    console.error('❌ [CONTACT] Email sending failed:', error);
-    return false;
-  }
-}
-
-// Helper function to send email with given transporter
-async function sendEmailWithTransporter(transporter: nodemailer.Transporter, formData: ContactFormData, recipientEmail: string): Promise<boolean> {
-  try {
+    // Email content
     const emailHTML = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>New Contact Form Submission</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-          .content { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
-          .field { margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35; }
-          .label { font-weight: bold; color: #ff6b35; }
-          .value { margin-top: 5px; }
-          .footer { background: #374151; color: white; padding: 15px; text-align: center; border-radius: 0 0 8px 8px; }
-        </style>
       </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>📧 New Contact Form Submission</h1>
-            <p>Intelli Global Conferences</p>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0;">📧 New Contact Form Submission</h1>
+            <p style="margin: 5px 0 0 0;">Intelli Global Conferences</p>
           </div>
-          <div class="content">
-            <div class="field">
-              <div class="label">👤 Name:</div>
-              <div class="value">${formData.name}</div>
+
+          <div style="background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb;">
+            <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35;">
+              <strong style="color: #ff6b35;">👤 Name:</strong><br>
+              ${formData.name}
             </div>
-            <div class="field">
-              <div class="label">📧 Email:</div>
-              <div class="value">${formData.email}</div>
+
+            <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35;">
+              <strong style="color: #ff6b35;">📧 Email:</strong><br>
+              ${formData.email}
             </div>
+
             ${formData.phone ? `
-            <div class="field">
-              <div class="label">📞 Phone:</div>
-              <div class="value">${formData.phone}</div>
+            <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35;">
+              <strong style="color: #ff6b35;">📞 Phone:</strong><br>
+              ${formData.phone}
             </div>
             ` : ''}
-            <div class="field">
-              <div class="label">📋 Subject:</div>
-              <div class="value">${formData.subject}</div>
+
+            <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35;">
+              <strong style="color: #ff6b35;">📋 Subject:</strong><br>
+              ${formData.subject}
             </div>
-            <div class="field">
-              <div class="label">💬 Message:</div>
-              <div class="value">${formData.message.replace(/\n/g, '<br>')}</div>
+
+            <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35;">
+              <strong style="color: #ff6b35;">💬 Message:</strong><br>
+              ${formData.message.replace(/\n/g, '<br>')}
             </div>
-            <div class="field">
-              <div class="label">🕒 Submitted:</div>
-              <div class="value">${new Date().toLocaleString()}</div>
+
+            <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35;">
+              <strong style="color: #ff6b35;">🕒 Submitted:</strong><br>
+              ${new Date().toLocaleString()}
             </div>
           </div>
-          <div class="footer">
-            <p>Reply directly to ${formData.email} to respond</p>
+
+          <div style="background: #374151; color: white; padding: 15px; text-align: center; border-radius: 0 0 8px 8px;">
+            <p style="margin: 0;">Reply directly to ${formData.email} to respond</p>
           </div>
         </div>
       </body>
       </html>
     `;
 
+    // EXACT mailOptions pattern from payment system
     const mailOptions = {
       from: `"Intelli Global Conferences" <${process.env.SMTP_USER || 'contactus@intelliglobalconferences.com'}>`,
       to: recipientEmail,
       replyTo: formData.email,
-      subject: `🔔 New Contact: ${formData.subject}`,
+      subject: `🔔 New Contact Form: ${formData.subject}`,
       html: emailHTML,
       text: `
 New Contact Form Submission
@@ -190,10 +134,15 @@ Message:
 ${formData.message}
 
 Submitted: ${new Date().toLocaleString()}
+
+---
+Reply directly to ${formData.email} to respond to this inquiry.
       `.trim()
     };
 
-    console.log('📧 [CONTACT] Sending email...');
+    console.log('📧 [CONTACT] Sending email with exact payment system pattern...');
+
+    // EXACT sendMail pattern from payment system
     const result = await transporter.sendMail(mailOptions);
 
     console.log('✅ [CONTACT] Email sent successfully:', {
@@ -202,11 +151,20 @@ Submitted: ${new Date().toLocaleString()}
     });
 
     return true;
+
   } catch (error) {
-    console.error('❌ [CONTACT] Failed to send email:', error);
+    console.error('❌ [CONTACT] Email sending failed:', error);
+    console.error('❌ [CONTACT] Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as any)?.code,
+      command: (error as any)?.command,
+      response: (error as any)?.response
+    });
     return false;
   }
 }
+
+
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
@@ -253,9 +211,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Get site settings to retrieve the contact email
-    const siteSettings = await getSiteSettings();
-    const recipientEmail = siteSettings?.contactInfo?.email || 'contactus@intelliglobalconferences.com';
+    // Use hardcoded recipient email to avoid Sanity dependency issues
+    const recipientEmail = 'contactus@intelliglobalconferences.com';
     
     // Log the contact form submission
     console.log('📧 Processing contact form submission...');
