@@ -65,57 +65,105 @@ export interface SponsorshipNotificationData {
   submittedAt: string;
 }
 
-// SMTP Configuration
-const SMTP_CONFIG = {
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false, // true for 465, false for other ports like 587
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS?.replace(/\s/g, ''), // Remove any spaces from password
-  },
-  tls: {
-    rejectUnauthorized: false // Allow self-signed certificates
-  },
-  debug: true, // Enable debug logs
-  logger: true // Enable logger
-};
+// SMTP Configuration - EXACT COPY from working payment receipt system
+function createSMTPConfig() {
+  const smtpConfig = {
+    host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+    port: parseInt(process.env.SMTP_PORT || '465'),
+    secure: process.env.SMTP_SECURE === 'true' || true,
+    auth: {
+      user: process.env.SMTP_USER || 'contactus@intelliglobalconferences.com',
+      pass: process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+      servername: process.env.SMTP_HOST || 'smtp.hostinger.com',
+      ciphers: 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA'
+    },
+    connectionTimeout: 60000, // 60 seconds
+    greetingTimeout: 30000,   // 30 seconds
+    socketTimeout: 60000,     // 60 seconds
+    pool: false,              // Disable connection pooling for Coolify
+    maxConnections: 1,        // Single connection for container environments
+    debug: process.env.NODE_ENV !== 'production', // Enable debug in development
+    logger: process.env.NODE_ENV !== 'production'  // Enable logging in development
+  };
 
-// Create reusable transporter object using SMTP transport
-let transporter: nodemailer.Transporter | null = null;
+  console.log('📧 Contact Form SMTP Configuration:', {
+    host: smtpConfig.host,
+    port: smtpConfig.port,
+    secure: smtpConfig.secure,
+    user: smtpConfig.auth.user,
+    hasPassword: !!smtpConfig.auth.pass,
+    environment: process.env.NODE_ENV
+  });
 
-function createTransporter(): nodemailer.Transporter {
-  if (!transporter) {
-    console.log('🔧 Creating SMTP transporter with config:', {
-      host: SMTP_CONFIG.host,
-      port: SMTP_CONFIG.port,
-      secure: SMTP_CONFIG.secure,
-      user: SMTP_CONFIG.auth.user ? '***configured***' : 'NOT_SET'
-    });
-
-    transporter = nodemailer.createTransport(SMTP_CONFIG);
-  }
-  return transporter;
+  return smtpConfig;
 }
 
-// Verify SMTP connection
+// Create transporter with same pattern as working payment system
+async function createTransporter(): Promise<nodemailer.Transporter> {
+  const smtpConfig = createSMTPConfig();
+  const transporter = nodemailer.createTransporter(smtpConfig);
+
+  // Verify SMTP connection before sending (same as payment system)
+  try {
+    console.log('🔍 Verifying Contact Form SMTP connection...');
+    await transporter.verify();
+    console.log('✅ Contact Form SMTP connection verified successfully');
+    return transporter;
+  } catch (verifyError) {
+    console.error('❌ Contact Form SMTP verification failed:', verifyError.message);
+
+    // Try alternative SMTP configuration for production (same as payment system)
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🔄 Contact Form: Trying alternative SMTP configurations for Coolify...');
+
+      const alternativeConfigs = [
+        {
+          name: 'Port 587 with STARTTLS',
+          config: {
+            ...smtpConfig,
+            port: 587,
+            secure: false,
+            tls: {
+              rejectUnauthorized: false,
+              starttls: true,
+              servername: process.env.SMTP_HOST || 'smtp.hostinger.com'
+            }
+          }
+        }
+      ];
+
+      for (const altConfig of alternativeConfigs) {
+        try {
+          console.log(`🔄 Contact Form: Trying ${altConfig.name}...`);
+          const altTransporter = nodemailer.createTransporter(altConfig.config);
+          await altTransporter.verify();
+          console.log(`✅ Contact Form: ${altConfig.name} successful!`);
+          return altTransporter;
+        } catch (altError) {
+          console.error(`❌ Contact Form: ${altConfig.name} failed:`, altError.message);
+        }
+      }
+    }
+
+    // If all configurations fail, return the original transporter
+    console.warn('⚠️ Contact Form: SMTP verification failed, proceeding with original config');
+    return transporter;
+  }
+}
+
+// Verify SMTP connection using same pattern as payment system
 export async function verifyEmailConnection(): Promise<boolean> {
   try {
-    console.log('🔧 Testing SMTP connection...');
-    console.log('SMTP Config:', {
-      host: SMTP_CONFIG.host,
-      port: SMTP_CONFIG.port,
-      secure: SMTP_CONFIG.secure,
-      user: SMTP_CONFIG.auth.user,
-      passLength: SMTP_CONFIG.auth.pass?.length || 0
-    });
-
-    const emailTransporter = createTransporter();
-    await emailTransporter.verify();
-    console.log('✅ SMTP connection verified successfully');
+    console.log('🔧 Testing Contact Form SMTP connection...');
+    const emailTransporter = await createTransporter();
+    // Connection verification is already done in createTransporter
+    console.log('✅ Contact Form SMTP connection verified successfully');
     return true;
   } catch (error) {
-    console.error('❌ SMTP connection failed:', error);
+    console.error('❌ Contact Form SMTP connection failed:', error);
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       code: (error as any)?.code,
@@ -141,7 +189,7 @@ export async function sendEmail(emailData: EmailData): Promise<boolean> {
       return false;
     }
 
-    const emailTransporter = createTransporter();
+    const emailTransporter = await createTransporter();
 
     // Prepare mail options
     const mailOptions = {
@@ -287,13 +335,46 @@ export async function sendContactFormNotification(
       html: emailHTML,
       text: emailText,
       replyTo: formData.email,
-      from: `"EventNext Contact Form" <${process.env.SMTP_USER}>`,
+      from: `"Intelli Global Conferences" <${process.env.SMTP_USER || 'contactus@intelliglobalconferences.com'}>`,
     };
 
-    return await sendEmail(emailData);
+    // Use exact same pattern as payment system - direct transporter.sendMail
+    const transporter = await createTransporter();
+
+    const mailOptions = {
+      from: `"Intelli Global Conferences" <${process.env.SMTP_USER || 'contactus@intelliglobalconferences.com'}>`,
+      to: adminEmail,
+      replyTo: formData.email,
+      subject: `🔔 New Contact Form: ${formData.subject}`,
+      html: emailHTML,
+      text: emailText.trim()
+    };
+
+    console.log('📧 Contact Form - Sending email with options:', {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      replyTo: mailOptions.replyTo,
+      subject: mailOptions.subject
+    });
+
+    // Send email using exact same pattern as payment system
+    const result = await transporter.sendMail(mailOptions);
+
+    console.log('✅ Contact form email sent successfully:', {
+      messageId: result.messageId,
+      response: result.response
+    });
+
+    return true;
 
   } catch (error) {
     console.error('❌ Error sending contact form notification:', error);
+    console.error('❌ Contact Form Error Details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as any)?.code,
+      command: (error as any)?.command,
+      response: (error as any)?.response
+    });
     return false;
   }
 }
