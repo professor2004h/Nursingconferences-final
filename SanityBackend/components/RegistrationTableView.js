@@ -190,7 +190,7 @@ export default function RegistrationTableView() {
         reg.personalDetails?.email || 'N/A',
         reg.paymentAmount || reg.pricing?.totalPrice || 0,
         reg.paymentCurrency || reg.pricing?.currency || 'USD',
-        (reg.status || reg.paymentStatus) === 'completed' ? 'Successful' : ((reg.status || reg.paymentStatus) || 'Pending'),
+        (reg.status || reg.paymentStatus || 'completed') === 'completed' ? 'Successful' : ((reg.status || reg.paymentStatus || 'completed') || 'Pending'),
         reg.registrationDate ? new Date(reg.registrationDate).toLocaleDateString() : 'N/A',
         (reg.pdfReceipt?.asset?.url || reg.registrationTable?.pdfReceiptFile?.asset?.url) ? 'Yes' : 'No'
       ].join(','))
@@ -462,14 +462,17 @@ export default function RegistrationTableView() {
   }
 
   const getStatusBadge = (status) => {
+    // Use same status logic as payment receipt: status || 'completed'
+    const normalizedStatus = status || 'completed'
+
     const statusConfig = {
       pending: { tone: 'caution', text: '⏳ Pending' },
-      completed: { tone: 'positive', text: '✅ Successful' },
+      completed: { tone: 'positive', text: '✅ completed' },
       failed: { tone: 'critical', text: '❌ Failed' },
       refunded: { tone: 'default', text: '🔄 Refunded' }
     }
 
-    const config = statusConfig[status] || { tone: 'default', text: '❓ Unknown' }
+    const config = statusConfig[normalizedStatus] || { tone: 'positive', text: '✅ completed' }
     return React.createElement(Badge, { tone: config.tone }, config.text)
   }
 
@@ -648,7 +651,7 @@ export default function RegistrationTableView() {
                           registration.paymentCurrency || registration.pricing?.currency || 'USD'
                         ),
                         React.createElement('td', { className: 'status' },
-                          getStatusBadge(registration.status || registration.paymentStatus)
+                          getStatusBadge(registration.status || registration.paymentStatus || 'completed')
                         ),
                         React.createElement('td', { className: 'date' },
                           registration.registrationDate
