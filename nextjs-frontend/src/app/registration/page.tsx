@@ -1109,14 +1109,20 @@ function RegistrationPageContent() {
                                   </span>
                                 </div>
 
-                                {/* Selection Radio */}
+                                {/* Selection Checkbox */}
                                 <div className="absolute top-4 right-4">
                                   <input
-                                    type="radio"
-                                    name="sponsorshipType"
+                                    type="checkbox"
+                                    name={`sponsorshipType-${tier.name}`}
                                     value={tier.name}
                                     checked={isTierSelected}
-                                    onChange={() => handleRadioChange('sponsorshipType', tier.name)}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      handleRadioChange('sponsorshipType', tier.name);
+                                    }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                    }}
                                     className="w-5 h-5 text-blue-600 cursor-pointer"
                                   />
                                 </div>

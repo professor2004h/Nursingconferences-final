@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sponsorship Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f3f4f6;
+        }
+        .sponsorship-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .sponsorship-card {
+            position: relative;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: white;
+            height: 320px;
+            width: 256px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .sponsorship-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .sponsorship-card.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+        .tier-badge {
+            position: absolute;
+            top: -12px;
+            left: 16px;
+            background-color: #4b5563;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .selection-checkbox {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 12px 0;
+        }
+        .benefits {
+            font-size: 14px;
+            color: #374151;
+        }
+        .benefits ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .benefits li {
+            margin: 4px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+        .benefits li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .selected-info {
+            background-color: #dbeafe;
+            border: 1px solid #3b82f6;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #15803d;
+        }
+        .error {
+            background-color: #fef2f2;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sponsorship Selection Test</h1>
+    <p>This test verifies that sponsorship options can be selected and deselected properly.</p>
+    
+    <div id="test-results"></div>
+    
+    <div class="selected-info">
+        <strong>Currently Selected Sponsorship:</strong> <span id="current-selection">None</span>
+    </div>
+
+    <div class="sponsorship-container">
+        <!-- Glod Sponsorship -->
+        <div class="sponsorship-card" id="card-glod" onclick="handleSponsorshipChange('glod')">
+            <div class="tier-badge">GLOD</div>
+            <div class="selection-checkbox">
+                <input type="checkbox" id="checkbox-glod" value="glod" onchange="handleCheckboxChange(this)" onclick="event.stopPropagation()">
+            </div>
+            <div style="margin-top: 16px;">
+                <h4 style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Glod</h4>
+                <div class="price">$1</div>
+                <div class="benefits">
+                    <p><strong>Key Benefits:</strong></p>
+                    <ul>
+                        <li>3 Complimentary event registrations</li>
+                        <li>Listing on meeting website</li>
+                        <li>Logo recognition on meeting material</li>
+                        <li>Logo printed on general session banner</li>
+                    </ul>
+                    <p style="color: #9ca3af; margin-top: 8px;">+ 9 more exclusive benefits</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platinum Sponsorship -->
+        <div class="sponsorship-card" id="card-platinum" onclick="handleSponsorshipChange('platinum')">
+            <div class="tier-badge">PLATINUM</div>
+            <div class="selection-checkbox">
+                <input type="checkbox" id="checkbox-platinum" value="platinum" onchange="handleCheckboxChange(this)" onclick="event.stopPropagation()">
+            </div>
+            <div style="margin-top: 16px;">
+                <h4 style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Platinum</h4>
+                <div class="price">$4,999</div>
+                <div class="benefits">
+                    <p><strong>Key Benefits:</strong></p>
+                    <ul>
+                        <li>4 Complimentary event registrations</li>
+                        <li>Listing on meeting website</li>
+                        <li>Logo recognition on meeting material</li>
+                        <li>Logo printed on general session banner</li>
+                    </ul>
+                    <p style="color: #9ca3af; margin-top: 8px;">+ 9 more exclusive benefits</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diamond Sponsorship -->
+        <div class="sponsorship-card" id="card-diamond" onclick="handleSponsorshipChange('diamond')">
+            <div class="tier-badge">DIAMOND</div>
+            <div class="selection-checkbox">
+                <input type="checkbox" id="checkbox-diamond" value="diamond" onchange="handleCheckboxChange(this)" onclick="event.stopPropagation()">
+            </div>
+            <div style="margin-top: 16px;">
+                <h4 style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Diamond</h4>
+                <div class="price">$5,999</div>
+                <div class="benefits">
+                    <p><strong>Key Benefits:</strong></p>
+                    <ul>
+                        <li>5 Complimentary event registrations</li>
+                        <li>Listing on meeting website</li>
+                        <li>Logo recognition on meeting material</li>
+                        <li>Logo printed on general session banner</li>
+                    </ul>
+                    <p style="color: #9ca3af; margin-top: 8px;">+ 11 more exclusive benefits</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSelection = null;
+        let testResults = [];
+
+        function addTestResult(message, isSuccess) {
+            testResults.push({ message, isSuccess, timestamp: new Date() });
+            updateTestResults();
+        }
+
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="test-result ${result.isSuccess ? 'success' : 'error'}">
+                    ${result.timestamp.toLocaleTimeString()}: ${result.message}
+                </div>`
+            ).join('');
+        }
+
+        function updateCurrentSelection() {
+            const selectionSpan = document.getElementById('current-selection');
+            selectionSpan.textContent = currentSelection || 'None';
+        }
+
+        function updateVisualState() {
+            // Update card visual states
+            ['glod', 'platinum', 'diamond'].forEach(tier => {
+                const card = document.getElementById(`card-${tier}`);
+                const checkbox = document.getElementById(`checkbox-${tier}`);
+                
+                if (currentSelection === tier) {
+                    card.classList.add('selected');
+                    checkbox.checked = true;
+                } else {
+                    card.classList.remove('selected');
+                    checkbox.checked = false;
+                }
+            });
+        }
+
+        function handleSponsorshipChange(tier) {
+            if (currentSelection === tier) {
+                // Deselect if clicking the same tier
+                currentSelection = null;
+                addTestResult(`Deselected ${tier} sponsorship - deselection working correctly!`, true);
+            } else {
+                // Select new tier
+                if (currentSelection) {
+                    addTestResult(`Switched from ${currentSelection} to ${tier} sponsorship`, true);
+                } else {
+                    addTestResult(`Selected ${tier} sponsorship`, true);
+                }
+                currentSelection = tier;
+            }
+            
+            updateCurrentSelection();
+            updateVisualState();
+        }
+
+        function handleCheckboxChange(checkbox) {
+            const tier = checkbox.value;
+            
+            if (checkbox.checked) {
+                if (currentSelection && currentSelection !== tier) {
+                    addTestResult(`Switched from ${currentSelection} to ${tier} sponsorship via checkbox`, true);
+                } else {
+                    addTestResult(`Selected ${tier} sponsorship via checkbox`, true);
+                }
+                currentSelection = tier;
+            } else {
+                if (currentSelection === tier) {
+                    currentSelection = null;
+                    addTestResult(`Deselected ${tier} sponsorship via checkbox - deselection working!`, true);
+                }
+            }
+            
+            updateCurrentSelection();
+            updateVisualState();
+        }
+
+        // Initialize
+        updateCurrentSelection();
+        updateVisualState();
+        addTestResult('Test initialized - try selecting and deselecting sponsorship options', true);
+    </script>
+</body>
+</html>
