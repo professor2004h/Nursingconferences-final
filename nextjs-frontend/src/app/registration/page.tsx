@@ -727,7 +727,6 @@ function RegistrationPageContent() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Last Name <span className="text-red-500">*</span>
-                    <span className="text-xs text-gray-500 ml-1">(minimum 1 character)</span>
                   </label>
                   <input
                     type="text"
@@ -811,7 +810,6 @@ function RegistrationPageContent() {
               <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Postal Address <span className="text-red-500">*</span>
-                  <span className="text-xs text-gray-500 ml-1">(minimum 1 character)</span>
                 </label>
                 <textarea
                   id="fullPostalAddress"
@@ -1187,7 +1185,7 @@ function RegistrationPageContent() {
           <div className="bg-white rounded-lg shadow-sm border">
             <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
               <h2 className="text-lg font-bold text-white">Accommodation Registration</h2>
-              <p className="text-blue-100 text-sm mt-1">Optional - Click any selected option again to deselect</p>
+              <p className="text-blue-100 text-sm mt-1">Optional</p>
             </div>
             <div className="p-6">
               {/* Loading State */}
@@ -1218,23 +1216,6 @@ function RegistrationPageContent() {
               {/* Dynamic Accommodation Options */}
               {dynamicData && dynamicData.accommodationOptions && (
                 <div className="space-y-6">
-                  {/* No Accommodation Option */}
-                  <div className="border rounded-lg p-4 bg-gray-50">
-                    <label className="flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name="accommodation"
-                        value=""
-                        checked={!getSelection('accommodation')}
-                        onChange={() => clearSelection('accommodation')}
-                        className="mr-3 w-4 h-4"
-                      />
-                      <div>
-                        <span className="font-medium text-gray-800">No Accommodation Required</span>
-                        <p className="text-sm text-gray-600">I will arrange my own accommodation</p>
-                      </div>
-                    </label>
-                  </div>
                   {dynamicData.accommodationOptions
                     .filter(hotel => hotel.isActive)
                     .sort((a, b) => a.displayOrder - b.displayOrder)

@@ -23,6 +23,10 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
       const savedCurrency = localStorage.getItem('selectedCurrency') as Currency;
       if (savedCurrency && ['USD', 'EUR', 'GBP', 'INR'].includes(savedCurrency)) {
         setSelectedCurrency(savedCurrency);
+      } else {
+        // Ensure USD is set as default if no valid saved currency
+        setSelectedCurrency('USD');
+        localStorage.setItem('selectedCurrency', 'USD');
       }
     }
   }, []);
