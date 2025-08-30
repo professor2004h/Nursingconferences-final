@@ -142,6 +142,7 @@ function RegistrationPageContent() {
     getSelection,
     resetAllSelections,
   } = useMultipleToggleableRadio({
+    allowDeselect: true, // Enable deselection of radio buttons
     onSelectionChange: (groupName, value, previousValue) => {
       console.log(`Selection changed in ${groupName}: ${previousValue} → ${value}`);
 
@@ -1185,7 +1186,6 @@ function RegistrationPageContent() {
           <div className="bg-white rounded-lg shadow-sm border">
             <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
               <h2 className="text-lg font-bold text-white">Accommodation Registration</h2>
-              <p className="text-blue-100 text-sm mt-1">Optional</p>
             </div>
             <div className="p-6">
               {/* Loading State */}
