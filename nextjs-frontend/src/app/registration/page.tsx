@@ -674,7 +674,7 @@ function RegistrationPageContent() {
           id="registrationForm"
         >
           {/* Currency Selection Section */}
-          <CurrencySelector />
+          <CurrencySelector className="mt-8" />
 
           {/* Personal Details Section */}
           <div className="bg-white rounded-lg shadow-sm border">
