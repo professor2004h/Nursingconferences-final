@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Currency Default Setting</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .currency-display {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button.danger {
+            background-color: #dc3545;
+        }
+        .button.danger:hover {
+            background-color: #c82333;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>Currency Default Setting Test</h1>
+    <p>This test verifies that the currency defaults to USD when the registration page loads.</p>
+    
+    <div class="test-section">
+        <h3>Current localStorage Status</h3>
+        <div id="localStorage-status"></div>
+        
+        <div class="currency-display">
+            <strong>Current Saved Currency:</strong> <span id="current-currency">Loading...</span>
+        </div>
+        
+        <button class="button" onclick="checkLocalStorage()">Check localStorage</button>
+        <button class="button danger" onclick="clearCurrency()">Clear Currency Setting</button>
+        <button class="button" onclick="setToUSD()">Set to USD</button>
+        <button class="button" onclick="setToINR()">Set to INR (for testing)</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Results</h3>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Instructions</h3>
+        <ol>
+            <li><strong>Clear Currency Setting</strong> - This removes any saved currency preference</li>
+            <li><strong>Refresh the registration page</strong> - It should now default to USD</li>
+            <li><strong>Check the currency selector</strong> - USD should be selected by default</li>
+            <li>If you want to test the old behavior, click "Set to INR" and refresh the page</li>
+        </ol>
+        
+        <div class="test-result info">
+            <strong>Note:</strong> After clearing the currency setting, the registration page should always start with USD selected, regardless of previous user preferences.
+        </div>
+    </div>
+
+    <script>
+        let testResults = [];
+
+        function addTestResult(message, type = 'info') {
+            testResults.push({ message, type, timestamp: new Date() });
+            updateTestResults();
+        }
+
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="test-result ${result.type}">
+                    ${result.timestamp.toLocaleTimeString()}: ${result.message}
+                </div>`
+            ).join('');
+        }
+
+        function updateCurrentCurrency() {
+            const savedCurrency = localStorage.getItem('selectedCurrency');
+            const currencySpan = document.getElementById('current-currency');
+            currencySpan.textContent = savedCurrency || 'None (will default to USD)';
+        }
+
+        function checkLocalStorage() {
+            const savedCurrency = localStorage.getItem('selectedCurrency');
+            const statusDiv = document.getElementById('localStorage-status');
+            
+            if (savedCurrency) {
+                statusDiv.innerHTML = `
+                    <div class="test-result info">
+                        <strong>Found saved currency:</strong> ${savedCurrency}
+                    </div>
+                `;
+                addTestResult(`Found saved currency: ${savedCurrency}`, 'info');
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="test-result success">
+                        <strong>No saved currency found</strong> - Will default to USD
+                    </div>
+                `;
+                addTestResult('No saved currency found - will default to USD', 'success');
+            }
+            
+            updateCurrentCurrency();
+        }
+
+        function clearCurrency() {
+            localStorage.removeItem('selectedCurrency');
+            addTestResult('Currency setting cleared from localStorage', 'success');
+            updateCurrentCurrency();
+            checkLocalStorage();
+        }
+
+        function setToUSD() {
+            localStorage.setItem('selectedCurrency', 'USD');
+            addTestResult('Currency set to USD', 'success');
+            updateCurrentCurrency();
+            checkLocalStorage();
+        }
+
+        function setToINR() {
+            localStorage.setItem('selectedCurrency', 'INR');
+            addTestResult('Currency set to INR (for testing)', 'warning');
+            updateCurrentCurrency();
+            checkLocalStorage();
+        }
+
+        // Initialize
+        checkLocalStorage();
+        addTestResult('Currency test initialized', 'info');
+    </script>
+</body>
+</html>

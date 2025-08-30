@@ -17,17 +17,12 @@ interface CurrencyProviderProps {
 export function CurrencyProvider({ children }: CurrencyProviderProps) {
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(DEFAULT_CURRENCY);
 
-  // Load saved currency preference from localStorage on mount
+  // Always start with USD as default currency
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedCurrency = localStorage.getItem('selectedCurrency') as Currency;
-      if (savedCurrency && ['USD', 'EUR', 'GBP', 'INR'].includes(savedCurrency)) {
-        setSelectedCurrency(savedCurrency);
-      } else {
-        // Ensure USD is set as default if no valid saved currency
-        setSelectedCurrency('USD');
-        localStorage.setItem('selectedCurrency', 'USD');
-      }
+      // Always set USD as default and save to localStorage
+      setSelectedCurrency('USD');
+      localStorage.setItem('selectedCurrency', 'USD');
     }
   }, []);
 
