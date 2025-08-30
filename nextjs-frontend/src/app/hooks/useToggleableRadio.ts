@@ -121,14 +121,15 @@ export const useMultipleToggleableRadio = (
    * Handle radio button change for a specific group
    */
   const handleRadioChange = useCallback((groupName: string, value: string) => {
-    const previousValue = selections[groupName] || '';
-
     setSelections(prev => {
+      const previousValue = prev[groupName] || '';
       const newSelections = { ...prev };
+      let newValue = value;
 
       if (allowDeselect && prev[groupName] === value) {
         // Deselect if clicking the same value
         delete newSelections[groupName];
+        newValue = '';
         onSelectionChange?.(groupName, '', previousValue);
       } else {
         // Select the new value
@@ -136,11 +137,10 @@ export const useMultipleToggleableRadio = (
         onSelectionChange?.(groupName, value, previousValue);
       }
 
+      console.log(`🔘 Radio selection changed in group "${groupName}": ${previousValue} → ${newValue}`);
       return newSelections;
     });
-
-    console.log(`🔘 Radio selection changed in group "${groupName}": ${previousValue} → ${selections[groupName] === value && allowDeselect ? '' : value}`);
-  }, [selections, allowDeselect, onSelectionChange]);
+  }, [allowDeselect, onSelectionChange]);
 
   /**
    * Clear selection for a specific group

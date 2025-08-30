@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Accommodation Deselection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .hotel-section {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .room-type {
+            text-align: left;
+            font-weight: bold;
+        }
+        label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .selected-info {
+            background-color: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #15803d;
+        }
+        .error {
+            background-color: #fef2f2;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <h1>Accommodation Deselection Test</h1>
+    <p>This test verifies that accommodation options can be selected and deselected properly.</p>
+    
+    <div id="test-results"></div>
+    
+    <div class="selected-info">
+        <strong>Currently Selected:</strong> <span id="current-selection">None</span>
+    </div>
+
+    <!-- Grand Convention Hotel -->
+    <div class="hotel-section">
+        <h2>Grand Convention Hotel</h2>
+        <p>Luxury 5-star hotel adjacent to the conference venue with premium amenities.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="room-type">Room Type</th>
+                    <th>2 Nights</th>
+                    <th>3 Nights</th>
+                    <th>5 Nights</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="room-type">Single ()</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-grand-single-2" value="grand-single-2" onchange="handleAccommodationChange(this)">
+                            $360
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-grand-single-3" value="grand-single-3" onchange="handleAccommodationChange(this)">
+                            $540
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-grand-single-5" value="grand-single-5" onchange="handleAccommodationChange(this)">
+                            $900
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="room-type">Double ()</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-grand-double-2" value="grand-double-2" onchange="handleAccommodationChange(this)">
+                            $500
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-grand-double-3" value="grand-double-3" onchange="handleAccommodationChange(this)">
+                            $750
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-grand-double-5" value="grand-double-5" onchange="handleAccommodationChange(this)">
+                            $1,250
+                        </label>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Business Inn & Suites -->
+    <div class="hotel-section">
+        <h2>Business Inn & Suites</h2>
+        <p>Comfortable 4-star business hotel with excellent conference facilities.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="room-type">Room Type</th>
+                    <th>2 Nights</th>
+                    <th>3 Nights</th>
+                    <th>5 Nights</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="room-type">Single ()</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-business-single-2" value="business-single-2" onchange="handleAccommodationChange(this)">
+                            $242
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-business-single-3" value="business-single-3" onchange="handleAccommodationChange(this)">
+                            $363
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-business-single-5" value="business-single-5" onchange="handleAccommodationChange(this)">
+                            $605
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="room-type">Double ()</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-business-double-2" value="business-double-2" onchange="handleAccommodationChange(this)">
+                            $320
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-business-double-3" value="business-double-3" onchange="handleAccommodationChange(this)">
+                            $480
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="accommodation-business-double-5" value="business-double-5" onchange="handleAccommodationChange(this)">
+                            $800
+                        </label>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let currentSelection = null;
+        let testResults = [];
+
+        function addTestResult(message, isSuccess) {
+            testResults.push({ message, isSuccess, timestamp: new Date() });
+            updateTestResults();
+        }
+
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="test-result ${result.isSuccess ? 'success' : 'error'}">
+                    ${result.timestamp.toLocaleTimeString()}: ${result.message}
+                </div>`
+            ).join('');
+        }
+
+        function updateCurrentSelection() {
+            const selectionSpan = document.getElementById('current-selection');
+            selectionSpan.textContent = currentSelection || 'None';
+        }
+
+        function handleAccommodationChange(checkbox) {
+            const value = checkbox.value;
+            
+            if (checkbox.checked) {
+                // If selecting a new option
+                if (currentSelection && currentSelection !== value) {
+                    // Deselect the previously selected option
+                    const prevCheckbox = document.querySelector(`input[value="${currentSelection}"]`);
+                    if (prevCheckbox) {
+                        prevCheckbox.checked = false;
+                    }
+                    addTestResult(`Switched from ${currentSelection} to ${value}`, true);
+                } else {
+                    addTestResult(`Selected ${value}`, true);
+                }
+                currentSelection = value;
+            } else {
+                // If deselecting the current option
+                if (currentSelection === value) {
+                    currentSelection = null;
+                    addTestResult(`Deselected ${value} - deselection working correctly!`, true);
+                } else {
+                    addTestResult(`Unexpected deselection behavior for ${value}`, false);
+                }
+            }
+            
+            updateCurrentSelection();
+        }
+
+        // Initialize
+        updateCurrentSelection();
+        addTestResult('Test initialized - try selecting and deselecting accommodation options', true);
+    </script>
+</body>
+</html>

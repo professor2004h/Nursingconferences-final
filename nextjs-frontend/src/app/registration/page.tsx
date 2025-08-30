@@ -1247,10 +1247,10 @@ function RegistrationPageContent() {
 
                                     return (
                                       <td key={nights} className="border border-gray-300 px-4 py-2 text-center">
-                                        <label className="flex items-center justify-center">
+                                        <label className="flex items-center justify-center cursor-pointer">
                                           <input
-                                            type="radio"
-                                            name="accommodation"
+                                            type="checkbox"
+                                            name={`accommodation-${accommodationKey}`}
                                             value={accommodationKey}
                                             checked={isSelected('accommodation', accommodationKey)}
                                             onChange={() => handleRadioChange('accommodation', accommodationKey)}
