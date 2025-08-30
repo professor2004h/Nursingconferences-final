@@ -96,6 +96,11 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      console.log('🔄 Updating registration payment status to COMPLETED...');
+      console.log('📋 Registration ID:', registration._id);
+      console.log('💰 Payment ID:', razorpay_payment_id);
+      console.log('📦 Order ID:', razorpay_order_id);
+
       const updateResult = await client
         .patch(registration._id)
         .set({
@@ -108,6 +113,8 @@ export async function POST(request: NextRequest) {
           paymentCurrency: currency,
           paymentDate: new Date().toISOString(),
           paymentCapturedAt: new Date().toISOString(),
+          lastUpdated: new Date().toISOString(),
+          webhookProcessed: true,
           razorpayPaymentData: {
             orderId: razorpay_order_id,
             paymentId: razorpay_payment_id,
@@ -118,8 +125,18 @@ export async function POST(request: NextRequest) {
           }
         })
         .commit();
-        
+
       console.log('✅ Registration updated with Razorpay payment details:', updateResult._id);
+      console.log('✅ Payment status set to: COMPLETED');
+
+      // Verify the update was successful
+      const verifyUpdate = await client.fetch(
+        `*[_type == "conferenceRegistration" && _id == $id][0] { paymentStatus, paymentMethod, paymentId }`,
+        { id: registration._id }
+      );
+      console.log('🔍 Verification - Current payment status:', verifyUpdate?.paymentStatus);
+      console.log('🔍 Verification - Payment method:', verifyUpdate?.paymentMethod);
+      console.log('🔍 Verification - Payment ID:', verifyUpdate?.paymentId);
       
     } catch (sanityError) {
       console.error('❌ Failed to update registration in Sanity:', sanityError);
@@ -237,16 +254,18 @@ export async function POST(request: NextRequest) {
             if (emailResult.success) {
               console.log('✅ Fallback email system succeeded');
 
-              // Update registration with receipt status
+              // Update registration with receipt status - MAINTAIN COMPLETED STATUS
               await client
                 .patch(registrationId)
                 .set({
+                  paymentStatus: 'completed', // CRITICAL: Ensure payment status remains completed
                   receiptEmailSent: true,
                   receiptEmailSentAt: new Date().toISOString(),
                   receiptEmailRecipient: customerEmail,
                   pdfReceiptGenerated: emailResult.pdfGenerated,
                   pdfReceiptStoredInSanity: emailResult.pdfUploaded,
-                  webhookProcessed: true
+                  webhookProcessed: true,
+                  lastUpdated: new Date().toISOString()
                 })
                 .commit();
             } else {
@@ -269,16 +288,18 @@ export async function POST(request: NextRequest) {
           if (emailResult.success) {
             console.log('✅ Legacy email system succeeded');
 
-            // Update registration with receipt status
+            // Update registration with receipt status - MAINTAIN COMPLETED STATUS
             await client
               .patch(registrationId)
               .set({
+                paymentStatus: 'completed', // CRITICAL: Ensure payment status remains completed
                 receiptEmailSent: true,
                 receiptEmailSentAt: new Date().toISOString(),
                 receiptEmailRecipient: customerEmail,
                 pdfReceiptGenerated: emailResult.pdfGenerated,
                 pdfReceiptStoredInSanity: emailResult.pdfUploaded,
-                webhookProcessed: true
+                webhookProcessed: true,
+                lastUpdated: new Date().toISOString()
               })
               .commit();
           } else {

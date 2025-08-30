@@ -460,6 +460,7 @@ async function processPaymentCompletion(paymentData, registrationData, paymentMe
         await sanityClient
           .patch(registrationData._id)
           .set({
+            paymentStatus: 'completed', // CRITICAL: Ensure payment status remains completed
             receiptEmailSent: true,
             receiptEmailSentAt: new Date().toISOString(),
             receiptEmailRecipient: customerEmail,
