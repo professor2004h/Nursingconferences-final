@@ -15,7 +15,7 @@ export default function RegistrationTableView() {
   const [dateRange, setDateRange] = React.useState({ start: '', end: '' })
   const [sortField, setSortField] = React.useState('registrationDate')
   const [sortDirection, setSortDirection] = React.useState('desc')
-  const client = useClient({ apiVersion: '2023-05-03' })
+  const client = useClient({ apiVersion: '2023-05-03', useCdn: false })
 
   React.useEffect(() => {
     fetchRegistrations()
@@ -89,6 +89,8 @@ export default function RegistrationTableView() {
   const fetchRegistrations = async () => {
     try {
       setLoading(true)
+      // Add timestamp to prevent caching issues
+      const timestamp = new Date().getTime()
       const query = `*[_type == "conferenceRegistration"] | order(registrationDate desc) {
         _id,
         registrationId,
