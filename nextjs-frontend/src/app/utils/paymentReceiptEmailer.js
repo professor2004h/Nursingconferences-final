@@ -556,23 +556,23 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Full Name:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.fullName || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getFullName(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Email:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.email || recipientEmail}</td>
+                  <td style="padding: 6px 0; color: #333;">${getEmail(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Phone:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.phone || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getPhone(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Country:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.country || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getCountry(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Address:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.address || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getAddress(registrationData)}</td>
                 </tr>
                 ${getRegistrationTypeDisplay(registrationData) ? `
                 <tr>
@@ -646,11 +646,11 @@ Status: ${paymentData.status || 'Completed'}
 
 REGISTRATION DETAILS:
 Registration ID: ${registrationData.registrationId || 'N/A'}
-Full Name: ${registrationData.fullName || 'N/A'}
-Email: ${registrationData.email || recipientEmail}
-Phone: ${registrationData.phone || 'N/A'}
-Country: ${registrationData.country || 'N/A'}
-Address: ${registrationData.address || 'N/A'}
+Full Name: ${getFullName(registrationData)}
+Email: ${getEmail(registrationData)}
+Phone: ${getPhone(registrationData)}
+Country: ${getCountry(registrationData)}
+Address: ${getAddress(registrationData)}
 ${getRegistrationTypeDisplay(registrationData) ? `Registration Type: ${getRegistrationTypeDisplay(registrationData)}` : ''}
 Number of Participants: ${String(registrationData.numberOfParticipants || 1)}
 
@@ -992,23 +992,23 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Full Name:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.fullName || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getFullName(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Email:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.email || recipientEmail}</td>
+                  <td style="padding: 6px 0; color: #333;">${getEmail(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Phone:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.phone || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getPhone(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Country:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.country || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getCountry(registrationData)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Address:</td>
-                  <td style="padding: 6px 0; color: #333;">${registrationData.address || 'N/A'}</td>
+                  <td style="padding: 6px 0; color: #333;">${getAddress(registrationData)}</td>
                 </tr>
                 ${getRegistrationTypeDisplay(registrationData) ? `
                 <tr>
@@ -1065,11 +1065,11 @@ Status: ${paymentData.status || 'Completed'}
 
 REGISTRATION DETAILS:
 Registration ID: ${registrationData.registrationId || 'N/A'}
-Full Name: ${registrationData.fullName || 'N/A'}
-Email: ${registrationData.email || recipientEmail}
-Phone: ${registrationData.phone || 'N/A'}
-Country: ${registrationData.country || 'N/A'}
-Address: ${registrationData.address || 'N/A'}
+Full Name: ${getFullName(registrationData)}
+Email: ${getEmail(registrationData)}
+Phone: ${getPhone(registrationData)}
+Country: ${getCountry(registrationData)}
+Address: ${getAddress(registrationData)}
 ${getRegistrationTypeDisplay(registrationData) ? `Registration Type: ${getRegistrationTypeDisplay(registrationData)}` : ''}
 Number of Participants: ${String(registrationData.numberOfParticipants || 1)}
 
@@ -1247,6 +1247,52 @@ function getProductionEmailConfig() {
   });
 
   return config;
+}
+
+/**
+ * Helper functions to extract data from registration object
+ * These match the functions used in unifiedReceiptGenerator.js
+ */
+function getPhone(registrationData) {
+  if (registrationData.phone) return registrationData.phone;
+  if (registrationData.phoneNumber) return registrationData.phoneNumber;
+  if (registrationData.personalDetails?.phone) return registrationData.personalDetails.phone;
+  if (registrationData.personalDetails?.phoneNumber) return registrationData.personalDetails.phoneNumber;
+  return 'N/A';
+}
+
+function getFullName(registrationData) {
+  if (registrationData.fullName) return registrationData.fullName;
+  if (registrationData.personalDetails?.fullName) return registrationData.personalDetails.fullName;
+
+  const firstName = registrationData.firstName || registrationData.personalDetails?.firstName || '';
+  const lastName = registrationData.lastName || registrationData.personalDetails?.lastName || '';
+  const title = registrationData.title || registrationData.personalDetails?.title || '';
+
+  if (firstName && lastName) {
+    return title ? `${title} ${firstName} ${lastName}`.trim() : `${firstName} ${lastName}`.trim();
+  }
+
+  return firstName || lastName || 'N/A';
+}
+
+function getEmail(registrationData) {
+  if (registrationData.email) return registrationData.email;
+  if (registrationData.personalDetails?.email) return registrationData.personalDetails.email;
+  return 'N/A';
+}
+
+function getCountry(registrationData) {
+  if (registrationData.country) return registrationData.country;
+  if (registrationData.personalDetails?.country) return registrationData.personalDetails.country;
+  return 'N/A';
+}
+
+function getAddress(registrationData) {
+  if (registrationData.address) return registrationData.address;
+  if (registrationData.personalDetails?.address) return registrationData.personalDetails.address;
+  if (registrationData.personalDetails?.fullPostalAddress) return registrationData.personalDetails.fullPostalAddress;
+  return 'N/A';
 }
 
 module.exports = {
