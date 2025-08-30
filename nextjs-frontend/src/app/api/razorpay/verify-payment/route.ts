@@ -106,12 +106,17 @@ export async function POST(request: NextRequest) {
         .set({
           paymentStatus: 'completed',
           paymentMethod: 'razorpay',
-          razorpayPaymentId: razorpay_payment_id, // CORRECT FIELD NAME
-          razorpayOrderId: razorpay_order_id,     // CORRECT FIELD NAME
+          razorpayPaymentId: razorpay_payment_id,
+          razorpayOrderId: razorpay_order_id,
           paymentDate: new Date().toISOString(),
           webhookProcessed: true,
           lastUpdated: new Date().toISOString(),
-          // Update pricing with correct currency and amount
+          // CRITICAL: Use same field names as email template and PDF receipt
+          paymentCurrency: currency,        // Same as paymentData.currency
+          paymentAmount: amount,            // Same as paymentData.amount
+          transactionId: razorpay_payment_id, // Same as paymentData.transactionId
+          status: 'completed',              // Same as paymentData.status
+          // Also update pricing for backward compatibility
           'pricing.currency': currency,
           'pricing.totalPrice': amount,
           razorpayPaymentData: {
@@ -267,10 +272,16 @@ export async function POST(request: NextRequest) {
                 .patch(registrationId)
                 .set({
                   paymentStatus: 'completed', // CRITICAL: Ensure payment status remains completed
-                  razorpayPaymentId: razorpay_payment_id, // CORRECT FIELD NAME
-                  razorpayOrderId: razorpay_order_id,     // CORRECT FIELD NAME
-                  'pricing.currency': currency,           // UPDATE CURRENCY IN PRICING
-                  'pricing.totalPrice': amount,           // UPDATE AMOUNT IN PRICING
+                  razorpayPaymentId: razorpay_payment_id,
+                  razorpayOrderId: razorpay_order_id,
+                  // CRITICAL: Use same field names as email template and PDF receipt
+                  paymentCurrency: currency,        // Same as paymentData.currency
+                  paymentAmount: amount,            // Same as paymentData.amount
+                  transactionId: razorpay_payment_id, // Same as paymentData.transactionId
+                  status: 'completed',              // Same as paymentData.status
+                  // Also update pricing for backward compatibility
+                  'pricing.currency': currency,
+                  'pricing.totalPrice': amount,
                   receiptEmailSent: true,
                   receiptEmailSentAt: new Date().toISOString(),
                   receiptEmailRecipient: customerEmail,
@@ -305,10 +316,16 @@ export async function POST(request: NextRequest) {
               .patch(registrationId)
               .set({
                 paymentStatus: 'completed', // CRITICAL: Ensure payment status remains completed
-                razorpayPaymentId: razorpay_payment_id, // CORRECT FIELD NAME
-                razorpayOrderId: razorpay_order_id,     // CORRECT FIELD NAME
-                'pricing.currency': currency,           // UPDATE CURRENCY IN PRICING
-                'pricing.totalPrice': amount,           // UPDATE AMOUNT IN PRICING
+                razorpayPaymentId: razorpay_payment_id,
+                razorpayOrderId: razorpay_order_id,
+                // CRITICAL: Use same field names as email template and PDF receipt
+                paymentCurrency: currency,        // Same as paymentData.currency
+                paymentAmount: amount,            // Same as paymentData.amount
+                transactionId: razorpay_payment_id, // Same as paymentData.transactionId
+                status: 'completed',              // Same as paymentData.status
+                // Also update pricing for backward compatibility
+                'pricing.currency': currency,
+                'pricing.totalPrice': amount,
                 receiptEmailSent: true,
                 receiptEmailSentAt: new Date().toISOString(),
                 receiptEmailRecipient: customerEmail,

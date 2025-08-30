@@ -468,7 +468,12 @@ async function processPaymentCompletion(paymentData, registrationData, paymentMe
             pdfReceiptStoredInSanity: pdfUploaded,
             webhookProcessed: true,
             lastUpdated: new Date().toISOString(),
-            // CRITICAL: Update pricing with actual payment currency and amount
+            // CRITICAL: Use same field names as email template and PDF receipt
+            paymentCurrency: paymentData.currency,    // Same as paymentData.currency
+            paymentAmount: paymentData.amount,        // Same as paymentData.amount
+            transactionId: paymentData.transactionId, // Same as paymentData.transactionId
+            status: 'completed',                      // Same as paymentData.status
+            // Also update pricing for backward compatibility
             'pricing.currency': paymentData.currency,
             'pricing.totalPrice': paymentData.amount
           })

@@ -150,7 +150,12 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
           paymentDate: new Date().toISOString(),
           webhookProcessed: true,
           lastUpdated: new Date().toISOString(),
-          // Update pricing with actual payment currency and amount
+          // CRITICAL: Use same field names as email template and PDF receipt
+          paymentCurrency: capture.amount.currency_code,  // Same as paymentData.currency
+          paymentAmount: parseFloat(capture.amount.value), // Same as paymentData.amount
+          transactionId: capture.id,                      // Same as paymentData.transactionId
+          status: 'completed',                            // Same as paymentData.status
+          // Also update pricing for backward compatibility
           'pricing.currency': capture.amount.currency_code,
           'pricing.totalPrice': parseFloat(capture.amount.value),
         })
