@@ -93,12 +93,39 @@ export async function POST(request: NextRequest) {
     }, { headers: corsHeaders });
 
   } catch (error) {
-    console.error('Error processing contact form:', error);
+    console.error('❌ CRITICAL: Contact form error:', error);
+    console.error('❌ Error type:', typeof error);
+    console.error('❌ Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      code: (error as any)?.code,
+      command: (error as any)?.command,
+      response: (error as any)?.response
+    });
+
+    // Log environment status for debugging
+    console.error('❌ Environment check:', {
+      SMTP_HOST: process.env.SMTP_HOST ? 'SET' : 'NOT SET',
+      SMTP_USER: process.env.SMTP_USER ? 'SET' : 'NOT SET',
+      SMTP_PASS: process.env.SMTP_PASS ? 'SET' : 'NOT SET',
+      NODE_ENV: process.env.NODE_ENV
+    });
 
     return NextResponse.json(
       {
         error: 'Failed to send message. Please try again later or contact us directly.',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+        // Include debugging info for development
+        debug: process.env.NODE_ENV !== 'production' ? {
+          errorType: typeof error,
+          stack: error instanceof Error ? error.stack : undefined,
+          envVars: {
+            SMTP_HOST: process.env.SMTP_HOST ? 'SET' : 'NOT SET',
+            SMTP_USER: process.env.SMTP_USER ? 'SET' : 'NOT SET',
+            SMTP_PASS: process.env.SMTP_PASS ? 'SET' : 'NOT SET'
+          }
+        } : undefined
       },
       { status: 500, headers: corsHeaders }
     );
