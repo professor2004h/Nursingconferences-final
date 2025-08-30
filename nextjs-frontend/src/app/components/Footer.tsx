@@ -247,7 +247,7 @@ export default async function Footer() {
                 <div className="flex-1 overflow-hidden">
                   <a
                     href={`mailto:${siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}`}
-                    className="text-white font-medium hover:text-orange-400 transition-colors text-sm whitespace-nowrap block overflow-hidden text-ellipsis"
+                    className="text-white font-medium hover:text-orange-400 transition-colors text-sm break-all"
                   >
                     {siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}
                   </a>

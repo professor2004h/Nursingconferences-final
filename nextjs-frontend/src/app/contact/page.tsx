@@ -63,11 +63,11 @@ export default async function ContactPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-lg text-slate-900 mb-1">Email</h4>
                     <a
                       href={`mailto:${siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}`}
-                      className="text-orange-600 hover:text-orange-700 transition-colors"
+                      className="text-orange-600 hover:text-orange-700 transition-colors break-all text-sm sm:text-base"
                     >
                       {siteSettings?.contactInfo?.email || "contactus@intelliglobalconferences.com"}
                     </a>
