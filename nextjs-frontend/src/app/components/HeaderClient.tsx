@@ -513,17 +513,12 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
         </div>
       </div>
 
-      {/* Mobile menu button - Positioned absolutely to top-right */}
-      <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2">
+      {/* Mobile menu button */}
+      <div className="md:hidden">
         <button
           onClick={toggleMenu}
-          className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors p-2 rounded-md bg-white shadow-sm border border-gray-200"
+          className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors"
           aria-label="Toggle menu"
-          style={{
-            minWidth: '44px',
-            minHeight: '44px',
-            zIndex: 9999
-          }}
         >
           <svg
             className="h-6 w-6"
