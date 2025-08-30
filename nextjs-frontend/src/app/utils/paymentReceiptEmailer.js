@@ -605,22 +605,20 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
             <div style="padding: 0 20px 30px 20px;">
               <h3 style="color: ${BRAND_COLORS.blueAccent}; font-size: 14px; margin: 0 0 15px 0; font-weight: bold;">Contact Information</h3>
 
-              <!-- Contact Email - Block Level -->
-              <div style="margin-bottom: 30px;">
-                <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.darkGray}; display: block;">
-                  Email: <a href="mailto:${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}" style="color: ${BRAND_COLORS.blueAccent};">${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}</a>
-                </p>
-              </div>
+              <!-- Contact Email -->
+              <p style="margin: 0 0 25px 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
+                Email: <a href="mailto:${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}" style="color: ${BRAND_COLORS.blueAccent};">${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}</a>
+              </p>
 
-              <!-- Copyright and Generation Date - Separate Block -->
-              <div style="border-top: 1px solid #eee; padding-top: 20px;">
-                <div style="margin-bottom: 10px;">
-                  <p style="margin: 0; font-size: 10px; color: #666; display: block;">© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</p>
-                </div>
-                <div>
-                  <p style="margin: 0; font-size: 10px; color: #999; display: block;">Generated on: ${new Date().toLocaleString()}</p>
-                </div>
-              </div>
+              <!-- Copyright - Separate line -->
+              <p style="margin: 0 0 8px 0; font-size: 10px; color: #666;">
+                © 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
+              </p>
+
+              <!-- Generation Date - Separate line -->
+              <p style="margin: 0; font-size: 10px; color: #999;">
+                Generated on: ${new Date().toLocaleString()}
+              </p>
             </div>
 
             <!-- Footer (now empty/minimal) -->
@@ -1028,22 +1026,20 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
             <div style="padding: 0 20px 30px 20px;">
               <h3 style="color: ${BRAND_COLORS.blueAccent}; font-size: 14px; margin: 0 0 15px 0; font-weight: bold;">Contact Information</h3>
 
-              <!-- Contact Email - Block Level -->
-              <div style="margin-bottom: 30px;">
-                <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.darkGray}; display: block;">
-                  Email: <a href="mailto:${emailConfig.fromEmail}" style="color: ${BRAND_COLORS.blueAccent};">${emailConfig.fromEmail}</a>
-                </p>
-              </div>
+              <!-- Contact Email -->
+              <p style="margin: 0 0 25px 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
+                Email: <a href="mailto:${emailConfig.fromEmail}" style="color: ${BRAND_COLORS.blueAccent};">${emailConfig.fromEmail}</a>
+              </p>
 
-              <!-- Copyright and Generation Date - Separate Block -->
-              <div style="border-top: 1px solid #eee; padding-top: 20px;">
-                <div style="margin-bottom: 10px;">
-                  <p style="margin: 0; font-size: 10px; color: #666; display: block;">© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</p>
-                </div>
-                <div>
-                  <p style="margin: 0; font-size: 10px; color: #999; display: block;">Generated on: ${new Date().toLocaleString()}</p>
-                </div>
-              </div>
+              <!-- Copyright - Separate line -->
+              <p style="margin: 0 0 8px 0; font-size: 10px; color: #666;">
+                © 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
+              </p>
+
+              <!-- Generation Date - Separate line -->
+              <p style="margin: 0; font-size: 10px; color: #999;">
+                Generated on: ${new Date().toLocaleString()}
+              </p>
             </div>
 
             <!-- Footer (now empty/minimal) -->
