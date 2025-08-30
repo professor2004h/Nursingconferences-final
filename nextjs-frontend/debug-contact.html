@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #ff6b35;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #e55a2b;
+        }
+        .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Contact Form Debug Dashboard</h1>
+        <p>This page helps debug the contact form email issues on production.</p>
+        
+        <div style="margin: 20px 0;">
+            <button class="button" onclick="checkDebugInfo()">1. Check Environment & SMTP</button>
+            <button class="button" onclick="testDebugEmail()">2. Test Debug Email</button>
+            <button class="button" onclick="testSimpleContact()">3. Test Simple Contact</button>
+        </div>
+        
+        <div id="debugResults"></div>
+    </div>
+
+    <div class="container">
+        <h2>📝 Simple Contact Form Test</h2>
+        <form id="simpleContactForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="Debug Test User" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="debug@test.com" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" value="+1234567890">
+            </div>
+            <div class="form-group">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject" value="Debug Test Email" required>
+            </div>
+            <div class="form-group">
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" required>This is a debug test message to verify the contact form email functionality is working properly on the production server.</textarea>
+            </div>
+            <button type="submit" class="button">Send Test Email</button>
+        </form>
+        
+        <div id="formResults"></div>
+    </div>
+
+    <script>
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showLoading(elementId, message) {
+            showStatus(elementId, `⏳ ${message}`, 'loading');
+        }
+
+        async function checkDebugInfo() {
+            showLoading('debugResults', 'Checking environment and SMTP configuration...');
+            
+            try {
+                const response = await fetch('/api/debug-contact');
+                const result = await response.json();
+                
+                console.log('Debug info:', result);
+                
+                let html = `<div class="status ${response.ok ? 'success' : 'error'}">
+                    ${response.ok ? '✅ Debug check completed' : '❌ Debug check failed'}
+                </div>`;
+                
+                html += '<h3>Environment Variables:</h3>';
+                html += `<pre>${JSON.stringify(result.environment, null, 2)}</pre>`;
+                
+                html += '<h3>SMTP Test:</h3>';
+                html += `<pre>${JSON.stringify(result.smtpTest, null, 2)}</pre>`;
+                
+                html += '<h3>Server Info:</h3>';
+                html += `<pre>${JSON.stringify(result.serverInfo, null, 2)}</pre>`;
+                
+                document.getElementById('debugResults').innerHTML = html;
+            } catch (error) {
+                console.error('Debug check error:', error);
+                showStatus('debugResults', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDebugEmail() {
+            showLoading('debugResults', 'Testing debug email send...');
+            
+            try {
+                const response = await fetch('/api/debug-contact', { method: 'POST' });
+                const result = await response.json();
+                
+                console.log('Debug email result:', result);
+                
+                if (response.ok) {
+                    showStatus('debugResults', `✅ Debug email sent successfully! Message ID: ${result.messageId}`, 'success');
+                } else {
+                    let html = `<div class="status error">❌ Debug email failed: ${result.error}</div>`;
+                    if (result.details) {
+                        html += `<pre>${JSON.stringify(result.details, null, 2)}</pre>`;
+                    }
+                    document.getElementById('debugResults').innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Debug email error:', error);
+                showStatus('debugResults', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSimpleContact() {
+            showLoading('debugResults', 'Testing simple contact API...');
+            
+            const testData = {
+                name: 'API Test User',
+                email: 'apitest@example.com',
+                phone: '+1234567890',
+                subject: 'Simple API Test',
+                message: 'This is a test of the simple contact API endpoint.'
+            };
+            
+            try {
+                const response = await fetch('/api/simple-contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                console.log('Simple contact result:', result);
+                
+                if (response.ok && result.success) {
+                    showStatus('debugResults', `✅ Simple contact test successful! Message ID: ${result.messageId}`, 'success');
+                } else {
+                    let html = `<div class="status error">❌ Simple contact test failed: ${result.error || result.details}</div>`;
+                    html += `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                    document.getElementById('debugResults').innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Simple contact error:', error);
+                showStatus('debugResults', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('simpleContactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value
+            };
+            
+            showLoading('formResults', 'Sending contact form...');
+            
+            try {
+                const response = await fetch('/api/simple-contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                console.log('Form submission result:', result);
+                
+                if (response.ok && result.success) {
+                    showStatus('formResults', `✅ Contact form sent successfully! Message ID: ${result.messageId}`, 'success');
+                } else {
+                    let html = `<div class="status error">❌ Contact form failed: ${result.error || result.details}</div>`;
+                    html += `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                    document.getElementById('formResults').innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                showStatus('formResults', `❌ Network error: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
