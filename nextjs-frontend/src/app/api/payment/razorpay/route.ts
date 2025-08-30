@@ -158,8 +158,17 @@ export async function PUT(request: NextRequest) {
       .patch(registration._id)
       .set({
         paymentStatus: 'completed',
+        paymentMethod: 'razorpay',
         paymentId: razorpay_payment_id,
         lastUpdated: new Date().toISOString(),
+        // CRITICAL: Use same field names as email template and PDF receipt
+        paymentCurrency: payment.currency,        // Same as paymentData.currency
+        paymentAmount: Number(payment.amount) / 100, // Same as paymentData.amount (convert from paise)
+        transactionId: razorpay_payment_id,      // Same as paymentData.transactionId
+        status: 'completed',                     // Same as paymentData.status
+        // Also update pricing for backward compatibility
+        'pricing.currency': payment.currency,
+        'pricing.totalPrice': Number(payment.amount) / 100,
       })
       .commit();
 

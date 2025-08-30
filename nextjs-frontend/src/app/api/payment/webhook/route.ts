@@ -95,8 +95,17 @@ async function handlePaymentCaptured(payment: any) {
       .patch(registration._id)
       .set({
         paymentStatus: 'completed',
+        paymentMethod: 'razorpay',
         paymentId: paymentId,
         lastUpdated: new Date().toISOString(),
+        // CRITICAL: Use same field names as email template and PDF receipt
+        paymentCurrency: 'INR',                  // Razorpay is typically INR
+        paymentAmount: amount,                   // Same as paymentData.amount
+        transactionId: paymentId,                // Same as paymentData.transactionId
+        status: 'completed',                     // Same as paymentData.status
+        // Also update pricing for backward compatibility
+        'pricing.currency': 'INR',
+        'pricing.totalPrice': amount,
       })
       .commit();
 
