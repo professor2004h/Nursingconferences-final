@@ -117,6 +117,11 @@ export default function RegistrationTableView() {
         paymentMethod,
         paymentDate,
         registrationDate,
+        // CRITICAL: Fetch same fields as email template and PDF receipt
+        paymentAmount,
+        paymentCurrency,
+        transactionId,
+        status,
         pdfReceipt {
           asset-> {
             _id,
@@ -176,14 +181,14 @@ export default function RegistrationTableView() {
     const csvContent = [
       headers.join(','),
       ...filteredRegistrations.map(reg => [
-        reg.paypalTransactionId || 'N/A',
+        reg.transactionId || reg.paypalTransactionId || 'N/A',
         reg.registrationType || 'N/A',
         `"${getFullName(reg)}"`,
         reg.personalDetails?.phoneNumber || 'N/A',
         reg.personalDetails?.email || 'N/A',
-        reg.pricing?.totalPrice || 0,
-        reg.pricing?.currency || 'USD',
-        reg.paymentStatus === 'completed' ? 'Successful' : (reg.paymentStatus || 'Pending'),
+        reg.paymentAmount || reg.pricing?.totalPrice || 0,
+        reg.paymentCurrency || reg.pricing?.currency || 'USD',
+        (reg.status || reg.paymentStatus) === 'completed' ? 'Successful' : ((reg.status || reg.paymentStatus) || 'Pending'),
         reg.registrationDate ? new Date(reg.registrationDate).toLocaleDateString() : 'N/A',
         (reg.pdfReceipt?.asset?.url || reg.registrationTable?.pdfReceiptFile?.asset?.url) ? 'Yes' : 'No'
       ].join(','))
@@ -620,7 +625,7 @@ export default function RegistrationTableView() {
                         className: index % 2 === 0 ? 'even' : 'odd'
                       },
                         React.createElement('td', { className: 'transaction-id' },
-                          registration.paypalTransactionId || 'N/A'
+                          registration.transactionId || registration.paypalTransactionId || 'N/A'
                         ),
                         React.createElement('td', { className: 'type' },
                           registration.registrationType || 'N/A'
@@ -635,13 +640,13 @@ export default function RegistrationTableView() {
                           registration.personalDetails?.email || 'N/A'
                         ),
                         React.createElement('td', { className: 'amount' },
-                          registration.pricing?.totalPrice || 0
+                          registration.paymentAmount || registration.pricing?.totalPrice || 0
                         ),
                         React.createElement('td', { className: 'currency' },
-                          registration.pricing?.currency || 'USD'
+                          registration.paymentCurrency || registration.pricing?.currency || 'USD'
                         ),
                         React.createElement('td', { className: 'status' },
-                          getStatusBadge(registration.paymentStatus)
+                          getStatusBadge(registration.status || registration.paymentStatus)
                         ),
                         React.createElement('td', { className: 'date' },
                           registration.registrationDate
