@@ -507,7 +507,7 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
               ` : `
                 <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Intelli Global Conferences</h1>
               `}
-              <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9;">Registration Receipt</p>
+              <!-- REMOVED: Registration Receipt text as requested -->
             </div>
             
             <!-- Conference Title - DYNAMIC from Sanity -->
@@ -605,7 +605,7 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
             <div style="padding: 0 20px 30px 20px;">
               <h3 style="color: ${BRAND_COLORS.blueAccent}; font-size: 14px; margin: 0 0 10px 0; font-weight: bold;">Contact Information</h3>
               <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
-                Email: <a href="mailto:contactus@intelliglobalconferences.com" style="color: ${BRAND_COLORS.blueAccent};">contactus@intelliglobalconferences.com</a>
+                Email: <a href="mailto:${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}" style="color: ${BRAND_COLORS.blueAccent};">${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}</a>
               </p>
             </div>
             
@@ -648,7 +648,7 @@ Registration Fee: ${paymentData.currency || 'USD'} ${paymentData.amount || '0.00
 Total Amount: ${paymentData.currency || 'USD'} ${paymentData.amount || '0.00'}
 
 CONTACT INFORMATION:
-Email: contactus@intelliglobalconferences.com
+Email: ${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}
 
 © 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
 Generated on: ${new Date().toLocaleString()}
@@ -932,7 +932,7 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
               ` : `
                 <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Intelli Global Conferences</h1>
               `}
-              <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9;">Registration Receipt</p>
+              <!-- REMOVED: Registration Receipt text as requested -->
             </div>
 
             <!-- Conference Title - DYNAMIC from Sanity -->

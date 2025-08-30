@@ -105,11 +105,11 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
         imageFormat = 'GIF';
       }
 
-      // Position logo in header with proper dimensions
-      const logoWidth = receiptSettings.receiptTemplate?.logoSize?.width || 72;
-      const logoHeight = receiptSettings.receiptTemplate?.logoSize?.height || 24;
+      // Position logo in header - TOP LEFT CENTER alignment
+      const logoWidth = receiptSettings.receiptTemplate?.logoSize?.width || 120;
+      const logoHeight = receiptSettings.receiptTemplate?.logoSize?.height || 40;
       const logoX = LAYOUT.margins.left;
-      const logoY = (LAYOUT.header.height - logoHeight) / 2;
+      const logoY = LAYOUT.margins.top + 8; // Top-left center positioning
 
       // Create data URL and embed logo
       const logoDataUrl = `data:image/${imageFormat.toLowerCase()};base64,${logoBase64}`;
@@ -126,7 +126,7 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
       doc.setTextColor(...colors.headerText);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.titleY);
+      doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.margins.top + 25);
     }
   } catch (logoError) {
     console.error('❌ Logo embedding failed:', logoError.message);
@@ -136,14 +136,10 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
     doc.setTextColor(...colors.headerText);
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.header.titleY);
+    doc.text(receiptSettings.companyName || 'Intelli Global Conferences', LAYOUT.margins.left, LAYOUT.margins.top + 25);
   }
 
-  // Registration Receipt subtitle in header
-  doc.setTextColor(...colors.headerText);
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Registration Receipt', LAYOUT.margins.left, LAYOUT.header.subtitleY);
+  // REMOVED: "Registration Receipt" subtitle as requested - header shows only logo
 
   let yPos = LAYOUT.header.height + LAYOUT.spacing.headerGap + 10;
 
