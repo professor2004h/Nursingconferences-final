@@ -602,24 +602,21 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
             </div>
             
             <!-- Contact Information -->
-            <div style="padding: 0 20px 15px 20px;">
+            <div style="padding: 0 20px 30px 20px;">
               <h3 style="color: ${BRAND_COLORS.blueAccent}; font-size: 14px; margin: 0 0 15px 0; font-weight: bold;">Contact Information</h3>
 
               <!-- Contact Email -->
-              <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
+              <p style="margin: 0 0 25px 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
                 Email: <a href="mailto:${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}" style="color: ${BRAND_COLORS.blueAccent};">${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}</a>
               </p>
-            </div>
 
-            <!-- Copyright and Date Section - COMPLETELY SEPARATE -->
-            <div style="padding: 20px 20px 30px 60px; clear: both;">
-              <!-- Copyright - With increased left margin -->
-              <p style="margin: 0 0 10px 0; font-size: 10px; color: #666; line-height: 1.4;">
+              <!-- Copyright - Separate line -->
+              <p style="margin: 0 0 8px 0; font-size: 10px; color: #666;">
                 © 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
               </p>
 
-              <!-- Generation Date - With increased left margin -->
-              <p style="margin: 0; font-size: 10px; color: #999; line-height: 1.4;">
+              <!-- Generation Date - Separate line -->
+              <p style="margin: 0; font-size: 10px; color: #999;">
                 Generated on: ${new Date().toLocaleString()}
               </p>
             </div>
@@ -1026,24 +1023,21 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
             </div>
 
             <!-- Contact Information -->
-            <div style="padding: 0 20px 15px 20px;">
+            <div style="padding: 0 20px 30px 20px;">
               <h3 style="color: ${BRAND_COLORS.blueAccent}; font-size: 14px; margin: 0 0 15px 0; font-weight: bold;">Contact Information</h3>
 
               <!-- Contact Email -->
-              <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
+              <p style="margin: 0 0 25px 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
                 Email: <a href="mailto:${emailConfig.fromEmail}" style="color: ${BRAND_COLORS.blueAccent};">${emailConfig.fromEmail}</a>
               </p>
-            </div>
 
-            <!-- Copyright and Date Section - COMPLETELY SEPARATE -->
-            <div style="padding: 20px 20px 30px 60px; clear: both;">
-              <!-- Copyright - With increased left margin -->
-              <p style="margin: 0 0 10px 0; font-size: 10px; color: #666; line-height: 1.4;">
+              <!-- Copyright - Separate line -->
+              <p style="margin: 0 0 8px 0; font-size: 10px; color: #666;">
                 © 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}
               </p>
 
-              <!-- Generation Date - With increased left margin -->
-              <p style="margin: 0; font-size: 10px; color: #999; line-height: 1.4;">
+              <!-- Generation Date - Separate line -->
+              <p style="margin: 0; font-size: 10px; color: #999;">
                 Generated on: ${new Date().toLocaleString()}
               </p>
             </div>

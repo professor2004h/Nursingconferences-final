@@ -193,18 +193,21 @@ async function generateBlueHeaderReceiptPDF(paymentData, registrationData, recei
 
   // Contact Information Section
   yPos = addSection(doc, 'Contact Information', yPos, colors, LAYOUT);
-  
+
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...colors.valueText);
   doc.text(`Email: ${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}`, LAYOUT.margins.left, yPos);
 
-  // Footer
-  const footerY = pageHeight - LAYOUT.margins.bottom - 10;
+  // Move to next line after email
+  yPos += LAYOUT.spacing.lineHeight + 10;
+
+  // Copyright and Generated Date - positioned below contact email (NOT in footer)
   doc.setFontSize(8);
   doc.setTextColor(...colors.footerText);
-  doc.text(`© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}`, pageWidth / 2, footerY, { align: 'center' });
-  doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, footerY + 6, { align: 'center' });
+  doc.text(`© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}`, LAYOUT.margins.left, yPos);
+  yPos += LAYOUT.spacing.lineHeight;
+  doc.text(`Generated on: ${new Date().toLocaleString()}`, LAYOUT.margins.left, yPos);
 
   return Buffer.from(doc.output('arraybuffer'));
 }
