@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 export default function RegistrationSuccessPage() {
   const searchParams = useSearchParams();
   const [registrationDetails, setRegistrationDetails] = useState<any>(null);
+  const [conferenceTitle, setConferenceTitle] = useState<string>('International Nursing Conference 2025'); // Fallback
   const [loading, setLoading] = useState(true);
 
   const transactionId = searchParams?.get('transaction_id');
@@ -16,7 +17,28 @@ export default function RegistrationSuccessPage() {
   const currency = searchParams?.get('currency') || 'USD';
   const capturedAt = searchParams?.get('captured_at');
 
+  // Function to fetch conference title from Sanity
+  const fetchConferenceTitle = async () => {
+    try {
+      const response = await fetch('/api/receipt-settings');
+      const data = await response.json();
+
+      if (data.success && data.data?.conferenceTitle) {
+        setConferenceTitle(data.data.conferenceTitle);
+        console.log('✅ Conference title fetched:', data.data.conferenceTitle);
+      } else {
+        console.log('⚠️ Using fallback conference title');
+      }
+    } catch (error) {
+      console.error('❌ Error fetching conference title:', error);
+      // Keep fallback title
+    }
+  };
+
   useEffect(() => {
+    // Fetch conference title from Sanity
+    fetchConferenceTitle();
+
     if (registrationId) {
       // Fetch registration details
       fetch(`/api/registration?registrationId=${registrationId}`)
@@ -68,7 +90,7 @@ export default function RegistrationSuccessPage() {
               </div>
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Registration Successful!</h1>
-            <p className="text-green-100">Thank you for registering for the International Nursing Conference 2025</p>
+            <p className="text-green-100">Thank you for registering for the {conferenceTitle}</p>
           </div>
 
           {/* Registration Details */}
