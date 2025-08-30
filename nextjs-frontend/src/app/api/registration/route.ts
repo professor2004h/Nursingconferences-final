@@ -6,14 +6,14 @@ import { z } from 'zod';
 const registrationSchema = z.object({
   // Personal Details
   title: z.string().optional(),
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  email: z.string().email(),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Please enter a valid email address"),
   phoneNumber: z.string().min(5, "Phone number must be at least 5 characters"),
 
   // Further Information
-  country: z.string().min(1),
-  fullPostalAddress: z.string().min(10),
+  country: z.string().min(1, "Country is required"),
+  fullPostalAddress: z.string().min(1, "Postal address is required"),
 
   // Registration Selection
   selectedRegistration: z.string().optional(),

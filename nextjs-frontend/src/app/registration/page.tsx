@@ -434,14 +434,18 @@ function RegistrationPageContent() {
     setIsLoading(true);
 
     try {
-      // Validate required fields
-      if (!formData.firstName || !formData.lastName || !formData.email || !formData.phoneNumber) {
-        alert('Please fill in all required fields');
-        return;
-      }
+      // Validate required fields with specific error messages
+      const missingFields = [];
 
-      if (!formData.country || !formData.fullPostalAddress) {
-        alert('Please fill in all required information fields');
+      if (!formData.firstName.trim()) missingFields.push('First Name');
+      if (!formData.lastName.trim()) missingFields.push('Last Name');
+      if (!formData.email.trim()) missingFields.push('Email');
+      if (!formData.phoneNumber.trim()) missingFields.push('Phone Number');
+      if (!formData.country.trim()) missingFields.push('Country');
+      if (!formData.fullPostalAddress.trim()) missingFields.push('Full Postal Address');
+
+      if (missingFields.length > 0) {
+        alert(`Please fill in the following required fields:\n• ${missingFields.join('\n• ')}`);
         return;
       }
 
@@ -721,7 +725,10 @@ function RegistrationPageContent() {
 
                 {/* Last Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name <span className="text-red-500">*</span>
+                    <span className="text-xs text-gray-500 ml-1">(minimum 1 character)</span>
+                  </label>
                   <input
                     type="text"
                     id="lastName"
@@ -802,7 +809,10 @@ function RegistrationPageContent() {
 
               {/* Full Postal Address */}
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Postal Address</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Postal Address <span className="text-red-500">*</span>
+                  <span className="text-xs text-gray-500 ml-1">(minimum 1 character)</span>
+                </label>
                 <textarea
                   id="fullPostalAddress"
                   name="fullPostalAddress"
@@ -1177,6 +1187,7 @@ function RegistrationPageContent() {
           <div className="bg-white rounded-lg shadow-sm border">
             <div className="bg-blue-800 text-white px-6 py-3 rounded-t-lg">
               <h2 className="text-lg font-bold text-white">Accommodation Registration</h2>
+              <p className="text-blue-100 text-sm mt-1">Optional - Click any selected option again to deselect</p>
             </div>
             <div className="p-6">
               {/* Loading State */}
@@ -1207,6 +1218,23 @@ function RegistrationPageContent() {
               {/* Dynamic Accommodation Options */}
               {dynamicData && dynamicData.accommodationOptions && (
                 <div className="space-y-6">
+                  {/* No Accommodation Option */}
+                  <div className="border rounded-lg p-4 bg-gray-50">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="accommodation"
+                        value=""
+                        checked={!getSelection('accommodation')}
+                        onChange={() => clearSelection('accommodation')}
+                        className="mr-3 w-4 h-4"
+                      />
+                      <div>
+                        <span className="font-medium text-gray-800">No Accommodation Required</span>
+                        <p className="text-sm text-gray-600">I will arrange my own accommodation</p>
+                      </div>
+                    </label>
+                  </div>
                   {dynamicData.accommodationOptions
                     .filter(hotel => hotel.isActive)
                     .sort((a, b) => a.displayOrder - b.displayOrder)
@@ -1327,9 +1355,9 @@ function RegistrationPageContent() {
               </div>
               <div className="p-6">
                 {(() => {
-                  // Check form validation
-                  const isFormValid = formData.firstName && formData.lastName && formData.email &&
-                                     formData.phoneNumber && formData.country && formData.fullPostalAddress;
+                  // Check form validation (allow single character names and addresses)
+                  const isFormValid = formData.firstName.trim() && formData.lastName.trim() && formData.email.trim() &&
+                                     formData.phoneNumber.trim() && formData.country.trim() && formData.fullPostalAddress.trim();
 
                   // Check if registration type or sponsorship is selected
                   const selectedRegistrationType = getSelection('registrationType');
