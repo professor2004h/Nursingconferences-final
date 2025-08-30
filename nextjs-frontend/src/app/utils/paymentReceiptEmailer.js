@@ -604,15 +604,18 @@ async function sendPaymentReceiptEmail(paymentData, registrationData, recipientE
             <!-- Contact Information -->
             <div style="padding: 0 20px 30px 20px;">
               <h3 style="color: ${BRAND_COLORS.blueAccent}; font-size: 14px; margin: 0 0 10px 0; font-weight: bold;">Contact Information</h3>
-              <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
+              <p style="margin: 0 0 15px 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
                 Email: <a href="mailto:${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}" style="color: ${BRAND_COLORS.blueAccent};">${receiptSettings.contactInformation?.supportEmail || 'contactus@intelliglobalconferences.com'}</a>
               </p>
-            </div>
-            
-            <!-- Footer -->
-            <div style="background-color: #f8f9fa; padding: 15px 20px; text-align: center; border-top: 1px solid #dee2e6;">
+
+              <!-- Copyright and Generation Date moved below contact email -->
               <p style="margin: 0 0 5px 0; font-size: 10px; color: #666;">© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</p>
               <p style="margin: 0; font-size: 10px; color: #999;">Generated on: ${new Date().toLocaleString()}</p>
+            </div>
+
+            <!-- Footer (now empty/minimal) -->
+            <div style="background-color: #f8f9fa; padding: 10px 20px; text-align: center; border-top: 1px solid #dee2e6;">
+              <!-- Footer content moved above to contact section -->
             </div>
             
           </div>
@@ -1014,15 +1017,18 @@ async function sendPaymentReceiptEmailWithRealData(paymentData, registrationData
             <!-- Contact Information -->
             <div style="padding: 0 20px 30px 20px;">
               <h3 style="color: ${BRAND_COLORS.blueAccent}; font-size: 14px; margin: 0 0 10px 0; font-weight: bold;">Contact Information</h3>
-              <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
+              <p style="margin: 0 0 15px 0; font-size: 12px; color: ${BRAND_COLORS.darkGray};">
                 Email: <a href="mailto:${emailConfig.fromEmail}" style="color: ${BRAND_COLORS.blueAccent};">${emailConfig.fromEmail}</a>
               </p>
-            </div>
 
-            <!-- Footer -->
-            <div style="background-color: #f8f9fa; padding: 15px 20px; text-align: center; border-top: 1px solid #dee2e6;">
+              <!-- Copyright and Generation Date moved below contact email -->
               <p style="margin: 0 0 5px 0; font-size: 10px; color: #666;">© 2025 ${receiptSettings.conferenceTitle || 'International Nursing Conference 2025'}</p>
               <p style="margin: 0; font-size: 10px; color: #999;">Generated on: ${new Date().toLocaleString()}</p>
+            </div>
+
+            <!-- Footer (now empty/minimal) -->
+            <div style="background-color: #f8f9fa; padding: 10px 20px; text-align: center; border-top: 1px solid #dee2e6;">
+              <!-- Footer content moved above to contact section -->
             </div>
 
           </div>
