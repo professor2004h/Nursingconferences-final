@@ -106,15 +106,14 @@ export async function POST(request: NextRequest) {
         .set({
           paymentStatus: 'completed',
           paymentMethod: 'razorpay',
-          paymentId: razorpay_payment_id,
-          paymentOrderId: razorpay_order_id,
-          paymentSignature: razorpay_signature,
-          paymentAmount: amount,
-          paymentCurrency: currency,
+          razorpayPaymentId: razorpay_payment_id, // CORRECT FIELD NAME
+          razorpayOrderId: razorpay_order_id,     // CORRECT FIELD NAME
           paymentDate: new Date().toISOString(),
-          paymentCapturedAt: new Date().toISOString(),
-          lastUpdated: new Date().toISOString(),
           webhookProcessed: true,
+          lastUpdated: new Date().toISOString(),
+          // Update pricing with correct currency and amount
+          'pricing.currency': currency,
+          'pricing.totalPrice': amount,
           razorpayPaymentData: {
             orderId: razorpay_order_id,
             paymentId: razorpay_payment_id,
@@ -131,12 +130,21 @@ export async function POST(request: NextRequest) {
 
       // Verify the update was successful
       const verifyUpdate = await client.fetch(
-        `*[_type == "conferenceRegistration" && _id == $id][0] { paymentStatus, paymentMethod, paymentId }`,
+        `*[_type == "conferenceRegistration" && _id == $id][0] {
+          paymentStatus,
+          paymentMethod,
+          razorpayPaymentId,
+          razorpayOrderId,
+          pricing { currency, totalPrice }
+        }`,
         { id: registration._id }
       );
       console.log('🔍 Verification - Current payment status:', verifyUpdate?.paymentStatus);
       console.log('🔍 Verification - Payment method:', verifyUpdate?.paymentMethod);
-      console.log('🔍 Verification - Payment ID:', verifyUpdate?.paymentId);
+      console.log('🔍 Verification - Razorpay Payment ID:', verifyUpdate?.razorpayPaymentId);
+      console.log('🔍 Verification - Razorpay Order ID:', verifyUpdate?.razorpayOrderId);
+      console.log('🔍 Verification - Currency:', verifyUpdate?.pricing?.currency);
+      console.log('🔍 Verification - Amount:', verifyUpdate?.pricing?.totalPrice);
       
     } catch (sanityError) {
       console.error('❌ Failed to update registration in Sanity:', sanityError);
@@ -259,6 +267,10 @@ export async function POST(request: NextRequest) {
                 .patch(registrationId)
                 .set({
                   paymentStatus: 'completed', // CRITICAL: Ensure payment status remains completed
+                  razorpayPaymentId: razorpay_payment_id, // CORRECT FIELD NAME
+                  razorpayOrderId: razorpay_order_id,     // CORRECT FIELD NAME
+                  'pricing.currency': currency,           // UPDATE CURRENCY IN PRICING
+                  'pricing.totalPrice': amount,           // UPDATE AMOUNT IN PRICING
                   receiptEmailSent: true,
                   receiptEmailSentAt: new Date().toISOString(),
                   receiptEmailRecipient: customerEmail,
@@ -293,6 +305,10 @@ export async function POST(request: NextRequest) {
               .patch(registrationId)
               .set({
                 paymentStatus: 'completed', // CRITICAL: Ensure payment status remains completed
+                razorpayPaymentId: razorpay_payment_id, // CORRECT FIELD NAME
+                razorpayOrderId: razorpay_order_id,     // CORRECT FIELD NAME
+                'pricing.currency': currency,           // UPDATE CURRENCY IN PRICING
+                'pricing.totalPrice': amount,           // UPDATE AMOUNT IN PRICING
                 receiptEmailSent: true,
                 receiptEmailSentAt: new Date().toISOString(),
                 receiptEmailRecipient: customerEmail,
