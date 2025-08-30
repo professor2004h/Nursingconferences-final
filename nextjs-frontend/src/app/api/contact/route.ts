@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSiteSettings } from '../../getSiteSettings';
-import { sendContactFormNotification, verifyEmailConnection, type ContactFormData } from '../../lib/emailService';
+import nodemailer from 'nodemailer';
+
+// Contact form data interface
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+}
 
 // CORS headers for API routes
 const corsHeaders = {
@@ -8,6 +17,196 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
+
+// Simplified email sending function for Coolify
+async function sendContactEmail(formData: ContactFormData, recipientEmail: string): Promise<boolean> {
+  try {
+    console.log('📧 [CONTACT] Starting email send process...');
+    console.log('📧 [CONTACT] Recipient:', recipientEmail);
+    console.log('📧 [CONTACT] From:', formData.email);
+
+    // Validate environment variables
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error('❌ [CONTACT] Missing SMTP credentials');
+      console.error('❌ [CONTACT] SMTP_USER:', process.env.SMTP_USER ? 'SET' : 'NOT SET');
+      console.error('❌ [CONTACT] SMTP_PASS:', process.env.SMTP_PASS ? 'SET' : 'NOT SET');
+      return false;
+    }
+
+    // Create SMTP configuration - EXACT same as working payment system
+    const smtpConfig = {
+      host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: process.env.SMTP_SECURE === 'true' || true,
+      auth: {
+        user: process.env.SMTP_USER || 'contactus@intelliglobalconferences.com',
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+        servername: process.env.SMTP_HOST || 'smtp.hostinger.com',
+        ciphers: 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA'
+      },
+      connectionTimeout: 60000,
+      greetingTimeout: 30000,
+      socketTimeout: 60000,
+      pool: false,
+      maxConnections: 1,
+      debug: process.env.NODE_ENV !== 'production',
+      logger: process.env.NODE_ENV !== 'production'
+    };
+
+    console.log('📧 [CONTACT] SMTP Config:', {
+      host: smtpConfig.host,
+      port: smtpConfig.port,
+      secure: smtpConfig.secure,
+      user: smtpConfig.auth.user,
+      hasPassword: !!smtpConfig.auth.pass
+    });
+
+    // Create transporter
+    const transporter = nodemailer.createTransporter(smtpConfig);
+
+    // Verify connection with fallback
+    try {
+      console.log('📧 [CONTACT] Testing SMTP connection...');
+      await transporter.verify();
+      console.log('✅ [CONTACT] SMTP connection verified');
+    } catch (verifyError) {
+      console.warn('⚠️ [CONTACT] SMTP verification failed, trying alternative config...');
+
+      // Try alternative configuration for Coolify
+      const altConfig = {
+        ...smtpConfig,
+        port: 587,
+        secure: false,
+        tls: {
+          rejectUnauthorized: false,
+          starttls: true,
+          servername: process.env.SMTP_HOST || 'smtp.hostinger.com'
+        }
+      };
+
+      const altTransporter = nodemailer.createTransporter(altConfig);
+      try {
+        await altTransporter.verify();
+        console.log('✅ [CONTACT] Alternative SMTP config verified');
+        // Use alternative transporter
+        const altResult = await sendEmailWithTransporter(altTransporter, formData, recipientEmail);
+        return altResult;
+      } catch (altError) {
+        console.error('❌ [CONTACT] Both SMTP configs failed:', altError);
+        // Continue with original transporter anyway
+      }
+    }
+
+    // Send email
+    const result = await sendEmailWithTransporter(transporter, formData, recipientEmail);
+    return result;
+
+  } catch (error) {
+    console.error('❌ [CONTACT] Email sending failed:', error);
+    return false;
+  }
+}
+
+// Helper function to send email with given transporter
+async function sendEmailWithTransporter(transporter: nodemailer.Transporter, formData: ContactFormData, recipientEmail: string): Promise<boolean> {
+  try {
+    const emailHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>New Contact Form Submission</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
+          .field { margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #ff6b35; }
+          .label { font-weight: bold; color: #ff6b35; }
+          .value { margin-top: 5px; }
+          .footer { background: #374151; color: white; padding: 15px; text-align: center; border-radius: 0 0 8px 8px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📧 New Contact Form Submission</h1>
+            <p>Intelli Global Conferences</p>
+          </div>
+          <div class="content">
+            <div class="field">
+              <div class="label">👤 Name:</div>
+              <div class="value">${formData.name}</div>
+            </div>
+            <div class="field">
+              <div class="label">📧 Email:</div>
+              <div class="value">${formData.email}</div>
+            </div>
+            ${formData.phone ? `
+            <div class="field">
+              <div class="label">📞 Phone:</div>
+              <div class="value">${formData.phone}</div>
+            </div>
+            ` : ''}
+            <div class="field">
+              <div class="label">📋 Subject:</div>
+              <div class="value">${formData.subject}</div>
+            </div>
+            <div class="field">
+              <div class="label">💬 Message:</div>
+              <div class="value">${formData.message.replace(/\n/g, '<br>')}</div>
+            </div>
+            <div class="field">
+              <div class="label">🕒 Submitted:</div>
+              <div class="value">${new Date().toLocaleString()}</div>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Reply directly to ${formData.email} to respond</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const mailOptions = {
+      from: `"Intelli Global Conferences" <${process.env.SMTP_USER || 'contactus@intelliglobalconferences.com'}>`,
+      to: recipientEmail,
+      replyTo: formData.email,
+      subject: `🔔 New Contact: ${formData.subject}`,
+      html: emailHTML,
+      text: `
+New Contact Form Submission
+
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone || 'Not provided'}
+Subject: ${formData.subject}
+
+Message:
+${formData.message}
+
+Submitted: ${new Date().toLocaleString()}
+      `.trim()
+    };
+
+    console.log('📧 [CONTACT] Sending email...');
+    const result = await transporter.sendMail(mailOptions);
+
+    console.log('✅ [CONTACT] Email sent successfully:', {
+      messageId: result.messageId,
+      response: result.response
+    });
+
+    return true;
+  } catch (error) {
+    console.error('❌ [CONTACT] Failed to send email:', error);
+    return false;
+  }
+}
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
@@ -70,14 +269,9 @@ export async function POST(request: NextRequest) {
       message: formData.message,
     });
 
-    // Verify email connection before sending
-    const connectionVerified = await verifyEmailConnection();
-    if (!connectionVerified) {
-      console.warn('⚠️ SMTP connection failed, but continuing with email attempt...');
-    }
-
-    // Send email notification to admin
-    const emailSent = await sendContactFormNotification(formData, recipientEmail);
+    // Send email notification to admin using simplified function
+    console.log('📧 [MAIN] Attempting to send contact form email...');
+    const emailSent = await sendContactEmail(formData, recipientEmail);
 
     if (!emailSent) {
       throw new Error('Failed to send email notification');
