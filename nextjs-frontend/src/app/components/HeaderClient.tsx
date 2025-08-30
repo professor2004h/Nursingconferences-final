@@ -425,7 +425,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   }, []);
 
   return (
-    <>
+    <div className="flex items-center justify-between flex-1">
       {/* Desktop Navigation - Reorganized with More dropdown */}
       <div className="hidden md:flex items-center overflow-visible flex-1 justify-center min-w-0 relative z-[9998]">
         {/* Main navigation links - Keep visible */}
@@ -514,11 +514,17 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       </div>
 
       {/* Mobile menu button */}
-      <div className="md:hidden">
+      <div className="md:hidden flex items-center justify-center flex-shrink-0">
         <button
           onClick={toggleMenu}
-          className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors"
+          className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors p-2 rounded-md"
           aria-label="Toggle menu"
+          style={{
+            minWidth: '44px',
+            minHeight: '44px',
+            zIndex: 9999,
+            position: 'relative'
+          }}
         >
           <svg
             className="h-6 w-6"
@@ -767,7 +773,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       {isMoreDropdownOpen && typeof window !== 'undefined' &&
         createPortal(renderDropdownContent(), document.body)
       }
-    </>
+    </div>
   );
 });
 
