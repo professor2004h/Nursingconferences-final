@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import nodemailer from 'nodemailer';
 
 // Contact form data interface
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     // Create transporter
     console.log('🚀 [CONTACT] Step 9: Creating nodemailer transporter...');
-    const transporter = nodemailer.createTransporter(smtpConfig);
+    const transporter = nodemailer.createTransport(smtpConfig);
     console.log('🚀 [CONTACT] Step 10: Transporter created successfully');
 
     // Simple email content
