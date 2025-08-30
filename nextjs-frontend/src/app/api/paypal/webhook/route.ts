@@ -145,12 +145,14 @@ async function handlePaymentCaptureCompleted(webhookEvent: any) {
         .patch(customId)
         .set({
           paymentStatus: 'completed',
-          paymentId: capture.id,
           paymentMethod: 'paypal',
-          paymentAmount: parseFloat(capture.amount.value),
-          paymentCurrency: capture.amount.currency_code,
+          paypalPaymentId: capture.id,
           paymentDate: new Date().toISOString(),
           webhookProcessed: true,
+          lastUpdated: new Date().toISOString(),
+          // Update pricing with actual payment currency and amount
+          'pricing.currency': capture.amount.currency_code,
+          'pricing.totalPrice': parseFloat(capture.amount.value),
         })
         .commit();
 

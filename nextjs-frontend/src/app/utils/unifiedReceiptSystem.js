@@ -467,7 +467,10 @@ async function processPaymentCompletion(paymentData, registrationData, paymentMe
             pdfReceiptGenerated: emailResult.pdfGenerated,
             pdfReceiptStoredInSanity: pdfUploaded,
             webhookProcessed: true,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
+            // CRITICAL: Update pricing with actual payment currency and amount
+            'pricing.currency': paymentData.currency,
+            'pricing.totalPrice': paymentData.amount
           })
           .commit();
 
