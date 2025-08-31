@@ -60,6 +60,17 @@ export default (S) =>
               S.listItem().title('Registration Types').schemaType('registrationTypes').child(S.documentTypeList('registrationTypes')),
               S.listItem().title('Accommodation Options').schemaType('accommodationOptions').child(S.documentTypeList('accommodationOptions')),
 
+            // Registration List for editing individual registrations
+              S.listItem()
+                .title('Registration List')
+                .id('registrationList')
+                .icon(UsersIcon)
+                .child(
+                  S.documentTypeList('conferenceRegistration')
+                    .title('Conference Registrations')
+                    .defaultOrdering([{field: 'registrationDate', direction: 'desc'}])
+                ),
+
               // Enhanced Registration Table View
               S.listItem()
                 .title('Registrations Table')
