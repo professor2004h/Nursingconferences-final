@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { getSiteSettings } from "../getSiteSettings";
+import { getJournalContent, getJournalMatterDescription } from "../getJournalContent";
+import { getJournalSectionStyling, generateJournalBackgroundStyles, generateJournalOverlayStyles } from "../getJournalSectionStyling";
 
 export const metadata = {
   title: "Journal - Intelli Global Conferences",
@@ -8,15 +10,31 @@ export const metadata = {
 
 export default async function JournalPage() {
   const siteSettings = await getSiteSettings();
-  // journal in siteSettings only has showJournal/journalUrl/openInNewTab per schema.
-  // Keep fallback test content until separate journal matter is implemented in Studio.
-  const journalMatter = null as unknown as string | null;
+  const journalContent = await getJournalContent();
+  const journalStyling = await getJournalSectionStyling();
+  
+  // Get the journal matter description from the fetched content
+  const journalMatter = getJournalMatterDescription(journalContent);
+  
+  // Generate background and overlay styles
+  const backgroundStyles = generateJournalBackgroundStyles(journalStyling);
+  const overlayStyles = generateJournalOverlayStyles(journalStyling);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-slate-800 via-blue-900 to-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section 
+        className="py-16 md:py-24 bg-gradient-to-br from-slate-800 via-blue-900 to-slate-900 relative"
+        style={backgroundStyles}
+      >
+        {/* Overlay for custom background */}
+        {journalStyling?.isActive && journalStyling.backgroundImage && (
+          <div 
+            className="absolute inset-0"
+            style={overlayStyles}
+          />
+        )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
             JOURNAL
           </h1>
