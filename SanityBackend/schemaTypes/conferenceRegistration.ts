@@ -273,10 +273,6 @@ export const conferenceRegistration = defineType({
         accept: '.pdf',
       },
       components: {
-        input: (props) => {
-          const { ReceiptFileInput } = require('../components/CustomFileInput.jsx')
-          return ReceiptFileInput(props)
-        },
         input: ReceiptFileInput,
       },
       description: 'Generated PDF receipt - opens in new tab when downloaded',
@@ -304,6 +300,81 @@ export const conferenceRegistration = defineType({
       type: 'boolean',
       description: 'Whether payment webhook was processed',
       initialValue: false,
+    }),
+
+    // Missing fields that were found in the data
+    defineField({
+      name: 'isActive',
+      title: 'Is Active',
+      type: 'boolean',
+      description: 'Whether this registration is active',
+      initialValue: true,
+    }),
+
+    defineField({
+      name: 'lastUpdated',
+      title: 'Last Updated',
+      type: 'datetime',
+      description: 'When this registration was last updated',
+    }),
+
+    defineField({
+      name: 'paidAmount',
+      title: 'Paid Amount',
+      type: 'number',
+      description: 'Amount actually paid',
+    }),
+
+    defineField({
+      name: 'paidCurrency',
+      title: 'Paid Currency',
+      type: 'string',
+      description: 'Currency of the paid amount',
+    }),
+
+    defineField({
+      name: 'paymentCapturedAt',
+      title: 'Payment Captured At',
+      type: 'datetime',
+      description: 'When payment was captured',
+    }),
+
+    defineField({
+      name: 'paymentInitiatedAt',
+      title: 'Payment Initiated At',
+      type: 'datetime',
+      description: 'When payment was initiated',
+    }),
+
+    defineField({
+      name: 'paypalOrderId',
+      title: 'PayPal Order ID',
+      type: 'string',
+      description: 'PayPal order identifier',
+    }),
+
+    defineField({
+      name: 'registrationTable',
+      title: 'Registration Table Data',
+      type: 'object',
+      description: 'Additional registration table data',
+      fields: [
+        {
+          name: 'pdfReceiptFile',
+          title: 'PDF Receipt File',
+          type: 'file',
+          options: {
+            accept: '.pdf',
+          },
+        },
+      ],
+    }),
+
+    defineField({
+      name: 'updatedAt',
+      title: 'Updated At',
+      type: 'datetime',
+      description: 'Last update timestamp',
     }),
 
     defineField({
