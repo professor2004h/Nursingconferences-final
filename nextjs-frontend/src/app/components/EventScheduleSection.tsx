@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface Session {
   startTime: string;
@@ -31,6 +31,13 @@ interface EventScheduleSectionProps {
 
 const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleData }) => {
   const [activeDay, setActiveDay] = useState(0);
+
+  // Ensure activeDay is always valid when scheduleData changes
+  useEffect(() => {
+    if (scheduleData?.days?.length && activeDay >= scheduleData.days.length) {
+      setActiveDay(0);
+    }
+  }, [scheduleData, activeDay]);
 
   if (!scheduleData || !scheduleData.isActive || !scheduleData.days?.length) {
     return null;
@@ -84,13 +91,13 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
           overflow: 'hidden',
         }}
       >
-        {scheduleData.days[activeDay] && (
+        {scheduleData.days[activeDay] && activeDay < scheduleData.days.length && (
           <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {/* Date Header - Enhanced with Orange Accent */}
             <div className="bg-white px-2 py-1.5 border-b-2 border-orange-500" style={{ flexShrink: 0 }}>
               <h3 className="text-sm font-medium text-black text-center h-4 flex items-center justify-center">
                 <span className="bg-orange-100 px-3 py-1 rounded-full text-orange-700 border border-orange-200">
-                  {scheduleData.days[activeDay].displayDate}
+                  {scheduleData.days[activeDay]?.displayDate || 'Day ' + (activeDay + 1)}
                 </span>
               </h3>
             </div>
@@ -139,35 +146,41 @@ const EventScheduleSection: React.FC<EventScheduleSectionProps> = ({ scheduleDat
 
               {/* Schedule Content */}
               <div className="space-y-1.5">
-                {scheduleData.days[activeDay].sessions.map((session, sessionIndex) => (
-                  <div
-                    key={sessionIndex}
-                    className="bg-white border border-gray-200 p-2 sm:p-2"
-                  >
-                    <div className="flex items-start gap-3">
-                      {/* Time Block - Enhanced with Orange Accent */}
-                      <div className="flex-shrink-0 w-16 h-8 flex flex-col justify-center text-xs bg-orange-50 border-l-2 border-orange-500 pl-2 rounded-r">
-                        <div className="font-medium leading-tight text-orange-600">{session.startTime}</div>
-                        <div className="leading-tight text-orange-500">{session.endTime}</div>
-                      </div>
+                {scheduleData.days[activeDay]?.sessions?.length > 0 ? (
+                  scheduleData.days[activeDay].sessions.map((session, sessionIndex) => (
+                    <div
+                      key={sessionIndex}
+                      className="bg-white border border-gray-200 p-2 sm:p-2"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Time Block - Enhanced with Orange Accent */}
+                        <div className="flex-shrink-0 w-16 h-8 flex flex-col justify-center text-xs bg-orange-50 border-l-2 border-orange-500 pl-2 rounded-r">
+                          <div className="font-medium leading-tight text-orange-600">{session.startTime || 'TBD'}</div>
+                          <div className="leading-tight text-orange-500">{session.endTime || 'TBD'}</div>
+                        </div>
 
-                      {/* Session Content - Enhanced with Orange Accents */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-black mb-1 leading-tight hover:text-orange-600 transition-colors">
-                          {session.title}
-                        </h4>
-                        {session.description && (
-                          <p className="text-xs text-gray-600 mb-2 leading-tight">
-                            {session.description}
-                          </p>
-                        )}
-                        <span className="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium leading-none border border-orange-200 rounded">
-                          {session.type.replace('-', ' ').toUpperCase()}
-                        </span>
+                        {/* Session Content - Enhanced with Orange Accents */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-black mb-1 leading-tight hover:text-orange-600 transition-colors">
+                            {session.title || 'Untitled Session'}
+                          </h4>
+                          {session.description && (
+                            <p className="text-xs text-gray-600 mb-2 leading-tight">
+                              {session.description}
+                            </p>
+                          )}
+                          <span className="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium leading-none border border-orange-200 rounded">
+                            {(session.type || 'other').replace('-', ' ').toUpperCase()}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="bg-white border border-gray-200 p-4 text-center">
+                    <p className="text-gray-500 text-sm">No sessions scheduled for this day</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
