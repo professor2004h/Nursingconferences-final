@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { ReceiptFileInput } from '../components/CustomFileInput.jsx';
 
 export const conferenceRegistration = defineType({
   name: 'conferenceRegistration',
@@ -276,6 +277,7 @@ export const conferenceRegistration = defineType({
           const { ReceiptFileInput } = require('../components/CustomFileInput.jsx')
           return ReceiptFileInput(props)
         },
+        input: ReceiptFileInput,
       },
       description: 'Generated PDF receipt - opens in new tab when downloaded',
     }),
@@ -326,7 +328,7 @@ export const conferenceRegistration = defineType({
       initialValue: 'draft',
     }),
   ],
-  
+
   orderings: [
     {
       title: 'Registration Date (Newest First)',
