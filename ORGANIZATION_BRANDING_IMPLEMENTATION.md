@@ -84,7 +84,7 @@ brandTagline: {
 - **Status**: ✅ Updated with organization branding fields
 
 ### About Organisation Section (Source)
-- **URL**: https://nursing-conferences-cms.sanity.studio/structure/aboutOrganisation;wbsl4nBMRmMfWuBpBcdmqs
+- **URL**: https://nursingconferences-org-final.sanity.studio/structure/aboutOrganisation;wbsl4nBMRmMfWuBpBcdmqs
 - **Schema**: `aboutUsSection`
 - **Status**: ✅ Contains original organization branding fields
 

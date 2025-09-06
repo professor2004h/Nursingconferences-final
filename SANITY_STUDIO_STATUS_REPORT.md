@@ -13,7 +13,7 @@ The Event Type field is now successfully deployed and available in the Sanity St
 - ✅ Schema validation passed with 0 errors and 0 warnings
 
 ### 2. **Studio Deployment** ✅
-- ✅ Successfully deployed Sanity Studio to cloud: `https://nursing-conferences-cms.sanity.studio/`
+- ✅ Successfully deployed Sanity Studio to cloud: `https://nursingconferences-org-final.sanity.studio/`
 - ✅ Schema deployment completed successfully
 - ✅ Build process completed without errors
 
@@ -25,7 +25,7 @@ The Event Type field is now successfully deployed and available in the Sanity St
 ## 📍 **Current Status**
 
 ### **Sanity Studio Access**
-- **URL**: https://nursing-conferences-cms.sanity.studio/
+- **URL**: https://nursingconferences-org-final.sanity.studio/
 - **Status**: ✅ Deployed and accessible
 - **Schema**: ✅ Updated with eventType field
 
@@ -37,7 +37,7 @@ The Event Type field is now successfully deployed and available in the Sanity St
 
 ## 🎯 **How to Access the Event Type Field**
 
-1. **Open Sanity Studio**: https://nursing-conferences-cms.sanity.studio/
+1. **Open Sanity Studio**: https://nursingconferences-org-final.sanity.studio/
 2. **Navigate to**: Content → Hero Section
 3. **Look for**: "Event Type" field after "Conference Venue"
 4. **Current Value**: "Hybrid event (Online and Offline)"
@@ -62,7 +62,7 @@ The Event Type field is now successfully deployed and available in the Sanity St
 
 ## 🎉 **Expected Result**
 
-When you access the Sanity Studio at https://nursing-conferences-cms.sanity.studio/ and navigate to the Hero Section document, you should see:
+When you access the Sanity Studio at https://nursingconferences-org-final.sanity.studio/ and navigate to the Hero Section document, you should see:
 
 ```
 Conference Title: [field]
@@ -78,7 +78,7 @@ Registration Info: [field]
 
 ## 🚀 **Next Steps**
 
-1. **Access Studio**: Visit https://nursing-conferences-cms.sanity.studio/
+1. **Access Studio**: Visit https://nursingconferences-org-final.sanity.studio/
 2. **Edit Field**: Modify the Event Type as needed
 3. **Verify Frontend**: Check that changes appear on the website
 4. **Test Responsiveness**: Ensure single-line layout works on mobile
