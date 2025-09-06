@@ -5,7 +5,7 @@ console.log('=====================================\n');
 
 // Use the same configuration as the app
 const writeClient = createClient({
-  projectId: 'n3no08m3',
+  projectId: 'zt8218vh',
   dataset: 'production',
   apiVersion: '2023-05-03',
   token: 'skjc5mkFKiTdcpHQsCWU8p2mUXSlrlvzMpb9TiyRBOoKWOwVjGHLcVaD7cdkCopUZK767GIyCj26Qo4nfnout8TpPgACQdKxvsfetjD1RBbpwQJUmcBXMvXtdGDbXze4YTkc3D8uLLJQBYBy920sd2RNQy1TTwTbbyGxzeyDnTyqVkaMLNgC',

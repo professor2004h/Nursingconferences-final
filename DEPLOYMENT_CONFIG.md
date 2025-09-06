@@ -8,10 +8,10 @@ Copy and paste these environment variables into your Coolify deployment:
 
 ```bash
 # Sanity CMS Configuration
-NEXT_PUBLIC_SANITY_PROJECT_ID=n3no08m3
+NEXT_PUBLIC_SANITY_PROJECT_ID=zt8218vh
 NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SANITY_API_VERSION=2023-05-03
-SANITY_API_TOKEN=skIrRjdaaygkwN7mE9JXLLV8IUPfHl2phKAu0umRR5eCLYuRw4oFi4kXfh3kXa0xxHHJZcv451AY6SFMxGuLWbHUMrPjxppFxA0NAFwgrkEZggVUYPJ3jtKA76br4f07USUJMDOR1JQoS7U0vSsiJzCp8q2CwgAcHiksA7H4FrN04Vh3kC3c
+SANITY_API_TOKEN=skJo4iwMzLtavnRYqibHHTzDqOJc5UJTQE9JCv066MM6vWDFE6XEZBnV2XZTzbxE8BKTawmfQhPE2ZPwrLNP7CokAwUlJN5VeQWLuUiLFeZQfyiXeDdkAShynpyk1v4jWmcNAZDvph2QCuCFcJko5q0XAf123nDHp9VF4oRr7NnJh1NkEa6V
 
 # Email Configuration
 SMTP_HOST=smtp.hostinger.com
@@ -64,7 +64,7 @@ Build Context: ./nextjs-frontend
 ### **🔧 Build Environment**
 ```bash
 # Build-time environment variables
-NEXT_PUBLIC_SANITY_PROJECT_ID=n3no08m3
+NEXT_PUBLIC_SANITY_PROJECT_ID=zt8218vh
 NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SANITY_API_VERSION=2023-05-03
 NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key_id_here
@@ -154,7 +154,7 @@ https://nursing-conferences-cms.sanity.studio/structure/registrationSystem;regis
 ```bash
 # Check SANITY_API_TOKEN permissions
 # Verify token has 'Editor' or 'Admin' role
-# Test with: curl -H "Authorization: Bearer $SANITY_API_TOKEN" https://api.sanity.io/v1/projects/n3no08m3
+# Test with: curl -H "Authorization: Bearer $SANITY_API_TOKEN" https://api.sanity.io/v1/projects/zt8218vh
 ```
 
 **2. Email Delivery Issues**

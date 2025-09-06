@@ -2,7 +2,7 @@
 
 ## 🚨 **Issue Identified**
 The brochure download is working on localhost but failing on production due to:
-1. **Wrong Project ID**: Coolify config has `tq1qdk3m` instead of `n3no08m3`
+1. **Wrong Project ID**: Coolify config has `zt8218vh` instead of `zt8218vh`
 2. **Missing API Token**: Production environment lacks `SANITY_API_TOKEN`
 
 ## ✅ **Solution: Update Coolify Environment Variables**
@@ -17,10 +17,10 @@ The brochure download is working on localhost but failing on production due to:
 #### **Critical Updates:**
 ```env
 # Fix Project ID (CHANGE THIS)
-NEXT_PUBLIC_SANITY_PROJECT_ID=n3no08m3
+NEXT_PUBLIC_SANITY_PROJECT_ID=zt8218vh
 
 # Add Missing API Token (ADD THIS)
-SANITY_API_TOKEN=skIrRjdaaygkwN7mE9JXLLV8IUPfHl2phKAu0umRR5eCLYuRw4oFi4kXfh3kXa0xxHHJZcv451AY6SFMxGuLWbHUMrPjxppFxA0NAFwgrkEZggVUYPJ3jtKA76br4f07USUJMDOR1JQoS7U0vSsiJzCp8q2CwgAcHiksA7H4FrN04Vh3kC3c
+SANITY_API_TOKEN=skJo4iwMzLtavnRYqibHHTzDqOJc5UJTQE9JCv066MM6vWDFE6XEZBnV2XZTzbxE8BKTawmfQhPE2ZPwrLNP7CokAwUlJN5VeQWLuUiLFeZQfyiXeDdkAShynpyk1v4jWmcNAZDvph2QCuCFcJko5q0XAf123nDHp9VF4oRr7NnJh1NkEa6V
 ```
 
 #### **Complete Environment Variables List:**
@@ -32,10 +32,10 @@ PORT=3000
 HOSTNAME=0.0.0.0
 
 # Sanity Configuration (CORRECTED)
-NEXT_PUBLIC_SANITY_PROJECT_ID=n3no08m3
+NEXT_PUBLIC_SANITY_PROJECT_ID=zt8218vh
 NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SANITY_API_VERSION=2023-05-03
-SANITY_API_TOKEN=skIrRjdaaygkwN7mE9JXLLV8IUPfHl2phKAu0umRR5eCLYuRw4oFi4kXfh3kXa0xxHHJZcv451AY6SFMxGuLWbHUMrPjxppFxA0NAFwgrkEZggVUYPJ3jtKA76br4f07USUJMDOR1JQoS7U0vSsiJzCp8q2CwgAcHiksA7H4FrN04Vh3kC3c
+SANITY_API_TOKEN=skJo4iwMzLtavnRYqibHHTzDqOJc5UJTQE9JCv066MM6vWDFE6XEZBnV2XZTzbxE8BKTawmfQhPE2ZPwrLNP7CokAwUlJN5VeQWLuUiLFeZQfyiXeDdkAShynpyk1v4jWmcNAZDvph2QCuCFcJko5q0XAf123nDHp9VF4oRr7NnJh1NkEa6V
 
 # PayPal Configuration (existing)
 PAYPAL_CLIENT_ID=AUmI5g_PA8vHr0HSeZq7PukrblnMLeOLQbW60lNHoJGLAqTg3JZjAeracZmAh1WSuuqmZnUIJxLdzGXc
@@ -78,7 +78,7 @@ Test these endpoints after deployment:
 
 3. **Verify Environment Variables**:
    - Ensure no trailing spaces
-   - Confirm exact project ID: `n3no08m3`
+   - Confirm exact project ID: `zt8218vh`
    - Verify API token is complete
 
 ### **Success Indicators:**
@@ -88,7 +88,7 @@ Test these endpoints after deployment:
 - ✅ No "Failed to process" error messages
 
 ## 📋 **Quick Checklist**
-- [ ] Updated `NEXT_PUBLIC_SANITY_PROJECT_ID` to `n3no08m3`
+- [ ] Updated `NEXT_PUBLIC_SANITY_PROJECT_ID` to `zt8218vh`
 - [ ] Added `SANITY_API_TOKEN` environment variable
 - [ ] Triggered new deployment in Coolify
 - [ ] Tested brochure download on production site

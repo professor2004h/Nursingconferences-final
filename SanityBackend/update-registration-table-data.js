@@ -10,7 +10,7 @@ const { createClient } = require('@sanity/client');
 
 // Sanity client configuration with write permissions
 const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'n3no08m3',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'zt8218vh',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2023-05-03',
   useCdn: false, // Don't use CDN for write operations
@@ -27,7 +27,7 @@ async function updateRegistrationTableData() {
     }
     
     console.log('🔗 Connecting to Sanity CMS...');
-    console.log(`📋 Project: ${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'n3no08m3'}`);
+    console.log(`📋 Project: ${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'zt8218vh'}`);
     console.log(`🗄️  Dataset: ${process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'}\n`);
     
     // Fetch all existing registrations

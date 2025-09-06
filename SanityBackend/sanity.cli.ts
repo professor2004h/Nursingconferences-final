@@ -2,10 +2,10 @@ import {defineCliConfig} from 'sanity/cli'
 
 export default defineCliConfig({
   api: {
-    projectId: 'n3no08m3',
+    projectId: 'zt8218vh',
     dataset: 'production'
   },
-  studioHost: 'nursing-conferences-cms',
+  studioHost: 'nursingconferences-org-final',
   /**
    * Enable auto-updates for studios.
    * Learn more at https://www.sanity.io/docs/cli#auto-updates

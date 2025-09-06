@@ -9,10 +9,10 @@ import deskStructure from './deskStructure'
 import './components/GlobalPDFHandler'  // Initialize global PDF handler
 
 export default defineConfig({
-  name: 'default',
-  title: 'Eventapp',
+  name: 'nursingconferences-org-final',
+  title: 'Final Nursing Conferences CMS',
 
-  projectId: 'n3no08m3',
+  projectId: 'zt8218vh',
   dataset: 'production',
   apiVersion: '2023-05-03',
 

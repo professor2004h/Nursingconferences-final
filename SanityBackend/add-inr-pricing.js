@@ -2,7 +2,7 @@ const { createClient } = require('@sanity/client');
 
 // Initialize Sanity client
 const client = createClient({
-  projectId: 'n3no08m3',
+  projectId: 'zt8218vh',
   dataset: 'production',
   useCdn: false,
   // token: process.env.SANITY_API_TOKEN, // Comment out for now to test read access

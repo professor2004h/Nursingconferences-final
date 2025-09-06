@@ -4,18 +4,18 @@ const path = require('path');
 
 // Create Sanity client with editing token first to check project details
 const editingClient = createClient({
-  projectId: 'n3no08m3',
+  projectId: 'zt8218vh',
   dataset: 'production',
-  token: 'skIrRjdaaygkwN7mE9JXLLV8IUPfHl2phKAu0umRR5eCLYuRw4oFi4kXfh3kXa0xxHHJZcv451AY6SFMxGuLWbHUMrPjxppFxA0NAFwgrkEZggVUYPJ3jtKA76br4f07USUJMDOR1JQoS7U0vSsiJzCp8q2CwgAcHiksA7H4FrN04Vh3kC3c',
+  token: 'skJo4iwMzLtavnRYqibHHTzDqOJc5UJTQE9JCv066MM6vWDFE6XEZBnV2XZTzbxE8BKTawmfQhPE2ZPwrLNP7CokAwUlJN5VeQWLuUiLFeZQfyiXeDdkAShynpyk1v4jWmcNAZDvph2QCuCFcJko5q0XAf123nDHp9VF4oRr7NnJh1NkEa6V',
   useCdn: false,
   apiVersion: '2023-05-03'
 });
 
 // Create Sanity client with deployment token
 const deployClient = createClient({
-  projectId: 'n3no08m3',
+  projectId: 'zt8218vh',
   dataset: 'production',
-  token: 'skm5Vr6I3J2tGwXbH5VE34OrEZd2YsVkMv8ZOTvxEhLE2YVsABikeolCIUOyVP3vpBPBu1IcEWaIPyXpoJPUGCtq7PYrMb1tBTlxK3GozsWLLVOrLlbn1htqdDFnLLeBciCS3H13s8UhkYaEOwSBCOIRSZDpC8cpRCphSQw18umo9dfGFGGq',
+  token: 'skJo4iwMzLtavnRYqibHHTzDqOJc5UJTQE9JCv066MM6vWDFE6XEZBnV2XZTzbxE8BKTawmfQhPE2ZPwrLNP7CokAwUlJN5VeQWLuUiLFeZQfyiXeDdkAShynpyk1v4jWmcNAZDvph2QCuCFcJko5q0XAf123nDHp9VF4oRr7NnJh1NkEa6V',
   useCdn: false,
   apiVersion: '2023-05-03'
 });
@@ -29,7 +29,7 @@ async function testConnection() {
     const editingProjects = await editingClient.projects.list();
     console.log('✅ Editing token works! Available projects:', editingProjects.map(p => `${p.displayName} (${p.id})`));
 
-    const project = editingProjects.find(p => p.id === 'n3no08m3');
+    const project = editingProjects.find(p => p.id === 'zt8218vh');
     if (project) {
       console.log('✅ Found target project:', project.displayName);
     }
@@ -43,7 +43,7 @@ async function testConnection() {
     const deployProjects = await deployClient.projects.list();
     console.log('✅ Deployment token works! Available projects:', deployProjects.map(p => `${p.displayName} (${p.id})`));
 
-    const project = deployProjects.find(p => p.id === 'n3no08m3');
+    const project = deployProjects.find(p => p.id === 'zt8218vh');
     if (project) {
       console.log('✅ Found target project with deployment token:', project.displayName);
       console.log('✅ Deployment token is working correctly!');
@@ -54,7 +54,7 @@ async function testConnection() {
       console.log('📝 Note: The studio deployment is managed by Sanity Cloud.');
       console.log('   Your schema changes and content are automatically synced.');
     } else {
-      console.log('❌ Could not find project n3no08m3 with deployment token');
+      console.log('❌ Could not find project zt8218vh with deployment token');
     }
 
   } catch (error) {

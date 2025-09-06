@@ -2,7 +2,7 @@
 const { createClient } = require('@sanity/client');
 
 const client = createClient({
-  projectId: 'tq1qdk3m',
+  projectId: 'zt8218vh',
   dataset: 'production',
   useCdn: false, // Disable CDN to get fresh data
   apiVersion: '2023-05-03',

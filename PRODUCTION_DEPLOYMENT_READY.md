@@ -35,7 +35,7 @@ The complete payment receipt system has been successfully implemented, tested, a
 - **Status**: ✅ Verified and working
 
 ### **✅ Sanity Backend Configuration**
-- **Project ID**: n3no08m3
+- **Project ID**: zt8218vh
 - **Dataset**: production
 - **API Version**: 2023-05-03
 - **Write Token**: ✅ Configured
@@ -121,7 +121,7 @@ EMAIL_FROM_NAME=Intelli Global Conferences
 
 # Sanity Configuration
 SANITY_API_TOKEN=your_sanity_write_token
-NEXT_PUBLIC_SANITY_PROJECT_ID=n3no08m3
+NEXT_PUBLIC_SANITY_PROJECT_ID=zt8218vh
 NEXT_PUBLIC_SANITY_DATASET=production
 NEXT_PUBLIC_SANITY_API_VERSION=2023-05-03
 ```
