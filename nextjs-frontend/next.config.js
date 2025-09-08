@@ -49,6 +49,11 @@ const nextConfig = {
         destination: '/studio',
         permanent: true,
       },
+      {
+        source: '/organizing-committee',
+        destination: '/structure/organizingCommittee',
+        permanent: true,
+      },
     ];
   },
 }

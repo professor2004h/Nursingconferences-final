@@ -268,8 +268,8 @@ export default function Header() {
                 Past Conferences
               </Link>
             )}
-            <Link href="/organizing-committee" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-              Committee
+            <Link href="/structure/organizingCommittee" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+              Organizing Committee
             </Link>
             <Link href="/speakers" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
               Speakers
@@ -339,11 +339,11 @@ export default function Header() {
                 </Link>
               )}
               <Link
-                href="/organizing-committee"
+                href="/structure/organizingCommittee"
                 className="block px-3 py-3 text-gray-700 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Committee
+                Organizing Committee
               </Link>
               <Link
                 href="/speakers"

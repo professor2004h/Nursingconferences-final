@@ -257,6 +257,13 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
         </Link>
       )}
       <Link
+        href="/structure/organizingCommittee"
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+        onClick={handleDropdownLinkClick}
+      >
+        Organizing Committee
+      </Link>
+      <Link
         href="/past-conference-gallery"
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
         onClick={handleDropdownLinkClick}
@@ -720,6 +727,13 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                     {posterPresentersSettings.navigationLabel || 'Poster Presenters'}
                   </Link>
                 )}
+                <Link
+                  href="/structure/organizingCommittee"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  Organizing Committee
+                </Link>
                 <Link
                   href="/past-conference-gallery"
                   className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
