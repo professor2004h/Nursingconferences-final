@@ -133,159 +133,200 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if database update fails
     }
 
-    // Send payment receipt email with REAL PayPal data (non-blocking with enhanced error handling)
-    setImmediate(async () => {
-      try {
-        console.log('📧 Initiating REAL payment receipt email for registration:', registrationId);
-        console.log('🔧 Production email delivery system starting...');
+    // AUTOMATIC PDF GENERATION, EMAIL SENDING, AND SANITY STORAGE
+    // Process immediately after successful payment capture (synchronous execution)
+    try {
+      console.log('🚀 Starting automatic post-payment processing for registration:', registrationId);
+      console.log('📧 Initiating automatic PDF generation, email delivery, and Sanity storage...');
 
-        // Import the updated payment receipt emailer
-        const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
+      // Import the updated payment receipt emailer
+      const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
 
-        // Fetch registration data from Sanity with retry logic and complete field structure
-        let registration = null;
-        let retryCount = 0;
-        const maxRetries = 3;
+      // Fetch registration data from Sanity with retry logic and complete field structure
+      let registration = null;
+      let retryCount = 0;
+      const maxRetries = 3;
 
-        while (!registration && retryCount < maxRetries) {
-          try {
-            registration = await client.fetch(
-              `*[_type == "conferenceRegistration" && _id == $registrationId][0]{
-                _id,
-                registrationId,
-                firstName,
-                lastName,
-                email,
-                phoneNumber,
-                country,
-                address,
-                registrationType,
-                personalDetails,
-                pricing,
-                paymentStatus,
-                registrationDate,
-                pdfReceipt
-              }`,
-              { registrationId }
-            );
+      while (!registration && retryCount < maxRetries) {
+        try {
+          registration = await client.fetch(
+            `*[_type == "conferenceRegistration" && _id == $registrationId][0]{
+              _id,
+              registrationId,
+              firstName,
+              lastName,
+              email,
+              phoneNumber,
+              country,
+              address,
+              registrationType,
+              personalDetails,
+              pricing,
+              paymentStatus,
+              registrationDate,
+              pdfReceipt
+            }`,
+            { registrationId }
+          );
 
-            if (!registration) {
-              retryCount++;
-              console.log(`⚠️ Registration not found, retry ${retryCount}/${maxRetries}...`);
-              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
-            }
-          } catch (fetchError) {
+          if (!registration) {
             retryCount++;
-            console.error(`❌ Error fetching registration (attempt ${retryCount}):`, fetchError);
-            if (retryCount >= maxRetries) throw fetchError;
-            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            console.log(`⚠️ Registration not found, retry ${retryCount}/${maxRetries}...`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
           }
+        } catch (fetchError) {
+          retryCount++;
+          console.error(`❌ Error fetching registration (attempt ${retryCount}):`, fetchError);
+          if (retryCount >= maxRetries) throw fetchError;
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
         }
-
-        if (!registration) {
-          throw new Error(`Registration not found after ${maxRetries} attempts: ${registrationId}`);
-        }
-
-        console.log('✅ Registration data retrieved successfully');
-        console.log('📋 Registration fields:', {
-          _id: registration._id,
-          registrationId: registration.registrationId,
-          email: registration.email || registration.personalDetails?.email,
-          hasPersonalDetails: !!registration.personalDetails
-        });
-
-        // Prepare REAL payment data from PayPal response
-        const realPaymentData = {
-          transactionId: transactionId || capture?.id || 'N/A',
-          orderId: orderId || result.id || 'N/A',
-          amount: amount || capture?.amount?.value || '0',
-          currency: currency || capture?.amount?.currency_code || 'USD',
-          paymentMethod: 'PayPal',
-          paymentDate: new Date().toISOString(),
-          status: status || capture?.status || 'COMPLETED',
-          capturedAt: new Date().toISOString(),
-          paypalOrderId: result.id,
-          paypalCaptureId: capture?.id,
-          paypalStatus: capture?.status
-        };
-
-        // Prepare registration data with correct structure for email system
-        const realRegistrationData = {
-          _id: registration._id, // CRITICAL: Required for PDF storage
-          registrationId: registration.registrationId || registration._id,
-          fullName: `${registration.firstName || registration.personalDetails?.firstName || ''} ${registration.lastName || registration.personalDetails?.lastName || ''}`.trim(),
-          email: registration.email || registration.personalDetails?.email,
-          phone: registration.phoneNumber || registration.personalDetails?.phoneNumber || 'N/A',
-          country: registration.country || registration.personalDetails?.country || 'N/A',
-          address: registration.address || registration.personalDetails?.fullPostalAddress || 'N/A',
-          registrationType: registration.registrationType || 'Regular Registration',
-          numberOfParticipants: '1',
-          // Include original registration object for fallback
-          originalRegistration: registration
-        };
-
-        console.log('📋 Prepared registration data:', {
-          _id: realRegistrationData._id,
-          registrationId: realRegistrationData.registrationId,
-          email: realRegistrationData.email,
-          fullName: realRegistrationData.fullName
-        });
-
-        // Use the correct email field
-        const recipientEmail = realRegistrationData.email;
-
-        if (!recipientEmail) {
-          throw new Error('No email address found for registration');
-        }
-
-        console.log('📧 Sending payment receipt to:', recipientEmail);
-
-        await sendPaymentReceiptEmailWithRealData(
-          realPaymentData,
-          realRegistrationData,
-          recipientEmail
-        );
-
-        console.log('✅ REAL payment receipt email sent successfully for:', registrationId);
-        console.log('📊 Email delivery metrics:', {
-          registrationId,
-          transactionId,
-          recipientEmail: registration.personalDetails?.email,
-          deliveryTime: new Date().toISOString(),
-          environment: process.env.NODE_ENV
-        });
-
-      } catch (emailError) {
-        console.error('⚠️ Failed to send REAL payment receipt email (non-blocking):', {
-          error: emailError instanceof Error ? emailError.message : 'Unknown error',
-          stack: emailError instanceof Error ? emailError.stack : undefined,
-          registrationId,
-          transactionId,
-          recipientEmail: registration?.personalDetails?.email,
-          timestamp: new Date().toISOString(),
-          environment: process.env.NODE_ENV,
-          smtpConfig: {
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            user: process.env.SMTP_USER,
-            hasPassword: !!process.env.SMTP_PASS
-          }
-        });
-
-        // Log specific error types for better debugging
-        if (emailError instanceof Error) {
-          if (emailError.message.includes('SMTP')) {
-            console.error('🔧 SMTP Configuration Issue - Check environment variables and network connectivity');
-          } else if (emailError.message.includes('authentication')) {
-            console.error('🔐 Authentication Issue - Verify SMTP credentials');
-          } else if (emailError.message.includes('timeout')) {
-            console.error('⏱️ Timeout Issue - Check network connectivity and SMTP server availability');
-          }
-        }
-
-        // Email failure doesn't affect payment success
       }
-    });
+
+      if (!registration) {
+        throw new Error(`Registration not found after ${maxRetries} attempts: ${registrationId}`);
+      }
+
+      console.log('✅ Registration data retrieved successfully');
+      console.log('📋 Registration fields:', {
+        _id: registration._id,
+        registrationId: registration.registrationId,
+        email: registration.email || registration.personalDetails?.email,
+        hasPersonalDetails: !!registration.personalDetails
+      });
+
+      // Prepare REAL payment data from PayPal response
+      const realPaymentData = {
+        transactionId: transactionId || capture?.id || 'N/A',
+        orderId: orderId || result.id || 'N/A',
+        amount: amount || capture?.amount?.value || '0',
+        currency: currency || capture?.amount?.currency_code || 'USD',
+        paymentMethod: 'PayPal',
+        paymentDate: new Date().toISOString(),
+        status: status || capture?.status || 'COMPLETED',
+        capturedAt: new Date().toISOString(),
+        paypalOrderId: result.id,
+        paypalCaptureId: capture?.id,
+        paypalStatus: capture?.status
+      };
+
+      // Prepare registration data with correct structure for email system
+      const realRegistrationData = {
+        _id: registration._id, // CRITICAL: Required for PDF storage
+        registrationId: registration.registrationId || registration._id,
+        fullName: `${registration.firstName || registration.personalDetails?.firstName || ''} ${registration.lastName || registration.personalDetails?.lastName || ''}`.trim(),
+        email: registration.email || registration.personalDetails?.email,
+        phone: registration.phoneNumber || registration.personalDetails?.phoneNumber || 'N/A',
+        country: registration.country || registration.personalDetails?.country || 'N/A',
+        address: registration.address || registration.personalDetails?.fullPostalAddress || 'N/A',
+        registrationType: registration.registrationType || 'Regular Registration',
+        numberOfParticipants: '1',
+        // Include original registration object for fallback
+        originalRegistration: registration
+      };
+
+      console.log('📋 Prepared registration data:', {
+        _id: realRegistrationData._id,
+        registrationId: realRegistrationData.registrationId,
+        email: realRegistrationData.email,
+        fullName: realRegistrationData.fullName
+      });
+
+      // Use the correct email field
+      const recipientEmail = realRegistrationData.email;
+
+      if (!recipientEmail) {
+        throw new Error('No email address found for registration');
+      }
+
+      console.log('📧 Automatically sending payment receipt to:', recipientEmail);
+
+      // EXECUTE AUTOMATIC PROCESSING: PDF Generation + Email Delivery + Sanity Storage
+      const emailResult = await sendPaymentReceiptEmailWithRealData(
+        realPaymentData,
+        realRegistrationData,
+        recipientEmail
+      );
+
+      console.log('✅ AUTOMATIC post-payment processing completed successfully:', {
+        registrationId,
+        transactionId,
+        recipientEmail,
+        pdfGenerated: emailResult.pdfGenerated,
+        pdfUploaded: emailResult.pdfUploaded,
+        emailSent: emailResult.success,
+        deliveryTime: new Date().toISOString(),
+        environment: process.env.NODE_ENV
+      });
+
+      // Update registration record to mark automatic processing as completed
+      try {
+        await client
+          .patch(registration._id)
+          .set({
+            automaticProcessingCompleted: true,
+            automaticProcessingCompletedAt: new Date().toISOString(),
+            receiptEmailSentAutomatically: emailResult.success,
+            pdfReceiptGeneratedAutomatically: emailResult.pdfGenerated,
+            pdfReceiptStoredAutomatically: emailResult.pdfUploaded,
+            lastAutomaticProcessingResult: 'success'
+          })
+          .commit();
+        console.log('✅ Registration updated with automatic processing status');
+      } catch (updateError) {
+        console.error('⚠️ Failed to update registration with automatic processing status:', updateError);
+      }
+
+    } catch (emailError) {
+      console.error('⚠️ Automatic post-payment processing failed (non-blocking):', {
+        error: emailError instanceof Error ? emailError.message : 'Unknown error',
+        stack: emailError instanceof Error ? emailError.stack : undefined,
+        registrationId,
+        transactionId,
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        smtpConfig: {
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          user: process.env.SMTP_USER,
+          hasPassword: !!process.env.SMTP_PASS
+        }
+      });
+
+      // Log specific error types for better debugging
+      if (emailError instanceof Error) {
+        if (emailError.message.includes('SMTP')) {
+          console.error('🔧 SMTP Configuration Issue - Check environment variables and network connectivity');
+        } else if (emailError.message.includes('authentication')) {
+          console.error('🔐 Authentication Issue - Verify SMTP credentials');
+        } else if (emailError.message.includes('timeout')) {
+          console.error('⏱️ Timeout Issue - Check network connectivity and SMTP server availability');
+        }
+      }
+
+      // Email failure doesn't affect payment success - payment is still completed
+      console.log('💡 Note: Payment was successful. Customer can use manual "Email PDF Receipt" button as backup.');
+
+      // Update registration record to mark automatic processing as failed
+      try {
+        if (registration?._id) {
+          await client
+            .patch(registration._id)
+            .set({
+              automaticProcessingCompleted: false,
+              automaticProcessingAttemptedAt: new Date().toISOString(),
+              receiptEmailSentAutomatically: false,
+              pdfReceiptGeneratedAutomatically: false,
+              pdfReceiptStoredAutomatically: false,
+              lastAutomaticProcessingResult: 'failed',
+              lastAutomaticProcessingError: emailError instanceof Error ? emailError.message : 'Unknown error'
+            })
+            .commit();
+          console.log('✅ Registration updated with failed automatic processing status');
+        }
+      } catch (updateError) {
+        console.error('⚠️ Failed to update registration with failed processing status:', updateError);
+      }
+    }
 
     return NextResponse.json({
       success: true,
