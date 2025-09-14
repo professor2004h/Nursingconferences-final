@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendPaymentReceiptEmail } from '@/app/services/emailService';
+import { createClient } from '@sanity/client';
 
 /**
  * PayPal Capture Order API Route - Production Version
  * Captures a PayPal order for live payments using production credentials
  */
+
+// Sanity client configuration for reading registration data
+const client = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'zt8218vh',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2023-05-03',
+  useCdn: false,
+  token: process.env.SANITY_API_TOKEN,
+});
+
+// Write client for updating registration records
+const writeClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'zt8218vh',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2023-05-03',
+  useCdn: false,
+  token: process.env.SANITY_API_TOKEN,
+});
 
 interface CaptureOrderRequest {
   orderId: string;
@@ -58,10 +77,23 @@ async function getPayPalAccessToken(): Promise<string | null> {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('💰 Capturing PayPal production payment...');
+    console.log('💰 PayPal Capture Order API called - Starting payment capture process...');
+    console.log('🔧 Environment:', process.env.NODE_ENV);
+    console.log('📧 SMTP Configuration Check:', {
+      hasHost: !!process.env.SMTP_HOST,
+      hasUser: !!process.env.SMTP_USER,
+      hasPass: !!process.env.SMTP_PASS,
+      hasSanityToken: !!process.env.SANITY_API_TOKEN
+    });
 
     const body: CaptureOrderRequest = await request.json();
     const { orderId, registrationId } = body;
+
+    console.log('📋 PayPal capture request data:', {
+      orderId,
+      registrationId,
+      timestamp: new Date().toISOString()
+    });
 
     // Validate request data
     if (!orderId || !registrationId) {
@@ -135,6 +167,8 @@ export async function POST(request: NextRequest) {
 
     // AUTOMATIC PDF GENERATION, EMAIL SENDING, AND SANITY STORAGE
     // Process immediately after successful payment capture (synchronous execution)
+    let registration = null; // Declare outside try block for error handling access
+
     try {
       console.log('🚀 Starting automatic post-payment processing for registration:', registrationId);
       console.log('📧 Initiating automatic PDF generation, email delivery, and Sanity storage...');
@@ -143,7 +177,6 @@ export async function POST(request: NextRequest) {
       const { sendPaymentReceiptEmailWithRealData } = await import('../../../utils/paymentReceiptEmailer');
 
       // Fetch registration data from Sanity with retry logic and complete field structure
-      let registration = null;
       let retryCount = 0;
       const maxRetries = 3;
 
@@ -239,13 +272,27 @@ export async function POST(request: NextRequest) {
       }
 
       console.log('📧 Automatically sending payment receipt to:', recipientEmail);
+      console.log('📋 Payment data for email:', {
+        transactionId: realPaymentData.transactionId,
+        amount: realPaymentData.amount,
+        currency: realPaymentData.currency,
+        paymentMethod: realPaymentData.paymentMethod
+      });
+      console.log('📋 Registration data for email:', {
+        _id: realRegistrationData._id,
+        registrationId: realRegistrationData.registrationId,
+        fullName: realRegistrationData.fullName,
+        email: realRegistrationData.email
+      });
 
       // EXECUTE AUTOMATIC PROCESSING: PDF Generation + Email Delivery + Sanity Storage
+      console.log('🚀 Calling sendPaymentReceiptEmailWithRealData...');
       const emailResult = await sendPaymentReceiptEmailWithRealData(
         realPaymentData,
         realRegistrationData,
         recipientEmail
       );
+      console.log('📧 Email processing result:', emailResult);
 
       console.log('✅ AUTOMATIC post-payment processing completed successfully:', {
         registrationId,
@@ -260,7 +307,7 @@ export async function POST(request: NextRequest) {
 
       // Update registration record to mark automatic processing as completed
       try {
-        await client
+        await writeClient
           .patch(registration._id)
           .set({
             automaticProcessingCompleted: true,
@@ -309,7 +356,7 @@ export async function POST(request: NextRequest) {
       // Update registration record to mark automatic processing as failed
       try {
         if (registration?._id) {
-          await client
+          await writeClient
             .patch(registration._id)
             .set({
               automaticProcessingCompleted: false,
