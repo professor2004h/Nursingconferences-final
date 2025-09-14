@@ -182,8 +182,12 @@ export async function POST(request: NextRequest) {
 
       while (!registration && retryCount < maxRetries) {
         try {
+          console.log(`🔍 Searching for registration with registrationId: ${registrationId} (attempt ${retryCount + 1}/${maxRetries})`);
+
+          // FIXED: Query by registrationId field, not _id field
+          // The registrationId field contains the PayPal Order ID after payment initiation
           registration = await client.fetch(
-            `*[_type == "conferenceRegistration" && _id == $registrationId][0]{
+            `*[_type == "conferenceRegistration" && registrationId == $registrationId][0]{
               _id,
               registrationId,
               firstName,
@@ -197,14 +201,35 @@ export async function POST(request: NextRequest) {
               pricing,
               paymentStatus,
               registrationDate,
-              pdfReceipt
+              pdfReceipt,
+              paypalOrderId
             }`,
             { registrationId }
           );
 
-          if (!registration) {
+          if (registration) {
+            console.log('✅ Registration found successfully:', {
+              _id: registration._id,
+              registrationId: registration.registrationId,
+              email: registration.email || registration.personalDetails?.email,
+              paypalOrderId: registration.paypalOrderId
+            });
+          } else {
             retryCount++;
-            console.log(`⚠️ Registration not found, retry ${retryCount}/${maxRetries}...`);
+            console.log(`⚠️ Registration not found with registrationId: ${registrationId}, retry ${retryCount}/${maxRetries}...`);
+
+            // Debug: Check if there are any registrations with similar IDs
+            const debugResults = await client.fetch(
+              `*[_type == "conferenceRegistration" && (registrationId match "*${registrationId.slice(-8)}*" || paypalOrderId == $registrationId)][0...3]{
+                _id,
+                registrationId,
+                paypalOrderId,
+                personalDetails.email
+              }`,
+              { registrationId }
+            );
+            console.log('🔍 Debug: Similar registrations found:', debugResults);
+
             await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
           }
         } catch (fetchError) {
