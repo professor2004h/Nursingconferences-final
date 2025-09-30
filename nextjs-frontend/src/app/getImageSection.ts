@@ -2,10 +2,35 @@
 
 import { client } from './sanity/client';
 
+export interface CarouselSlide {
+  logo: {
+    asset: {
+      _ref: string;
+      url: string;
+    };
+    hotspot?: {
+      x: number;
+      y: number;
+    };
+  };
+  name: string;
+  description?: string;
+  link?: string;
+  layout: 'top-center' | 'left-right';
+}
+
 export interface ImageSectionData {
   _id: string;
   title?: string;
-  image: {
+  carouselSlides?: CarouselSlide[];
+  carouselSettings?: {
+    autoplay: boolean;
+    autoplaySpeed: number;
+    showDots: boolean;
+    showArrows: boolean;
+  };
+  // Legacy fields for backward compatibility
+  image?: {
     asset: {
       _ref: string;
       url: string;
@@ -17,7 +42,6 @@ export interface ImageSectionData {
       y: number;
     };
   };
-  // NEW: CPD banner image
   cpdImage?: {
     asset?: {
       _ref?: string;
@@ -31,8 +55,6 @@ export interface ImageSectionData {
     };
   };
   layout: {
-    aspectRatio: string;
-    objectFit: string;
     borderRadius: string;
   };
   visibility: {
@@ -46,16 +68,20 @@ export async function getImageSectionContent(): Promise<ImageSectionData | null>
     const query = `*[_type == "imageSection" && visibility.showOnHomepage == true][0]{
       _id,
       title,
-      image{
-        asset->{
-          _ref,
-          url
+      "carouselSlides": carouselSlides[]{
+        "logo": logo{
+          asset->{
+            _ref,
+            url
+          },
+          hotspot
         },
-        alt,
-        caption,
-        hotspot
+        name,
+        description,
+        link,
+        layout
       },
-      // project CPD image exactly like main image
+      carouselSettings,
       "cpdImage": cpdImage{
         asset->{
           _ref,
@@ -85,15 +111,20 @@ export async function getAboutPageImageSection(): Promise<ImageSectionData | nul
     const query = `*[_type == "imageSection" && visibility.showOnAboutPage == true][0]{
       _id,
       title,
-      image{
-        asset->{
-          _ref,
-          url
+      "carouselSlides": carouselSlides[]{
+        "logo": logo{
+          asset->{
+            _ref,
+            url
+          },
+          hotspot
         },
-        alt,
-        caption,
-        hotspot
+        name,
+        description,
+        link,
+        layout
       },
+      carouselSettings,
       "cpdImage": cpdImage{
         asset->{
           _ref,
@@ -123,17 +154,14 @@ export function getDefaultImageSection(): ImageSectionData {
   return {
     _id: 'default',
     title: 'Our Impact',
-    image: {
-      asset: {
-        _ref: 'default',
-        url: '/api/placeholder/600/400', // Fallback placeholder
-      },
-      alt: 'Conference Impact Image',
-      caption: 'Making a difference in the academic community',
+    carouselSlides: [],
+    carouselSettings: {
+      autoplay: true,
+      autoplaySpeed: 5,
+      showDots: true,
+      showArrows: true,
     },
     layout: {
-      aspectRatio: '16/9',
-      objectFit: 'cover',
       borderRadius: 'lg',
     },
     visibility: {

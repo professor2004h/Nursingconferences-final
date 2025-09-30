@@ -90,9 +90,9 @@ export default async function AboutPage() {
       {/* Main Content */}
       <section className="py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            {/* Main Content - Left Column */}
+            <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
                 {about?.title && (
                   <div className="mb-8">
@@ -111,7 +111,7 @@ export default async function AboutPage() {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
                   {about?.description ? (
                     <PortableText value={about.description} />
@@ -122,26 +122,26 @@ export default async function AboutPage() {
                         knowledge group of the society, the students, learners and more on a common ground – to share their knowledge,
                         on the scientific progress that brings along the benefits to humanity and to our existence itself.
                       </p>
-                      
+
                       <p>
-                        Our agile Platform enables stake holders to carry out listing, updating & promoting different events, conferences, 
-                        knowledge sharing sessions, seminars on latest technological advancements, workshops for participants and more. 
-                        With a large group of diverse subscribers from different academic backgrounds, that include subject matter experts, 
+                        Our agile Platform enables stake holders to carry out listing, updating & promoting different events, conferences,
+                        knowledge sharing sessions, seminars on latest technological advancements, workshops for participants and more.
+                        With a large group of diverse subscribers from different academic backgrounds, that include subject matter experts,
                         researchers, academicians and more from across the Globe.
                       </p>
-                      
+
                       <p>
-                        We are the pioneers in connecting people – bringing in the best minds to the table to resolve complex global human concerns 
+                        We are the pioneers in connecting people – bringing in the best minds to the table to resolve complex global human concerns
                         to deliver simple usable solutions. We are in the critical path of bringing scientific innovations to the masses.
                       </p>
-                      
+
                       <p>
-                        Core to our business - are People, a pack of extraordinary associates, who passionately express themselves by providing 
+                        Core to our business - are People, a pack of extraordinary associates, who passionately express themselves by providing
                         an ecosystem that brings best minds together in the quest to solve complex Global concerns.
                       </p>
-                      
+
                       <p>
-                        Enable a Better World - with knowledge sharing among Global Citizens By enabling knowledge sharing platforms, 
+                        Enable a Better World - with knowledge sharing among Global Citizens By enabling knowledge sharing platforms,
                         establishing an ecosystem that sustains today agile demands, promoting collaboration & constructive sharing.
                       </p>
                     </div>
@@ -150,18 +150,13 @@ export default async function AboutPage() {
               </div>
             </div>
 
-            {/* Sidebar */}
+            {/* Right Column - Carousel & CPD Image */}
             <div className="lg:col-span-1">
-              <div className="space-y-8">
-                {/* Image removed to avoid duplicating hero background image */}
-
-                {/* Dynamic Image Section */}
+              <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                {/* Dynamic Image Section - Carousel + CPD */}
                 <ImageSection
                   data={imageSection || getDefaultImageSection()}
-                  className="shadow-lg"
                 />
-
-
               </div>
             </div>
           </div>
