@@ -100,39 +100,57 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
           {currentSlideData && (
             <div className="absolute inset-0 w-full h-full">
               {/* Centered Layout - Large Logo with Name Below */}
-              <div className="flex flex-col items-center justify-center h-full p-4 md:p-8 bg-gradient-to-b from-white/95 to-white/90">
+              <div className="flex flex-col items-center justify-center h-full p-3 md:p-8 bg-gradient-to-b from-white/95 to-white/90">
                 {/* Large Logo - Takes most of the space */}
-                <div className="relative w-52 h-52 md:w-56 md:h-56 mb-3 md:mb-4">
-                  <Image
-                    src={currentSlideData.logo.asset.url}
-                    alt={currentSlideData.name}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 768px) 208px, 224px"
-                    priority
-                  />
-                </div>
+                {currentSlideData.link ? (
+                  <a
+                    href={currentSlideData.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative w-72 h-72 md:w-56 md:h-56 mb-2 md:mb-4 block transition-transform duration-300 hover:scale-105"
+                  >
+                    <Image
+                      src={currentSlideData.logo.asset.url}
+                      alt={currentSlideData.name}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 288px, 224px"
+                      priority
+                    />
+                  </a>
+                ) : (
+                  <div className="relative w-72 h-72 md:w-56 md:h-56 mb-2 md:mb-4">
+                    <Image
+                      src={currentSlideData.logo.asset.url}
+                      alt={currentSlideData.name}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 288px, 224px"
+                      priority
+                    />
+                  </div>
+                )}
 
                 {/* Organization Name - Below Logo */}
-                <div className="text-center max-w-3xl px-4">
+                <div className="text-center max-w-3xl px-2">
                   {currentSlideData.link ? (
                     <a
                       href={currentSlideData.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-base md:text-xl font-bold text-slate-900 hover:text-orange-600 transition-colors duration-300 inline-block"
+                      className="text-xs md:text-xl font-bold text-slate-900 hover:text-orange-600 transition-colors duration-300 inline-block"
                     >
                       {currentSlideData.name}
                     </a>
                   ) : (
-                    <h3 className="text-base md:text-xl font-bold text-slate-900">
+                    <h3 className="text-xs md:text-xl font-bold text-slate-900">
                       {currentSlideData.name}
                     </h3>
                   )}
 
                   {/* Truncated Description */}
                   {currentSlideData.description && (
-                    <p className="mt-2 text-xs md:text-sm text-slate-600 line-clamp-2">
+                    <p className="mt-1 text-[10px] md:text-sm text-slate-600 line-clamp-2">
                       {currentSlideData.description}
                     </p>
                   )}
