@@ -65,11 +65,13 @@ export const freshClient = createClient({
 // Write client with API token for create/update/delete operations
 export const writeClient = createClient(writeClientConfig);
 
-// Log write client status
-if (token) {
-  console.log('✅ Write client configured with API token');
-} else {
-  console.warn('⚠️ Write client configured WITHOUT API token - write operations will fail');
+// Log write client status (only on server side)
+if (typeof window === 'undefined') {
+  if (token) {
+    console.log('✅ Write client configured with API token');
+  } else {
+    console.warn('⚠️ Write client configured WITHOUT API token - write operations will fail');
+  }
 }
 
 // Client specifically for header requests - optimized for speed

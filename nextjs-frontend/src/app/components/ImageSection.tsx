@@ -5,11 +5,23 @@ import Image from 'next/image';
 import { ImageSectionData } from '../getImageSection';
 
 interface ImageSectionProps {
-  data: ImageSectionData;
+  data: ImageSectionData | null;
   className?: string;
 }
 
 const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = '' }) => {
+  // Early return if no data
+  if (!rawData) {
+    console.warn('ImageSection: No data provided');
+    return null;
+  }
+
+  // Validate required fields
+  if (!rawData.image || !rawData.image.asset || !rawData.image.asset.url) {
+    console.error('ImageSection: Missing required image data', rawData);
+    return null;
+  }
+
   // Normalize to ensure cpdImage is present on the object for TypeScript
   const data = rawData as ImageSectionData & {
     cpdImage?: {
@@ -19,6 +31,7 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
       hotspot?: { x: number; y: number };
     };
   };
+
   // Helper function to get aspect ratio class
   const getAspectRatioClass = (ratio: string) => {
     switch (ratio) {
@@ -55,9 +68,9 @@ const ImageSection: React.FC<ImageSectionProps> = ({ data: rawData, className = 
   };
 
   // For CPD banner we want full visibility (no crop), so force contain + fixed aspect
-  const aspectRatioClass = getAspectRatioClass(data.layout.aspectRatio);
-  const borderRadiusClass = getBorderRadiusClass(data.layout.borderRadius);
-  const objectFitClass = getObjectFitClass(data.layout.objectFit);
+  const aspectRatioClass = getAspectRatioClass(data.layout?.aspectRatio || '16/9');
+  const borderRadiusClass = getBorderRadiusClass(data.layout?.borderRadius || 'lg');
+  const objectFitClass = getObjectFitClass(data.layout?.objectFit || 'cover');
   const hasCPD = Boolean(data.cpdImage?.asset?.url);
 
   return (
