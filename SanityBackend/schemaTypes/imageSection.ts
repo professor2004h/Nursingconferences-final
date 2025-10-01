@@ -13,35 +13,123 @@ export default {
       initialValue: 'Our Impact',
     },
     {
-      name: 'image',
-      title: 'Main Section Image (16:9)',
-      type: 'image',
-      description: 'Main image to display in this section (16:9 photo). Recommended size ~1552x874 for exact 16:9.',
-      validation: (Rule: any) => Rule.required(),
-      options: {
-        hotspot: true,
-      },
-      fields: [
+      name: 'carouselSlides',
+      title: 'University/Organization Carousel Slides',
+      type: 'array',
+      description: 'Add multiple university or organization logos with names and links. Each slide will be displayed in 16:9 ratio.',
+      validation: (Rule: any) => Rule.min(1).max(10),
+      of: [
         {
-          name: 'alt',
-          title: 'Alternative Text',
-          type: 'string',
-          description: 'Important for accessibility and SEO',
-          validation: (Rule: any) => Rule.required(),
-        },
-        {
-          name: 'caption',
-          title: 'Caption',
-          type: 'string',
-          description: 'Optional caption to display below the image',
+          type: 'object',
+          title: 'Carousel Slide',
+          fields: [
+            {
+              name: 'logo',
+              title: 'Logo/Image',
+              type: 'image',
+              description: 'University or organization logo (will be displayed in 16:9 container)',
+              validation: (Rule: any) => Rule.required(),
+              options: {
+                hotspot: true,
+              },
+            },
+            {
+              name: 'name',
+              title: 'Organization Name',
+              type: 'string',
+              description: 'Name of the university or organization',
+              validation: (Rule: any) => Rule.required().min(2).max(200),
+            },
+            {
+              name: 'description',
+              title: 'Description',
+              type: 'text',
+              description: 'Short description about the organization (optional)',
+              rows: 3,
+            },
+            {
+              name: 'link',
+              title: 'Website Link',
+              type: 'url',
+              description: 'Link to the organization website (optional)',
+              validation: (Rule: any) =>
+                Rule.uri({
+                  scheme: ['http', 'https'],
+                }),
+            },
+            {
+              name: 'layout',
+              title: 'Slide Layout',
+              type: 'string',
+              description: 'Choose how to display the logo and text',
+              options: {
+                list: [
+                  { title: 'Logo Top - Text Bottom (Centered)', value: 'top-center' },
+                  { title: 'Logo Left - Text Right', value: 'left-right' },
+                ],
+              },
+              initialValue: 'top-center',
+            },
+          ],
+          preview: {
+            select: {
+              title: 'name',
+              subtitle: 'description',
+              media: 'logo',
+            },
+          },
         },
       ],
     },
     {
+      name: 'carouselSettings',
+      title: 'Carousel Settings',
+      type: 'object',
+      description: 'Configure carousel behavior',
+      fields: [
+        {
+          name: 'autoplay',
+          title: 'Auto-play Carousel',
+          type: 'boolean',
+          description: 'Automatically cycle through slides',
+          initialValue: true,
+        },
+        {
+          name: 'autoplaySpeed',
+          title: 'Auto-play Speed (seconds)',
+          type: 'number',
+          description: 'Time to display each slide before moving to next',
+          validation: (Rule: any) => Rule.min(2).max(30),
+          initialValue: 5,
+          hidden: ({ parent }: any) => !parent?.autoplay,
+        },
+        {
+          name: 'showDots',
+          title: 'Show Navigation Dots',
+          type: 'boolean',
+          description: 'Display dots for slide navigation',
+          initialValue: true,
+        },
+        {
+          name: 'showArrows',
+          title: 'Show Navigation Arrows',
+          type: 'boolean',
+          description: 'Display left/right arrows for manual navigation',
+          initialValue: true,
+        },
+      ],
+      initialValue: {
+        autoplay: true,
+        autoplaySpeed: 5,
+        showDots: true,
+        showArrows: true,
+      },
+    },
+    {
       name: 'cpdImage',
-      title: 'CPD Credit Image (1552x531)',
+      title: 'CPD Credit Image (Bottom)',
       type: 'image',
-      description: 'Upload the CPD credit points image (target 1552x531). This will be shown alongside the main image in a gallery layout.',
+      description: 'Upload the CPD credit points image. This will be shown below the carousel. Recommended size: 1552x531 (approx 2.92:1 ratio).',
       options: {
         hotspot: true,
       },
@@ -63,7 +151,6 @@ export default {
       validation: (Rule: any) =>
         Rule.custom((value: any) => {
           if (!value) return true; // optional field
-          // We cannot reliably access image metadata here; provide a friendly pass-through
           return true;
         }).warning('Recommended dimensions are 1552x531 (approx 2.92:1).'),
     },
@@ -73,40 +160,10 @@ export default {
       type: 'object',
       fields: [
         {
-          name: 'aspectRatio',
-          title: 'Main Image Aspect Ratio',
-          type: 'string',
-          description: 'Choose the aspect ratio for the MAIN image display',
-          options: {
-            list: [
-              { title: '16:9 (Widescreen)', value: '16/9' },
-              { title: '4:3 (Standard)', value: '4/3' },
-              { title: '3:2 (Photo)', value: '3/2' },
-              { title: '1:1 (Square)', value: '1/1' },
-              { title: 'Auto (Original)', value: 'auto' },
-            ],
-          },
-          initialValue: '16/9',
-        },
-        {
-          name: 'objectFit',
-          title: 'Main Image Fit',
-          type: 'string',
-          description: 'How the MAIN image should fit within its container',
-          options: {
-            list: [
-              { title: 'Cover (Fill container)', value: 'cover' },
-              { title: 'Contain (Fit within)', value: 'contain' },
-              { title: 'Fill (Stretch)', value: 'fill' },
-            ],
-          },
-          initialValue: 'cover',
-        },
-        {
           name: 'borderRadius',
           title: 'Border Radius',
           type: 'string',
-          description: 'Rounded corners for images in this section',
+          description: 'Rounded corners for carousel slides',
           options: {
             list: [
               { title: 'None', value: 'none' },
@@ -114,41 +171,12 @@ export default {
               { title: 'Medium', value: 'md' },
               { title: 'Large', value: 'lg' },
               { title: 'Extra Large', value: 'xl' },
-              { title: 'Full (Circle/Pill)', value: 'full' },
             ],
           },
           initialValue: 'lg',
         },
-        {
-          name: 'cpdAspectRatio',
-          title: 'CPD Image Aspect Ratio',
-          type: 'string',
-          description: 'Display ratio hint for the CPD image (content is 1552x531 ~ 2.92:1)',
-          options: {
-            list: [
-              { title: 'Auto (Original)', value: 'auto' },
-              { title: '3:1 (Wide banner approx)', value: '3/1' },
-            ],
-          },
-          initialValue: 'auto',
-        },
-        {
-          name: 'galleryStyle',
-          title: 'Gallery Layout',
-          type: 'string',
-          description: 'How the two images should be arranged',
-          options: {
-            list: [
-              { title: 'Side-by-side (2 columns)', value: 'cols' },
-              { title: 'Stacked (Main above CPD)', value: 'stack' },
-            ],
-          },
-          initialValue: 'cols',
-        },
       ],
       initialValue: {
-        aspectRatio: '16/9',
-        objectFit: 'cover',
         borderRadius: 'lg',
       },
     },
@@ -181,22 +209,26 @@ export default {
   preview: {
     select: {
       title: 'title',
-      image: 'image',
-      alt: 'image.alt',
+      slides: 'carouselSlides',
     },
-    prepare({ title, image, alt }: any) {
+    prepare({ title, slides }: any) {
+      const slideCount = slides?.length || 0;
       return {
         title: title || 'Image Section',
-        subtitle: alt || 'No alt text provided',
-        media: image,
+        subtitle: `${slideCount} carousel slide${slideCount !== 1 ? 's' : ''}`,
+        media: slides?.[0]?.logo,
       };
     },
   },
   initialValue: {
     title: 'Our Impact',
+    carouselSettings: {
+      autoplay: true,
+      autoplaySpeed: 5,
+      showDots: true,
+      showArrows: true,
+    },
     layout: {
-      aspectRatio: '16/9',
-      objectFit: 'cover',
       borderRadius: 'lg',
     },
     visibility: {

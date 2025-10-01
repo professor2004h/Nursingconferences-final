@@ -200,8 +200,8 @@ function HomePageContent({
       {/* 3. About Us and Statistics Section */}
       <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div className="animate-fade-in-up">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-stretch">
+            <div className="animate-fade-in-up flex flex-col justify-center">
               <div className="mb-6">
                 <span className="text-orange-500 font-semibold text-lg tracking-wide uppercase">About Us</span>
                 <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mt-2 leading-tight">
@@ -263,11 +263,11 @@ function HomePageContent({
               </div>
             </div>
 
-            <div className="animate-fade-in-up lg:animate-fade-in-right">
+            <div className="animate-fade-in-up lg:animate-fade-in-right flex items-stretch">
               {/* Always render only the dynamic Image Section; do not render About image on homepage */}
               <ImageSection
                 data={safeImageSection}
-                className="shadow-2xl"
+                className="shadow-2xl w-full"
               />
             </div>
           </div>
