@@ -16,6 +16,12 @@ interface ExhibitorsSettings {
   navigationLabel: string;
 }
 
+interface GallerySettings {
+  showGallery: boolean;
+  navigationLabel: string;
+  showOnHomepage: boolean;
+}
+
 interface HeaderClientProps {
   siteSettings: SiteSettings | null;
 }
@@ -33,6 +39,7 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const [posterPresentersSettings, setPosterPresentersSettings] = useState<PosterPresentersSettings | null>(null);
   const [exhibitorsSettings, setExhibitorsSettings] = useState<ExhibitorsSettings | null>(null);
+  const [gallerySettings, setGallerySettings] = useState<GallerySettings | null>(null);
   const [showPastConferences, setShowPastConferences] = useState(false); // Default to false for immediate hiding
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownContentRef = useRef<HTMLDivElement>(null);
@@ -263,13 +270,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
       >
         Organizing Committee
       </Link>
-      <Link
-        href="/past-conference-gallery"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-        onClick={handleDropdownLinkClick}
-      >
-        Gallery
-      </Link>
+      {gallerySettings?.showGallery && (
+        <Link
+          href="/past-conference-gallery"
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+          onClick={handleDropdownLinkClick}
+        >
+          {gallerySettings.navigationLabel || 'Gallery'}
+        </Link>
+      )}
       {siteSettings?.journal?.showJournal && (
         <Link
           href={siteSettings.journal.journalUrl || "/journal"}
@@ -393,6 +402,27 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
     };
 
     fetchExhibitorsSettings();
+  }, []);
+
+  // Fetch gallery settings
+  useEffect(() => {
+    const fetchGallerySettings = async () => {
+      try {
+        const response = await fetch('/api/gallery-settings');
+        const settings = await response.json();
+        setGallerySettings(settings);
+      } catch (error) {
+        console.error('Error fetching gallery settings:', error);
+        // Default to showing gallery if fetch fails
+        setGallerySettings({
+          showGallery: true,
+          navigationLabel: 'Gallery',
+          showOnHomepage: false
+        });
+      }
+    };
+
+    fetchGallerySettings();
   }, []);
 
   // Fetch past conferences visibility setting with periodic refresh
@@ -734,13 +764,15 @@ const HeaderClient = memo(function HeaderClient({ siteSettings }: HeaderClientPr
                 >
                   Organizing Committee
                 </Link>
-                <Link
-                  href="/past-conference-gallery"
-                  className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                  onClick={closeMenu}
-                >
-                  Gallery
-                </Link>
+                {gallerySettings?.showGallery && (
+                  <Link
+                    href="/past-conference-gallery"
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-orange-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={closeMenu}
+                  >
+                    {gallerySettings.navigationLabel || 'Gallery'}
+                  </Link>
+                )}
                 {siteSettings?.journal?.showJournal && (
                   <Link
                     href={siteSettings.journal.journalUrl || "/journal"}

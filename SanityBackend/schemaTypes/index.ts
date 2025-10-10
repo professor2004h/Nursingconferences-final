@@ -42,6 +42,7 @@ import posterPresentersSettings from './posterPresentersSettings';
 
 // Past conference gallery schema
 import pastConferenceGallery from './pastConferenceGallery';
+import gallerySettings from './gallerySettings';
 
  // Media partners schema
 import mediaPartners from './mediaPartners';
@@ -107,6 +108,7 @@ export const schemaTypes = [
   posterPresentersSettings,
   // Past conference gallery schema
   pastConferenceGallery,
+  gallerySettings,
   // Media partners schema
   mediaPartners,
   // Exhibitors schema
